@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Shifts{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Shifts</h1><p>A shift whose end is earlier than its start crosses midnight and belongs to the date it starts.</p></div>
+<a class="btn" href="{{ url_for('admin.shift_form') }}">Add shift</a></div>
+<section class="panel"><div class="table-wrap"><table>
+<thead><tr><th>Code</th><th>Name</th><th>Start</th><th>End</th><th class="num">Late grace</th><th class="num">Early-leave grace</th><th>Working days</th><th>Status</th><th></th></tr></thead>
+<tbody>{% for s in rows %}<tr><td>{{ s.code }}</td><td>{{ s.name }}</td><td>{{ s.start_time }}</td><td>{{ s.end_time }}{% if s.end_time <= s.start_time %} <span class="badge">next day</span>{% endif %}</td>
+<td class="num">{{ s.grace_minutes }} min</td><td class="num">{{ s.early_leave_grace_minutes }} min</td><td>{{ s.workdays.replace(',', ', ') }}</td>
+<td>{% if s.is_active %}<span class="badge ok">Active</span>{% else %}<span class="badge">Inactive</span>{% endif %}</td>
+<td class="actions"><a href="{{ url_for('admin.shift_form', shift_id=s.shift_id) }}">Edit</a></td></tr>{% endfor %}</tbody>
+</table></div></section>
+{% endblock %}

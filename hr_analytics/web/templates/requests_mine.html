@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}My requests{% endblock %}
+{% macro req_status(s) -%}
+<span class="badge {{ {'approved': 'ok', 'pending': 'warn', 'rejected': 'bad', 'cancelled': ''}[s] }}">{{ s }}</span>
+{%- endmacro %}
+{% block content %}
+<div class="page-head"><div><h1>My requests</h1>
+<p>{{ emp.full_name }} · {{ emp.employee_code }} · {{ emp.department_name }}. Requests go to your department manager or HR. Nothing changes in your attendance until a request is approved.</p></div></div>
+
+<div class="grid-2">
+<section class="panel" id="leave">
+  <h2>Request leave</h2>
+  <form method="post" class="form-grid" style="grid-template-columns:1fr 1fr">
+    {{ csrf_field() }}<input type="hidden" name="action" value="new_leave">
+    <div class="field"><label for="lt">Type</label>
+      <select id="lt" name="leave_type">{% for t in leave_types %}<option value="{{ t }}" {% if leave_form.leave_type == t %}selected{% endif %}>{{ t|title }}</option>{% endfor %}</select></div>
+    <div></div>
+    <div class="field"><label for="ls">From</label><input id="ls" name="start_date" type="date" required value="{{ leave_form.start_date or '' }}"></div>
+    <div class="field"><label for="le">To (inclusive)</label><input id="le" name="end_date" type="date" required value="{{ leave_form.end_date or '' }}"></div>
+    <div class="field" style="grid-column:1/-1"><label for="lr">Reason <span class="muted">(required for "other")</span></label>
+      <textarea id="lr" name="reason" maxlength="500" style="min-height:3.5rem">{{ leave_form.reason or '' }}</textarea></div>
+    <div><button class="btn" type="submit">Send leave request</button></div>
+  </form>
+  <p class="help">Up to {{ max_leave }} days per request. Sick leave can be filed after the fact, up to 90 days back.</p>
+</section>
+
+<section class="panel" id="correction">
+  <h2>Report a missed punch</h2>
+  <form method="post" class="form-grid" style="grid-template-columns:1fr 1fr">
+    {{ csrf_field() }}<input type="hidden" name="action" value="new_correction">
+    <div class="field"><label for="pk">What was missed</label>
+      <select id="pk" name="punch_kind">
+        <option value="in" {% if corr_form.punch_kind == 'in' %}selected{% endif %}>Clock-in (arrival)</option>
+        <option value="out" {% if corr_form.punch_kind == 'out' %}selected{% endif %}>Clock-out (leaving)</option>
+      </select></div>
+    <div class="field"><label for="pt">Actual date and time</label><input id="pt" name="punch_time" type="datetime-local" required max="{{ today }}T23:59" value="{{ corr_form.punch_time or '' }}"></div>
+    <div class="field" style="grid-column:1/-1"><label for="cr">What happened</label>
+      <textarea id="cr" name="reason" maxlength="500" required minlength="5" style="min-height:3.5rem" placeholder="e.g. Badge reader at gate 2 was not working">{{ corr_form.reason or '' }}</textarea></div>
+    <div><button class="btn" type="submit">Send correction</button></div>
+  </form>
+  <p class="help">For the last {{ corr_days }} days. Once approved, the punch is added as a manual entry, marked with who approved it, and that day is recalculated. Times that fall outside your shift windows are refused because they would not count for any day.</p>
+</section>
+</div>
+
+<section class="panel" style="margin-top:1.1rem">
+  <div class="panel-head"><h2>My leave requests</h2><span class="small muted">latest first</span></div>
+  {% if leaves %}
+  <div class="table-wrap"><table>
+    <thead><tr><th>Type</th><th>From</th><th>To</th><th class="num">Days</th><th>Status</th><th>Decided by</th><th>Note</th><th></th></tr></thead>
+    <tbody>{% for l in leaves %}
+    <tr><td>{{ l.leave_type|title }}</td><td class="nowrap">{{ l.start_date }}</td><td class="nowrap">{{ l.end_date }}</td>
+      <td class="num">{{ l.calendar_days|int }}</td><td>{{ req_status(l.status) }}</td>
+      <td>{{ l.decided_by or ('HR record' if not l.requested_by else '') }}</td>
+      <td class="small">{{ l.decision_note or l.reason or '' }}</td>
+      <td class="actions">{% if l.can_cancel and l.requested_by %}
+        <form method="post">{{ csrf_field() }}<input type="hidden" name="action" value="cancel_leave"><input type="hidden" name="leave_id" value="{{ l.leave_id }}"><button class="linklike" type="submit">Cancel</button></form>{% endif %}</td></tr>
+    {% endfor %}</tbody></table></div>
+  {% else %}<div class="empty">No leave requests yet.</div>{% endif %}
+</section>
+
+<section class="panel">
+  <div class="panel-head"><h2>My punch corrections</h2><span class="small muted">latest first</span></div>
+  {% if corrections %}
+  <div class="table-wrap"><table>
+    <thead><tr><th>Shift date</th><th>Missed</th><th>Time</th><th>Status</th><th>Reason</th><th>Decided by</th><th>Note</th><th></th></tr></thead>
+    <tbody>{% for c in corrections %}
+    <tr><td class="nowrap">{{ c.shift_date }}</td><td>clock-{{ c.punch_kind }}</td><td class="nowrap">{{ c.punch_time[:16] }}</td>
+      <td>{{ req_status(c.status) }}</td><td class="small">{{ c.reason }}</td><td>{{ c.decided_by or '' }}</td><td class="small">{{ c.decision_note or '' }}</td>
+      <td class="actions">{% if c.status == 'pending' %}
+        <form method="post">{{ csrf_field() }}<input type="hidden" name="action" value="cancel_correction"><input type="hidden" name="correction_id" value="{{ c.correction_id }}"><button class="linklike" type="submit">Withdraw</button></form>{% endif %}</td></tr>
+    {% endfor %}</tbody></table></div>
+  {% else %}<div class="empty">No corrections yet. If a day shows "single punch" or "absent" by mistake, report it above.</div>{% endif %}
+</section>
+{% endblock %}

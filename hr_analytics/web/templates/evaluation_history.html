@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Evaluation history{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Evaluation history</h1><p>{{ ev.employee_code }} {{ ev.full_name }} · {{ ev.period }} · current weighted score {{ '%.2f'|format(ev.weighted_score) }}</p></div></div>
+<section class="panel"><div class="table-wrap"><table>
+<thead><tr><th>When</th><th>By</th><th>Change</th>{% for c in categories %}<th class="num">{{ labels[c] }}</th>{% endfor %}<th class="num">Weighted</th><th>Comments</th></tr></thead>
+<tbody>{% for h in history %}<tr><td class="nowrap">{{ h.changed_at }}</td><td>{{ h.username }}</td><td>{{ h.action }}</td>
+{% for c in categories %}<td class="num">{% if h.old and h.old['score_' ~ c] != h.new['score_' ~ c] %}<span class="muted"><s>{{ h.old['score_' ~ c] }}</s></span> {% endif %}{{ h.new['score_' ~ c] }}</td>{% endfor %}
+<td class="num">{% if h.old %}<span class="muted">{{ '%.2f'|format(h.old.weighted_score) }} to </span>{% endif %}{{ '%.2f'|format(h.new.weighted_score) }}</td>
+<td class="small">{{ h.new.comments or '' }}</td></tr>{% endfor %}</tbody>
+</table></div></section>
+{% endblock %}

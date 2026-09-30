@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Password{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Change password</h1><p>At least 12 characters. The password is stored only as a salted hash.</p></div></div>
+<section class="panel">
+<form method="post" class="form-grid" style="max-width:28rem;grid-template-columns:1fr">
+  {{ csrf_field() }}
+  <div class="field"><label for="cp">Current password</label><input id="cp" name="current_password" type="password" autocomplete="current-password" required></div>
+  <div class="field"><label for="np">New password</label><input id="np" name="new_password" type="password" autocomplete="new-password" minlength="12" required></div>
+  <div class="field"><label for="rp">Repeat new password</label><input id="rp" name="repeat_password" type="password" autocomplete="new-password" minlength="12" required></div>
+  <div><button class="btn" type="submit">Change password</button></div>
+</form>
+</section>
+{% endblock %}

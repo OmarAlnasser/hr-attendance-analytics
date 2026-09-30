@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% from "macros.html" import kpi, dept_select, status_chip %}
+{% block title %}Attendance{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Daily attendance</h1><p>One row per employee per shift date. Night shifts belong to the date they start.</p></div>
+</div>
+<section class="panel">
+<form class="filters" method="get">
+  <div class="field"><label for="start">From</label><input id="start" type="date" name="start" value="{{ f.start }}"></div>
+  <div class="field"><label for="end">To</label><input id="end" type="date" name="end" value="{{ f.end }}"></div>
+  {% if current_user.role != 'employee' %}{{ dept_select(departments, f.department_id) }}{% endif %}
+  <div class="field"><label for="status">Status</label><select id="status" name="status"><option value="">Any</option>
+    {% for s in statuses %}<option value="{{ s }}" {% if f.status == s %}selected{% endif %}>{{ s.replace('_', ' ') }}</option>{% endfor %}</select></div>
+  {% if current_user.role != 'employee' %}<div class="field"><label for="q">Employee</label><input id="q" type="text" name="q" value="{{ f.q }}" placeholder="Code or name"></div>{% endif %}
+  <button class="btn secondary" type="submit">Apply</button>
+  {% set qs = {'start': f.start, 'end': f.end, 'department_id': f.department_id or '', 'status': f.status or '', 'q': f.q} %}
+  <a class="btn quiet" href="{{ url_for('attendance.export', fmt='csv', **qs) }}">Export CSV</a>
+  <a class="btn quiet" href="{{ url_for('attendance.export', fmt='xlsx', **qs) }}">Export Excel</a>
+</form>
+</section>
+
+<div class="kpis">
+  {{ kpi('Attendance rate', k.attendance_rate|pct, '%s of %s expected days'|format(k.attended_days, k.expected_days)) }}
+  {{ kpi('Absence rate', k.absence_rate|pct, '%s absent days'|format(k.absent_days)) }}
+  {{ kpi('Late rate', k.late_rate|pct, '%s late days'|format(k.late_days)) }}
+  {{ kpi('Single-punch days', k.incomplete_rate|pct, '%s of attended days'|format(k.incomplete_days)) }}
+  {{ kpi('Presence span', fmt_num(k.avg_presence_span_hours, 2) ~ ' h', 'first to last punch; not verified hours') }}
+</div>
+{% if f.status %}<p class="small muted">The figures above use every status in the date range; the status filter only narrows the table.</p>{% endif %}
+
+<section class="panel">
+  <div class="panel-head"><h2>{{ '{:,}'.format(total) }} rows</h2>{% if total > max_rows %}<span class="small muted">showing the first {{ max_rows }}; export for the full set</span>{% endif %}</div>
+  {% if rows %}
+  <div class="table-wrap"><table>
+    <thead><tr><th>Shift date</th><th>Employee</th><th>Department</th><th>Shift</th><th>Status</th><th>First punch</th><th>Last punch</th><th class="num">Late min</th><th class="num">Early leave</th><th class="num">Span h</th><th>Notes</th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+      <tr>
+        <td class="nowrap">{{ r.shift_date }}</td>
+        <td><a href="{{ url_for('attendance.employee', employee_id=r.employee_id, period=r.shift_date[:7]) }}">{{ r.employee_code }}</a> {{ r.full_name }}</td>
+        <td>{{ r.department_name }}</td>
+        <td>{{ r.shift_code or '' }}</td>
+        <td>{{ status_chip(r.status, r.is_late) }}</td>
+        <td class="nowrap">{{ (r.first_punch or '')[5:16] }}</td>
+        <td class="nowrap">{{ (r.last_punch or '')[5:16] if r.punch_count > 1 else '' }}</td>
+        <td class="num">{{ r.late_minutes if r.is_late else '' }}</td>
+        <td class="num">{{ r.early_leave_minutes or '' }}</td>
+        <td class="num">{{ '%.2f'|format(r.span_minutes / 60) if r.span_minutes is not none and r.span_minutes == r.span_minutes else '' }}</td>
+        <td class="small">{{ r.leave_type or r.holiday_name or r.notes or '' }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  {% else %}<div class="empty">No rows match these filters.</div>{% endif %}
+</section>
+{% endblock %}

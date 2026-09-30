@@ -1,0 +1,9 @@
+StatusCode,StatusLabel,IsExpected,IsAttended,SortOrder
+present,Present,1,1,1
+incomplete,Incomplete (single punch),1,1,2
+absent,Absent,1,0,3
+leave,Approved leave,0,0,4
+holiday,Public holiday,0,0,5
+day_off,Day off,0,0,6
+pending,Pending (shift not finished),0,0,7
+unscheduled_work,Work on day off / holiday,0,0,8

@@ -1,0 +1,30 @@
+# Render Blueprint: one free web service. The database is external (Supabase PostgreSQL);
+# paste its *Session pooler* connection string into HR_DATABASE_URL when Render asks.
+# Full walkthrough: docs/deployment.md
+services:
+  - type: web
+    name: hr-attendance-analytics
+    runtime: python
+    plan: free
+    region: frankfurt            # keep it close to the Supabase region (eu-central-1)
+    buildCommand: pip install -r requirements.txt
+    # one worker (512 MB on the free plan), threads for concurrency; the app opens a DB connection per request
+    startCommand: gunicorn --workers 1 --threads 4 --timeout 120 --bind 0.0.0.0:$PORT "hr_analytics.web:create_app()"
+    healthCheckPath: /healthz
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.11
+      - key: TZ
+        value: Asia/Riyadh
+      - key: HR_DATABASE_URL
+        sync: false              # secret: entered in the Render dashboard, never committed
+      - key: HR_SECRET_KEY
+        generateValue: true
+      - key: HR_DEMO_MODE
+        value: "1"
+      - key: HR_BEHIND_PROXY
+        value: "1"
+      - key: HR_SESSION_COOKIE_SECURE
+        value: "1"
+      - key: HR_PASSWORD_HASH_METHOD
+        value: "scrypt"

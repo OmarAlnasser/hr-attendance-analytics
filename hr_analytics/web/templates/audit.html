@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Audit log{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Audit log</h1><p>Latest {{ rows|length }} events: sign-ins, imports, processing, evaluations, master-data changes, exports and reports. Read only.</p></div></div>
+<section class="panel"><div class="table-wrap"><table>
+<thead><tr><th>When</th><th>User</th><th>Action</th><th>Record</th><th>Details</th><th>Address</th></tr></thead>
+<tbody>{% for a in rows %}<tr><td class="nowrap">{{ a.occurred_at }}</td><td>{{ a.username or 'system' }}</td><td>{{ a.action.replace('_', ' ') }}</td>
+<td class="nowrap">{{ a.entity }}{% if a.entity_id %} #{{ a.entity_id }}{% endif %}</td><td><pre class="raw">{{ a.details or '' }}</pre></td><td class="small">{{ a.remote_addr or '' }}</td></tr>{% endfor %}</tbody>
+</table></div></section>
+{% endblock %}

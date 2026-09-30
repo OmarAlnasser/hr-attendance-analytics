@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% from "macros.html" import kpi, dept_select %}
+{% block title %}Today{% endblock %}
+{% block head %}{% if live %}<meta http-equiv="refresh" content="60">{% endif %}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{% if live %}<span class="live-dot" aria-hidden="true"></span>Today{% else %}Replay{% endif %}</h1>
+    <p>{{ day.strftime('%A %d %B %Y') }} as of <b>{{ as_of.strftime('%H:%M') }}</b>{% if live %} · refreshes every minute{% else %} · punches after this moment are ignored{% endif %}</p>
+  </div>
+  <form method="get" class="filters" style="display:flex;gap:.6rem;align-items:flex-end;flex-wrap:wrap">
+    <div class="field"><label for="d">Date</label><input id="d" type="date" name="date" value="{{ day.isoformat() }}" max="{{ now.date().isoformat() }}"></div>
+    <div class="field"><label for="t">Time</label><input id="t" type="time" name="time" value="{{ as_of.strftime('%H:%M') }}"></div>
+    {{ dept_select(departments, dept) }}
+    <button class="btn secondary" type="submit">Show</button>
+    {% if not live %}<a class="btn quiet" href="{{ url_for('today.index', department_id=dept) }}">Back to live</a>{% endif %}
+  </form>
+</div>
+
+{% if stale %}
+<div class="flash warning" role="note" style="margin-bottom:1rem">
+  {% if last_punch %}The latest punch received is from <b>{{ last_punch[:16] }}</b>. Punches arrive when a device file is imported, so anyone without a punch after that simply has no data yet. They are not necessarily absent.{% else %}No punches have been imported yet.{% endif %}
+  {% if replay_hint %} <a href="{{ url_for('today.index', date=replay_hint, time='09:30', department_id=dept) }}">Replay {{ replay_hint }} at 09:30</a> to see the board with data.{% endif %}
+  Schedule <code>import-punches</code> every few minutes against the device export folder for a live feed (see README).
+</div>
+{% endif %}
+
+<div class="kpis">
+  {{ kpi('Scheduled to work', scheduled, 'workday shift on this date') }}
+  {{ kpi('In now', cols['in']|length + cols['late']|length, '%s arrived late'|format(cols['late']|length)) }}
+  {{ kpi('Not in yet', cols['missing']|length, 'past start + grace, no punch', alert=(cols['missing']|length > 0 and not stale)) }}
+  {{ kpi('Expected later', cols['later']|length, 'shift not due yet') }}
+  {{ kpi('Clocked out', cols['done']|length, 'in and out recorded') }}
+  {{ kpi('On leave / off', '%s / %s'|format(cols['leave']|length, cols['off']|length), 'approved leave / day off or holiday') }}
+</div>
+
+<div class="board">
+{% for key, title, css in columns %}
+  <section class="col {{ css }}" aria-label="{{ title }}">
+    <h3>{{ title }} <span class="badge">{{ cols[key]|length }}</span></h3>
+    {% if cols[key] %}
+    <ul>{% for r in cols[key] %}
+      <li><span><a href="{{ url_for('attendance.employee', employee_id=r.employee_id, period=day.isoformat()[:7]) }}">{{ r.code }}</a> {{ r.name }} <span class="muted">· {{ r.dept }} {{ r.shift }}</span></span><span class="t">{{ r.detail }}</span></li>
+    {% endfor %}</ul>
+    {% else %}<p class="small muted" style="padding:.4rem .8rem">Nobody.</p>{% endif %}
+  </section>
+{% endfor %}
+</div>
+{% if cols['off'] %}
+<details class="panel" style="margin-top:1rem"><summary><b>Off today ({{ cols['off']|length }})</b> <span class="small muted">weekly day off or public holiday</span></summary>
+<p class="small">{% for r in cols['off'] %}{{ r.code }}{% if not loop.last %}, {% endif %}{% endfor %}</p></details>
+{% endif %}
+<p class="help">Same rules as the monthly figures: late = first punch after shift start + grace. Night shifts appear on the date they start. Nothing on this page is saved; the nightly processing run records the final result.</p>
+{% endblock %}

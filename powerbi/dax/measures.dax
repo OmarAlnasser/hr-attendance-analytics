@@ -1,0 +1,253 @@
+// =====================================================================================
+// HR Attendance & Performance — DAX measures
+// Create a table named _Measures (Enter data, one empty column, then hide the column) and
+// add each measure below to it. Display folders are given in the comments.
+//
+// Definitions are identical to hr_analytics/domain/metrics.py; reconcile with
+// validation/expected_kpis.csv (see powerbi/README.md, "Validation").
+//
+// Blank vs zero: every rate uses DIVIDE(), which returns BLANK when the denominator is 0
+// or blank. A blank rate means "no expected days / no evaluations in this selection",
+// which is different from a 0% rate. Do not wrap rates in +0 or COALESCE(..., 0).
+//
+// Rates are POOLED over days (sum of numerators / sum of denominators), not averages of
+// per-employee or per-department rates. This weights every expected day equally, so
+// departments of different size are comparable and small groups do not dominate totals.
+// Always show [Employees With Records] or [Expected Days] next to a rate.
+// =====================================================================================
+
+
+// ---------------------------------------------------------------- Attendance \ Counts
+// Grain of FactAttendanceDaily: one row per employee per shift date.
+
+Expected Days =
+// Scheduled working day, inside employment, not approved leave, not a public holiday,
+// and the shift had ended when the data were processed (status present/incomplete/absent).
+SUM ( FactAttendanceDaily[IsExpected] )
+
+Attended Days =
+// Expected day with at least one punch (present or incomplete).
+SUM ( FactAttendanceDaily[IsAttended] )
+
+Absent Days =
+SUM ( FactAttendanceDaily[IsAbsent] )
+
+Incomplete Days =
+// Exactly one punch after collapsing near-duplicates (missing IN or OUT).
+SUM ( FactAttendanceDaily[IsIncomplete] )
+
+Late Days =
+// First punch after start + grace, counted only on attended days.
+CALCULATE (
+    COUNTROWS ( FactAttendanceDaily ),
+    FactAttendanceDaily[IsLate] = 1,
+    FactAttendanceDaily[IsAttended] = 1
+)
+
+Early Leave Days =
+CALCULATE (
+    COUNTROWS ( FactAttendanceDaily ),
+    FactAttendanceDaily[EarlyLeaveMinutes] > 0,
+    FactAttendanceDaily[IsAttended] = 1
+)
+
+Leave Days =
+CALCULATE ( COUNTROWS ( FactAttendanceDaily ), FactAttendanceDaily[StatusCode] = "leave" )
+
+Holiday Days =
+CALCULATE ( COUNTROWS ( FactAttendanceDaily ), FactAttendanceDaily[StatusCode] = "holiday" )
+
+Unscheduled Work Days =
+// Punches on a day off or a holiday. Excluded from all rates; shown for transparency.
+CALCULATE ( COUNTROWS ( FactAttendanceDaily ), FactAttendanceDaily[StatusCode] = "unscheduled_work" )
+
+Pending Days =
+// Shift not finished when processed. Never counted as absence.
+CALCULATE ( COUNTROWS ( FactAttendanceDaily ), FactAttendanceDaily[StatusCode] = "pending" )
+
+Employees With Records =
+CALCULATE (
+    DISTINCTCOUNT ( FactAttendanceDaily[EmployeeKey] ),
+    FactAttendanceDaily[IsExpected] = 1
+)
+
+
+// ----------------------------------------------------------------- Attendance \ Rates
+
+Attendance Rate =
+DIVIDE ( [Attended Days], [Expected Days] )
+
+Absence Rate =
+DIVIDE ( [Absent Days], [Expected Days] )
+
+Late Rate =
+// Denominator is ATTENDED days: an absent employee cannot be late.
+DIVIDE ( [Late Days], [Attended Days] )
+
+Incomplete Rate =
+DIVIDE ( [Incomplete Days], [Attended Days] )
+
+Avg Late Minutes =
+// Minutes after the scheduled start, averaged over late days only.
+DIVIDE (
+    CALCULATE (
+        SUM ( FactAttendanceDaily[LateMinutes] ),
+        FactAttendanceDaily[IsLate] = 1,
+        FactAttendanceDaily[IsAttended] = 1
+    ),
+    [Late Days]
+)
+
+Avg Presence Span (h) =
+// First-to-last punch on 'present' days. This is a PRESENCE SPAN, not verified working
+// time: breaks and exits without a punch are unknown. Label visuals accordingly.
+VAR SpanMinutes =
+    CALCULATE ( SUM ( FactAttendanceDaily[PresenceSpanMinutes] ), FactAttendanceDaily[StatusCode] = "present" )
+VAR SpanDays =
+    CALCULATE ( COUNT ( FactAttendanceDaily[PresenceSpanMinutes] ), FactAttendanceDaily[StatusCode] = "present" )
+RETURN
+    DIVIDE ( SpanMinutes, SpanDays ) / 60
+
+Attendance Rate Previous Month =
+CALCULATE ( [Attendance Rate], DATEADD ( DimDate[Date], -1, MONTH ) )
+
+Attendance Rate MoM Change =
+// Percentage points. Blank when either month has no expected days.
+VAR Cur = [Attendance Rate]
+VAR Prev = [Attendance Rate Previous Month]
+RETURN
+    IF ( NOT ISBLANK ( Cur ) && NOT ISBLANK ( Prev ), Cur - Prev )
+
+Small Sample Threshold Value =
+// What-if parameter "Small Sample Threshold" (GENERATESERIES(2, 20, 1), default 5).
+SELECTEDVALUE ( 'Small Sample Threshold'[Small Sample Threshold], 5 )
+
+Small Sample Flag =
+// Use as a text column or a conditional-format rule: "*" = read with caution.
+IF (
+    NOT ISBLANK ( [Expected Days] ) && [Employees With Records] < [Small Sample Threshold Value],
+    "*"
+)
+
+
+// ------------------------------------------------------------ Performance \ Evaluations
+// Grain of FactPerformanceMonthly: one row per employee per evaluated month.
+
+Evaluations =
+COUNTROWS ( FactPerformanceMonthly )
+
+Evaluable Employee Months =
+// Employee-months with at least 10 days of employment (see FactEmployeeMonth).
+CALCULATE ( COUNTROWS ( FactEmployeeMonth ), FactEmployeeMonth[IsEvaluable] = 1 )
+
+Evaluation Coverage =
+DIVIDE ( [Evaluations], [Evaluable Employee Months] )
+
+Avg Weighted Score =
+// Each evaluation's score already uses the weights in force when it was saved (1-5 scale).
+AVERAGE ( FactPerformanceMonthly[WeightedScore] )
+
+Avg Punctuality Score = AVERAGE ( FactPerformanceMonthly[PunctualityScore] )
+Avg Communication Score = AVERAGE ( FactPerformanceMonthly[CommunicationScore] )
+Avg Task Completion Score = AVERAGE ( FactPerformanceMonthly[TaskCompletionScore] )
+Avg Teamwork Score = AVERAGE ( FactPerformanceMonthly[TeamworkScore] )
+
+Avg Score Previous Month =
+CALCULATE ( [Avg Weighted Score], DATEADD ( DimDate[Date], -1, MONTH ) )
+
+Avg Score MoM Change =
+VAR Cur = [Avg Weighted Score]
+VAR Prev = [Avg Score Previous Month]
+RETURN
+    IF ( NOT ISBLANK ( Cur ) && NOT ISBLANK ( Prev ), Cur - Prev )
+
+Low Score Threshold Value =
+// What-if parameter "Low Score Threshold" (GENERATESERIES(1, 5, 0.1), default 3.0).
+// Must match HR_LOW_SCORE_THRESHOLD when comparing with the app or the PDF report.
+SELECTEDVALUE ( 'Low Score Threshold'[Low Score Threshold], 3.0 )
+
+Low Score Count =
+VAR T = [Low Score Threshold Value]
+RETURN
+    CALCULATE (
+        COUNTROWS ( FactPerformanceMonthly ),
+        KEEPFILTERS ( FactPerformanceMonthly[WeightedScore] < T )
+    )
+
+Low Score Rate =
+DIVIDE ( [Low Score Count], [Evaluations] )
+
+
+// ------------------------------------------------- Performance \ Weight scenario (optional)
+// Four what-if parameters (0-100, step 5): 'W Punctuality', 'W Communication',
+// 'W Task Completion', 'W Teamwork'. This recomputes scores under OTHER weights for
+// discussion. It is a scenario, never the official score, and returns BLANK unless the
+// four weights add up to exactly 100.
+
+Scenario Weights Total =
+SELECTEDVALUE ( 'W Punctuality'[W Punctuality], 25 )
+    + SELECTEDVALUE ( 'W Communication'[W Communication], 20 )
+    + SELECTEDVALUE ( 'W Task Completion'[W Task Completion], 35 )
+    + SELECTEDVALUE ( 'W Teamwork'[W Teamwork], 20 )
+
+Scenario Weighted Score =
+VAR WP = SELECTEDVALUE ( 'W Punctuality'[W Punctuality], 25 )
+VAR WC = SELECTEDVALUE ( 'W Communication'[W Communication], 20 )
+VAR WT = SELECTEDVALUE ( 'W Task Completion'[W Task Completion], 35 )
+VAR WW = SELECTEDVALUE ( 'W Teamwork'[W Teamwork], 20 )
+RETURN
+    IF (
+        WP + WC + WT + WW = 100,
+        AVERAGEX (
+            FactPerformanceMonthly,
+            ( FactPerformanceMonthly[PunctualityScore] * WP
+                + FactPerformanceMonthly[CommunicationScore] * WC
+                + FactPerformanceMonthly[TaskCompletionScore] * WT
+                + FactPerformanceMonthly[TeamworkScore] * WW ) / 100
+        )
+    )
+
+
+// ------------------------------------------------------------------ Review \ Rule flags
+// FactReviewFlag: transparent rules computed by the app (not predictions).
+
+Review Flags =
+COUNTROWS ( FactReviewFlag )
+
+Employees Flagged =
+DISTINCTCOUNT ( FactReviewFlag[EmployeeKey] )
+
+
+// ------------------------------------------------------- Review \ Experimental model
+// FactRiskScore: probability that next month's weighted score falls below the threshold.
+// Experimental, for prioritising supportive conversations only. Never for automatic or
+// disciplinary decisions. Empty when the model status is insufficient_data.
+
+Avg Risk Probability =
+AVERAGE ( FactRiskScore[Probability] )
+
+Risk Cutoff Value =
+// What-if parameter "Risk Cutoff" (GENERATESERIES(0.1, 0.9, 0.05), default 0.5).
+SELECTEDVALUE ( 'Risk Cutoff'[Risk Cutoff], 0.5 )
+
+Employees Above Risk Cutoff =
+VAR C = [Risk Cutoff Value]
+RETURN
+    CALCULATE (
+        DISTINCTCOUNT ( FactRiskScore[EmployeeKey] ),
+        KEEPFILTERS ( FactRiskScore[Probability] >= C )
+    )
+
+
+// ---------------------------------------------------------------------- Report labels
+
+Data Label =
+// Put in a card on every page. Reads the export metadata.
+IF (
+    MAX ( ExportInfo[IsSyntheticData] ) = 1,
+    "Synthetic demonstration data - not evidence about any real organisation",
+    "Data exported " & FORMAT ( MAX ( ExportInfo[ExportedAt] ), "yyyy-mm-dd hh:nn" )
+)
+
+Rule Version =
+MAX ( ExportInfo[RuleVersion] )

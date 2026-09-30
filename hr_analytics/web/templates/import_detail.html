@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Import {{ b.batch_id }}{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Import {{ b.batch_id }}: {{ b.source_name }}</h1><p>{{ b.message }}</p></div>
+<a class="btn secondary" href="{{ url_for('imports.index') }}">All imports</a></div>
+<section class="panel">
+<dl class="facts">
+  <dt>Status</dt><dd><span class="badge {{ {'success': 'ok', 'partial': 'warn', 'failed': 'bad'}[b.status] }}">{{ b.status }}</span></dd>
+  <dt>Imported</dt><dd>{{ b.imported_at }}</dd>
+  <dt>File type</dt><dd>{{ b.source_type }}</dd>
+  <dt>Timezone of naive timestamps</dt><dd>{{ b.source_timezone }}</dd>
+  <dt>Device</dt><dd>{{ b.source_device or 'from file' }}</dd>
+  <dt>SHA-256</dt><dd class="small">{{ b.file_sha256 }}</dd>
+  <dt>Rows</dt><dd>{{ '{:,}'.format(b.rows_total) }} read · {{ '{:,}'.format(b.rows_accepted) }} new punches · {{ b.rows_duplicate }} duplicates skipped · {{ b.rows_rejected }} quarantined</dd>
+  <dt>Punch range (organisation time)</dt><dd>{{ b.min_punch_time or '' }} to {{ b.max_punch_time or '' }}</dd>
+</dl>
+</section>
+<section class="panel">
+  <div class="panel-head"><h2>Quarantined rows</h2><span class="small muted">{% for r in reasons %}{{ r.reason_code }} {{ r.n }}{% if not loop.last %}, {% endif %}{% endfor %}</span></div>
+  {% if rejects %}
+  <div class="table-wrap"><table><thead><tr><th class="num">Row</th><th>Reason</th><th>Detail</th><th>Original values</th></tr></thead>
+  <tbody>{% for r in rejects %}<tr><td class="num">{{ r.source_row }}</td><td><span class="badge bad">{{ r.reason_code }}</span></td><td>{{ r.reason_detail }}</td><td><pre class="raw">{{ r.raw_data }}</pre></td></tr>{% endfor %}</tbody></table></div>
+  <p class="help">Fix the rows at the source (for example link the unknown badge to an employee) and import a corrected file; rows already stored will be skipped as duplicates.</p>
+  {% else %}<div class="empty">Every row passed validation.</div>{% endif %}
+</section>
+{% endblock %}

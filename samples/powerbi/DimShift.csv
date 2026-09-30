@@ -1,0 +1,4 @@
+ShiftKey,ShiftCode,ShiftName,StartTime,EndTime,GraceMinutes,CrossesMidnight,Workdays
+1,DAY,Day shift,08:00,16:00,15,0,"SUN,MON,TUE,WED,THU"
+2,EVE,Evening shift,14:00,22:00,10,0,"SUN,MON,TUE,WED,THU"
+3,NIGHT,Night shift,22:00,06:00,15,1,"SUN,MON,TUE,WED,THU"

@@ -1,0 +1,9 @@
+{% if issued %}
+<section class="panel" style="border-color:#EFD39A">
+  <h2>Temporary password{{ 's' if issued|length > 1 }}: shown once</h2>
+  <p class="small">Give each person their password privately. It will not be shown again, and it only opens the Change password page: they must pick their own at first sign-in. If one is lost, use <b>Reset password</b>.</p>
+  <div class="table-wrap"><table><thead><tr><th>Username</th><th>Name</th><th>For</th><th>Temporary password</th></tr></thead><tbody>
+  {% for i in issued %}<tr><td><b>{{ i.username }}</b></td><td>{{ i.name }}</td><td class="small">{{ i.what }}</td><td><span class="pw-once">{{ i.password }}</span></td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endif %}

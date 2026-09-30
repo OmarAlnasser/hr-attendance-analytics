@@ -1,0 +1,42 @@
+# Rebuilds the public demo database every night, so whatever visitors change
+# (approvals, imports, new users...) is undone. It also keeps the free Supabase
+# project active: Supabase pauses free projects after a week without activity.
+#
+# Needs one repository secret:  SUPABASE_DB_URL  (Supabase > Connect > Session pooler URI)
+# Optional repository variable: DEMO_SITE_URL    (e.g. https://hr-attendance-analytics.onrender.com)
+name: demo-reset
+
+on:
+  schedule:
+    - cron: "0 0 * * *"          # 00:00 UTC = 03:00 Riyadh
+  workflow_dispatch:              # "Run workflow" button for a manual reset
+
+concurrency:
+  group: demo-reset
+  cancel-in-progress: false
+
+jobs:
+  reset:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      TZ: Asia/Riyadh
+      HR_DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+      HR_SECRET_KEY: not-used-by-the-cli
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Check the secret is set
+        run: test -n "$HR_DATABASE_URL" || (echo "Add the SUPABASE_DB_URL repository secret" && exit 1)
+      - name: Rebuild the demo (12 full months ending last month)
+        run: |
+          export HR_SYNTHETIC_START=$(date -d "$(date +%Y-%m-01) -12 months" +%Y-%m-01)
+          echo "Synthetic data from $HR_SYNTHETIC_START"
+          python -m hr_analytics demo
+      - name: Wake the web service
+        if: ${{ vars.DEMO_SITE_URL != '' }}
+        run: curl -fsS --retry 5 --retry-delay 20 --max-time 90 "${{ vars.DEMO_SITE_URL }}/healthz"

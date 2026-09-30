@@ -1,0 +1,5 @@
+# crontab -e   (server time zone should be Asia/Riyadh, or adjust the hours)
+# m  h  dom mon dow  command
+30   0  *   *   *    /opt/hr-attendance-analytics/scripts/nightly.sh
+# 06:00 on the 3rd: gives two days for late device exports of the previous month
+0    6  3   *   *    /opt/hr-attendance-analytics/scripts/monthly_report.sh

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Import punches{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Import time-clock punches</h1>
+<p>CSV or Excel with a badge column and an ISO timestamp (for example 2026-08-03 07:58:12, or with an offset such as 2026-08-03T04:58:12Z). Invalid rows are quarantined with a reason; a punch already stored is never stored twice.</p></div></div>
+<div class="grid-2">
+<section class="panel">
+  <h2>Upload a device export</h2>
+  <form method="post" action="{{ url_for('imports.upload') }}" enctype="multipart/form-data" class="form-grid" style="grid-template-columns:1fr">
+    {{ csrf_field() }}
+    <div class="field"><label for="file">File (.csv or .xlsx)</label><input id="file" name="file" type="file" accept=".csv,.xlsx" required></div>
+    <div class="field"><label for="tz">Timezone of timestamps without an offset</label><select id="tz" name="timezone">
+      {% for t in timezones %}<option value="{{ t }}" {% if t == default_tz %}selected{% endif %}>{{ t }}</option>{% endfor %}</select>
+      <span class="help">Timestamps that carry an offset or Z are converted exactly; the rest are read in this zone.</span></div>
+    <div class="field"><label for="device">Device name (if the file has no device column)</label><input id="device" name="device" type="text" maxlength="40"></div>
+    <div><button class="btn" type="submit">Import and process</button></div>
+  </form>
+  <p class="help">Accepted headers include badge_id / Badge No, punch_time / Date Time, device_id / Terminal, punch_type / State. The IN/OUT column is kept for reference only; results use the punch times.</p>
+</section>
+<section class="panel">
+  <h2>Re-process a date range</h2>
+  <p class="small">Rebuilds daily results from stored punches, schedules, holidays and leave, for example after a shift definition changed. Re-running gives the same result.</p>
+  <form method="post" action="{{ url_for('imports.reprocess') }}" class="form-grid" style="grid-template-columns:1fr 1fr">
+    {{ csrf_field() }}
+    <div class="field"><label for="rs">From</label><input id="rs" name="start" type="date" required></div>
+    <div class="field"><label for="re">To</label><input id="re" name="end" type="date" required></div>
+    <div><button class="btn secondary" type="submit">Re-process</button></div>
+  </form>
+  <p class="help">This is a data refresh of the app. Power BI reads the exported files and refreshes separately.</p>
+</section>
+</div>
+<section class="panel" style="margin-top:1.1rem">
+  <h2>Import history</h2>
+  {% if batches %}
+  <div class="table-wrap"><table>
+    <thead><tr><th>#</th><th>File</th><th>Imported</th><th>By</th><th>Status</th><th class="num">Rows</th><th class="num">New punches</th><th class="num">Duplicates</th><th class="num">Quarantined</th><th>Punch range</th></tr></thead>
+    <tbody>{% for b in batches %}<tr>
+      <td><a href="{{ url_for('imports.detail', batch_id=b.batch_id) }}">{{ b.batch_id }}</a></td><td>{{ b.source_name }}</td><td class="nowrap">{{ b.imported_at }}</td><td>{{ b.imported_by or 'command line' }}</td>
+      <td><span class="badge {{ {'success': 'ok', 'partial': 'warn', 'failed': 'bad'}[b.status] }}">{{ b.status }}</span></td>
+      <td class="num">{{ '{:,}'.format(b.rows_total) }}</td><td class="num">{{ '{:,}'.format(b.rows_accepted) }}</td><td class="num">{{ b.rows_duplicate }}</td><td class="num">{{ b.rows_rejected }}</td>
+      <td class="small nowrap">{{ (b.min_punch_time or '')[:16] }} to {{ (b.max_punch_time or '')[:16] }}</td></tr>{% endfor %}</tbody>
+  </table></div>
+  {% else %}<div class="empty">No files imported yet. Upload a device export to begin.</div>{% endif %}
+</section>
+{% endblock %}

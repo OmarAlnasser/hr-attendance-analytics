@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit ' ~ emp.employee_code if emp else 'Add employee' }}{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>{{ 'Edit ' ~ emp.full_name if emp else 'Add employee' }}</h1>
+<p>Changing employment dates or the shift re-processes this employee's attendance for the affected days.</p></div></div>
+<section class="panel">
+<form method="post">
+  {{ csrf_field() }}
+  <div class="form-grid">
+    <div class="field"><label for="employee_code">Employee code</label><input id="employee_code" name="employee_code" type="text" value="{{ form.employee_code or '' }}" required maxlength="20"></div>
+    <div class="field"><label for="badge_id">Time-clock badge ID</label><input id="badge_id" name="badge_id" type="text" value="{{ form.badge_id or '' }}" required maxlength="20"><span class="help">Must match the badge column in device exports.</span></div>
+    <div class="field"><label for="full_name">Full name</label><input id="full_name" name="full_name" type="text" value="{{ form.full_name or '' }}" required maxlength="120"></div>
+    <div class="field"><label for="email">Work email</label><input id="email" name="email" type="email" value="{{ form.email or '' }}"><span class="help">Also used as the Power BI sign-in for row-level security.</span></div>
+    <div class="field"><label for="job_title">Job title</label><input id="job_title" name="job_title" type="text" value="{{ form.job_title or '' }}"></div>
+    <div class="field"><label for="department_id">Department</label><select id="department_id" name="department_id" required><option value="">Choose</option>
+      {% for d in departments %}<option value="{{ d.department_id }}" {% if form.department_id == d.department_id %}selected{% endif %}>{{ d.name }}</option>{% endfor %}</select></div>
+    <div class="field"><label for="hire_date">Hire date</label><input id="hire_date" name="hire_date" type="date" value="{{ form.hire_date or '' }}" required></div>
+    <div class="field"><label for="termination_date">Last working day</label><input id="termination_date" name="termination_date" type="date" value="{{ form.termination_date or '' }}"><span class="help">Leave empty while employed. Days after it are never counted.</span></div>
+    <div class="field"><label for="shift_id">Shift</label><select id="shift_id" name="shift_id" required><option value="">Choose</option>
+      {% for s in shifts %}<option value="{{ s.shift_id }}" {% if form.shift_id == s.shift_id %}selected{% endif %}>{{ s.name }} ({{ s.start_time }} to {{ s.end_time }})</option>{% endfor %}</select></div>
+    <div class="field"><label for="shift_effective_from">Shift applies from</label><input id="shift_effective_from" name="shift_effective_from" type="date" value="{{ form.shift_effective_from or '' }}"><span class="help">Only used when the shift changes. Defaults to the hire date for new employees.</span></div>
+  </div>
+  <div class="btn-row"><button class="btn" type="submit">Save employee</button>
+  <a class="btn quiet" href="{{ url_for('attendance.employee', employee_id=emp.employee_id) if emp else url_for('admin.employees') }}">Cancel</a></div>
+</form>
+</section>
+{% endblock %}

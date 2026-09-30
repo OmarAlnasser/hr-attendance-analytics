@@ -1,0 +1,29 @@
+# Tested with Python 3.12.3 on Linux. pandas 3.x needs Python >= 3.11.
+# Every version below is the exact version the test suite ran against.
+Flask==3.1.3
+Werkzeug==3.1.7
+Jinja2==3.1.6
+MarkupSafe==3.0.3
+itsdangerous==2.2.0
+click==8.3.1
+blinker==1.9.0
+python-dotenv==1.2.2
+pandas==3.0.2
+numpy==2.4.4
+python-dateutil==2.9.0.post0
+openpyxl==3.1.5
+scikit-learn==1.8.0
+scipy==1.17.1
+joblib==1.5.3
+threadpoolctl==3.6.0
+matplotlib==3.10.8
+pillow==12.1.1
+reportlab==4.4.10
+# Windows has no system time-zone database; zoneinfo needs this package there.
+# It could not be installed in the build environment (no network), so this is the only
+# line without an exact tested version.
+tzdata>=2024.1; sys_platform == "win32"
+# --- hosting (v2): PostgreSQL driver and production WSGI server -----------------
+# Only needed when HR_DATABASE_URL / DATABASE_URL points at PostgreSQL, or when served by gunicorn.
+psycopg[binary]==3.3.6
+gunicorn==26.2.0; sys_platform != "win32"

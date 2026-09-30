@@ -1,0 +1,39 @@
+// =====================================================================================
+// Row-level security roles  (Modeling > Manage roles)
+// Filters flow from DimEmployee to every fact table through single-direction,
+// one-to-many relationships, so filtering DimEmployee is enough for all facts.
+// UPNs are stored in lower case by Power Query; LOWER() makes the comparison case-insensitive.
+// =====================================================================================
+
+// ---- Role: HR ------------------------------------------------------------------------
+// Organisation-wide. No table filter. (Same as the app's "hr" role.)
+
+
+// ---- Role: Department Manager --------------------------------------------------------
+// Table: DimEmployee
+VAR Me = LOWER ( USERPRINCIPALNAME () )
+VAR MyDepartments =
+    SELECTCOLUMNS (
+        FILTER ( SecurityManagerDepartment, SecurityManagerDepartment[UserPrincipalName] = Me ),
+        "DepartmentKey", SecurityManagerDepartment[DepartmentKey]
+    )
+RETURN
+    DimEmployee[DepartmentKey] IN MyDepartments
+        || DimEmployee[UserPrincipalName] = Me          // own record, as in the app
+
+// Table: SecurityManagerDepartment   (a manager must not read other managers' mappings)
+SecurityManagerDepartment[UserPrincipalName] = LOWER ( USERPRINCIPALNAME () )
+
+
+// ---- Role: Employee ------------------------------------------------------------------
+// Table: DimEmployee
+DimEmployee[UserPrincipalName] = LOWER ( USERPRINCIPALNAME () )
+
+// Table: SecurityManagerDepartment
+FALSE ()
+
+// Table: FactReviewFlag   (review flags are for HR and managers, as in the app)
+FALSE ()
+
+// Table: FactRiskScore    (experimental model output is never shown to employees)
+FALSE ()

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Shift{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>{{ 'Edit shift' if shift.shift_id else 'Add shift' }}</h1>
+<p>Editing times changes the result of any day that is re-processed later. To keep past results unchanged, create a new shift and assign it to employees from a start date.</p></div></div>
+<section class="panel"><form method="post">
+  {{ csrf_field() }}
+  <div class="form-grid">
+    <div class="field"><label for="code">Code</label><input id="code" name="code" type="text" value="{{ shift.code or '' }}" required maxlength="20"></div>
+    <div class="field"><label for="name">Name</label><input id="name" name="name" type="text" value="{{ shift.name or '' }}" required></div>
+    <div class="field"><label for="start_time">Start</label><input id="start_time" name="start_time" type="time" value="{{ shift.start_time or '' }}" required></div>
+    <div class="field"><label for="end_time">End</label><input id="end_time" name="end_time" type="time" value="{{ shift.end_time or '' }}" required></div>
+    <div class="field"><label for="grace_minutes">Late grace (minutes)</label><input id="grace_minutes" name="grace_minutes" type="number" min="0" max="120" value="{{ shift.grace_minutes }}" required><span class="help">A first punch at exactly start + grace is on time.</span></div>
+    <div class="field"><label for="early">Early-leave grace (minutes)</label><input id="early" name="early_leave_grace_minutes" type="number" min="0" max="120" value="{{ shift.early_leave_grace_minutes }}" required></div>
+    <fieldset class="wide"><legend>Working days</legend><div class="checks">
+      {% for d in ['SUN','MON','TUE','WED','THU','FRI','SAT'] %}<label><input type="checkbox" name="wd_{{ d }}" value="1" {% if d in (shift.workdays or '').split(',') %}checked{% endif %}> {{ d|title }}</label>{% endfor %}
+    </div></fieldset>
+    <div class="checks"><label><input type="checkbox" name="is_active" value="1" {% if shift.is_active %}checked{% endif %}> Active</label></div>
+  </div>
+  <div class="btn-row"><button class="btn" type="submit">Save shift</button><a class="btn quiet" href="{{ url_for('admin.shifts') }}">Cancel</a></div>
+</form></section>
+{% endblock %}

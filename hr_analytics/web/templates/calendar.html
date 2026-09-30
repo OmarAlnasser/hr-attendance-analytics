@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Holidays and leave{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Holidays and approved leave</h1><p>Both are excluded from expected days. Saving a change re-processes the affected days.</p></div></div>
+<div class="grid-2">
+<section class="panel">
+  <h2>Record approved leave</h2>
+  <form method="post" class="form-grid" style="grid-template-columns:1fr 1fr">
+    {{ csrf_field() }}<input type="hidden" name="action" value="add_leave">
+    <div class="field"><label for="ec">Employee code</label><input id="ec" name="employee_code" type="text" required></div>
+    <div class="field"><label for="lt">Type</label><select id="lt" name="leave_type">{% for t in leave_types %}<option value="{{ t }}">{{ t|title }}</option>{% endfor %}</select></div>
+    <div class="field"><label for="ls">From</label><input id="ls" name="start_date" type="date" required></div>
+    <div class="field"><label for="le">To (inclusive)</label><input id="le" name="end_date" type="date" required></div>
+    <div><button class="btn" type="submit">Record leave</button></div>
+  </form>
+</section>
+<section class="panel">
+  <h2>Add or rename a public holiday</h2>
+  <form method="post" class="form-grid" style="grid-template-columns:1fr 1fr">
+    {{ csrf_field() }}<input type="hidden" name="action" value="add_holiday">
+    <div class="field"><label for="hd">Date</label><input id="hd" name="holiday_date" type="date" required></div>
+    <div class="field"><label for="hn">Name</label><input id="hn" name="name" type="text" required maxlength="80"></div>
+    <div><button class="btn" type="submit">Save holiday</button></div>
+  </form>
+  <p class="help">Dates marked "verify" came with the demo data and are approximate; confirm them against the official calendar.</p>
+</section>
+</div>
+<div class="grid-2" style="margin-top:1.1rem">
+<section class="panel">
+  <h2>Holidays</h2>
+  <div class="table-wrap"><table><thead><tr><th>Date</th><th>Name</th><th></th><th></th></tr></thead><tbody>
+  {% for h in holidays|reverse %}<tr><td class="nowrap">{{ h.holiday_date }}</td><td>{{ h.name }}</td><td>{% if h.is_illustrative %}<span class="badge warn">verify</span>{% endif %}</td>
+  <td class="actions"><form method="post">{{ csrf_field() }}<input type="hidden" name="action" value="delete_holiday"><input type="hidden" name="holiday_date" value="{{ h.holiday_date }}"><button class="linklike" type="submit">Remove</button></form></td></tr>
+  {% else %}<tr><td colspan="4" class="muted">No holidays recorded.</td></tr>{% endfor %}</tbody></table></div>
+</section>
+<section class="panel">
+  <h2>Recent leave records</h2>
+  <div class="table-wrap"><table><thead><tr><th>Employee</th><th>Type</th><th>From</th><th>To</th><th>Status</th></tr></thead><tbody>
+  {% for l in leaves %}<tr><td><a href="{{ url_for('attendance.employee', employee_id=l.employee_id, period=l.start_date[:7]) }}">{{ l.employee_code }}</a></td><td>{{ l.leave_type }}</td><td class="nowrap">{{ l.start_date }}</td><td class="nowrap">{{ l.end_date }}</td><td>{{ l.status }}</td></tr>
+  {% else %}<tr><td colspan="5" class="muted">No leave records.</td></tr>{% endfor %}</tbody></table></div>
+</section>
+</div>
+{% endblock %}

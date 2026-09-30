@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% from "macros.html" import kpi, status_chip, period_nav, status_legend %}
+{% block title %}{{ emp.employee_code }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{{ emp.full_name }}</h1>
+    <p>{{ emp.employee_code }} · {{ emp.job_title or 'No title' }} · {{ emp.department_name }}{% if shift %} · {{ shift.name }} {{ shift.start_time }} to {{ shift.end_time }}, grace {{ shift.grace_minutes }} min{% endif %}</p>
+  </div>
+  <div class="btn-row" style="margin:0">
+    {{ period_nav('attendance.employee', period, prev_period, next_period, employee_id=emp.employee_id) }}
+    {% if can_evaluate %}<a class="btn" href="{{ url_for('evaluations.form', employee_id=emp.employee_id, period=period) }}">Evaluate {{ period }}</a>{% endif %}
+    {% if current_user.role == 'hr' %}<a class="btn secondary" href="{{ url_for('admin.employee_form', employee_id=emp.employee_id) }}">Edit record</a>{% endif %}
+    {% if is_self %}<a class="btn secondary" href="{{ url_for('requests.mine') }}">My requests</a>{% endif %}
+  </div>
+</div>
+
+<section class="panel">
+  <div class="panel-head"><h2>{{ period }} day by day</h2><span class="small muted">hired {{ emp.hire_date }}{% if emp.termination_date %} · left {{ emp.termination_date }}{% endif %}</span></div>
+  <div class="ribbon" role="list" aria-label="Attendance per day">
+    {% for d in ribbon %}
+    <div class="day s-{{ d.cls }}{% if d.cls == 'none' %} none{% endif %}{% if d.date.weekday() in (4, 5) %} weekend{% endif %}" role="listitem" title="{{ d.tip }}">
+      <span>{{ d.weekday }}</span><div class="cell"></div><span>{{ d.date.day }}</span>
+      <span class="visually-hidden">{{ d.tip }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  {{ status_legend() }}
+</section>
+
+<div class="kpis">
+  {{ kpi('Attendance rate', k.attendance_rate|pct, '%s of %s expected days'|format(k.attended_days, k.expected_days)) }}
+  {{ kpi('Absent days', k.absent_days, 'unexcused, after shift end') }}
+  {{ kpi('Late days', k.late_days, ('average %s min'|format(fmt_num(k.avg_late_minutes, 0))) if k.late_days else 'none') }}
+  {{ kpi('Single-punch days', k.incomplete_days, 'missing IN or OUT') }}
+  {{ kpi('Leave / holiday', '%s / %s'|format(k.leave_days, k.holiday_days), 'excluded from rates') }}
+</div>
+
+<div class="grid-2">
+  <section class="panel"><div class="panel-head"><h2>Attendance trend</h2></div>{{ att_chart }}</section>
+  <section class="panel"><div class="panel-head"><h2>Weighted score trend</h2></div>{{ score_chart }}</section>
+</div>
+
+<section class="panel" style="margin-top:1.1rem">
+  <div class="panel-head"><h2>Days that need a look</h2><span class="small muted">late, absent, single punch, leave, holidays, work on days off</span></div>
+  {% if detail %}
+  <div class="table-wrap"><table>
+    <thead><tr><th>Date</th><th>Status</th><th>First punch</th><th>Last punch</th><th class="num">Late min</th><th class="num">Early leave min</th><th>Notes</th>{% if is_self %}<th></th>{% endif %}</tr></thead>
+    <tbody>{% for r in detail %}
+      <tr><td class="nowrap">{{ r.shift_date }}</td><td>{{ status_chip(r.status, r.is_late) }}</td>
+      <td class="nowrap">{{ (r.first_punch or '')[5:16] }}</td><td class="nowrap">{{ (r.last_punch or '')[5:16] if r.punch_count > 1 else '' }}</td>
+      <td class="num">{{ r.late_minutes if r.is_late else '' }}</td><td class="num">{{ r.early_leave_minutes or '' }}</td>
+      <td class="small">{{ r.leave_type or r.holiday_name or r.notes or '' }}</td>
+      {% if is_self %}<td class="actions">{% if r.status in ('absent', 'incomplete') and r.shift_date in pending_dates %}<span class="badge warn">correction pending</span>{% elif r.status in ('absent', 'incomplete') %}<a href="{{ url_for('requests.mine', date=r.shift_date, kind='out' if (r.status == 'incomplete' and r.notes and 'missing_out' in r.notes) else 'in', time=(r.scheduled_end if (r.status == 'incomplete' and r.notes and 'missing_out' in r.notes) else r.scheduled_start or '')[11:16]) }}#correction">Report missed punch</a>{% endif %}</td>{% endif %}</tr>{% endfor %}
+    </tbody></table></div>
+  {% else %}<div class="empty">Nothing unusual this month.</div>{% endif %}
+</section>
+
+<section class="panel">
+  <div class="panel-head"><h2>Evaluations, last 12 months</h2><span class="small muted">weights are those in force when each evaluation was saved</span></div>
+  {% if evals %}
+  <div class="table-wrap"><table>
+    <thead><tr><th>Period</th>{% for c in categories %}<th class="num">{{ labels[c] }}</th>{% endfor %}<th class="num">Weighted</th><th>Evaluator</th><th>Comments</th><th></th></tr></thead>
+    <tbody>{% for e in evals %}
+      <tr><td class="nowrap">{{ e.period }}</td>{% for c in categories %}<td class="num">{{ e['score_' ~ c] }}</td>{% endfor %}
+      <td class="num"><b>{{ '%.2f'|format(e.weighted_score) }}</b></td><td>{{ e.evaluator }}</td><td class="small">{{ e.comments or '' }}</td>
+      <td class="actions"><a href="{{ url_for('evaluations.history', evaluation_id=e.evaluation_id) }}">History</a>{% if can_evaluate %} · <a href="{{ url_for('evaluations.form', employee_id=emp.employee_id, period=e.period) }}">Edit</a>{% endif %}</td></tr>{% endfor %}
+    </tbody></table></div>
+  {% else %}<div class="empty">No evaluations recorded in the last 12 months.</div>{% endif %}
+</section>
+
+{% if corrections %}
+<section class="panel">
+  <h2>Punch corrections this month</h2>
+  <div class="table-wrap"><table><thead><tr><th>Shift date</th><th>Missed</th><th>Time</th><th>Status</th><th>Reason</th><th>Decided by</th></tr></thead>
+  <tbody>{% for c in corrections %}<tr><td>{{ c.shift_date }}</td><td>clock-{{ c.punch_kind }}</td><td>{{ c.punch_time[:16] }}</td><td>{{ c.status }}</td><td class="small">{{ c.reason }}</td><td>{{ c.decided_by or '' }}</td></tr>{% endfor %}</tbody></table></div>
+</section>
+{% endif %}
+
+{% if leaves %}
+<section class="panel">
+  <h2>Leave records</h2>
+  <div class="table-wrap"><table><thead><tr><th>Type</th><th>From</th><th>To</th><th>Status</th></tr></thead>
+  <tbody>{% for l in leaves %}<tr><td>{{ l.leave_type }}</td><td>{{ l.start_date }}</td><td>{{ l.end_date }}</td><td>{{ l.status }}</td></tr>{% endfor %}</tbody></table></div>
+  {% if is_self %}<p class="help"><a href="{{ url_for('requests.mine') }}">Request leave or report a missed punch</a></p>{% endif %}
+</section>
+{% endif %}
+{% endblock %}

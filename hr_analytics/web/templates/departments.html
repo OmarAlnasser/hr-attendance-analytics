@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Departments{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Departments</h1><p>The manager of a department sees that department's data, in the app and in Power BI.</p></div>
+<a class="btn" href="{{ url_for('admin.department_form') }}">Add department</a></div>
+<section class="panel"><div class="table-wrap"><table>
+<thead><tr><th>Code</th><th>Name</th><th>Manager</th><th class="num">Current headcount</th><th>Status</th><th></th></tr></thead>
+<tbody>{% for d in rows %}<tr><td>{{ d.code }}</td><td>{{ d.name }}</td><td>{{ d.manager_name or 'None' }}</td><td class="num">{{ d.active_headcount }}</td>
+<td>{% if d.is_active %}<span class="badge ok">Active</span>{% else %}<span class="badge">Inactive</span>{% endif %}</td>
+<td class="actions"><a href="{{ url_for('admin.department_form', department_id=d.department_id) }}">Edit</a></td></tr>{% endfor %}</tbody>
+</table></div></section>
+{% endblock %}

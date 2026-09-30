@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign in · HR Attendance &amp; Performance</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+</head>
+<body>
+<div class="login">
+  <section class="intro">
+    <div>
+      <h1>Attendance and performance, one month at a glance</h1>
+      <p>Time-clock punches become daily results with stated rules; monthly evaluations sit beside them. Flags point to conversations, never to automatic decisions.</p>
+      <div class="ribbon" aria-hidden="true">
+        {% for c in ['present','present','late','present','present','day_off','day_off','present','present','present','incomplete','present','day_off','day_off','leave','leave','present','present','absent','day_off','day_off','present','holiday','present','present','late','day_off','day_off','present','present','present'] %}
+        <div class="day s-{{ c }}"><div class="cell"></div></div>{% endfor %}
+      </div>
+    </div>
+    <p class="small">{% if demo %}Live demo on synthetic data: 120 invented employees, 12 months of punches. Nothing you change is permanent: the data is rebuilt every night.{% else %}Local installation. Demo accounts are created by the seed command.{% endif %}</p>
+  </section>
+  <section class="form-side">
+    <div class="login-stack">
+    {% if demo %}
+    <div class="demo-pick">
+      <h2>Explore the live demo</h2>
+      <p class="small muted">No sign-up. Pick a role to see what that person sees; permissions are enforced on the server.</p>
+      {% for a in demo %}
+      <form method="post" action="{{ url_for('auth.demo_login') }}">
+        {{ csrf_field() }}<input type="hidden" name="username" value="{{ a.username }}">
+        <button class="demo-role r-{{ a.role }}" type="submit">
+          <b>{{ a.label }}</b> <span class="who-name">{{ a.name }} · {{ a.department }}</span>
+          <span class="blurb">{{ a.blurb }}</span>
+        </button>
+      </form>
+      {% endfor %}
+    </div>
+    <details class="other-signin" {% if username or get_flashed_messages() %}open{% endif %}><summary>Sign in with a username and password</summary>
+    {% endif %}
+    <form method="post" autocomplete="on">
+      <h2>Sign in</h2>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}<ul class="flashes">{% for cat, m in messages %}<li class="flash {{ cat }}" role="alert">{{ m }}</li>{% endfor %}</ul>{% endif %}
+      {% endwith %}
+      {{ csrf_field() }}
+      <div class="field"><label for="username">Username</label><input id="username" name="username" type="text" value="{{ username }}" autocomplete="username" required {% if not demo %}autofocus{% endif %}></div>
+      <div class="field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required></div>
+      <button class="btn" type="submit">Sign in</button>
+    </form>
+    {% if demo %}</details>{% endif %}
+    </div>
+  </section>
+</div>
+</body>
+</html>

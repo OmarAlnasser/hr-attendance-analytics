@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Monthly reports{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Monthly PDF reports</h1>
+<p>One report per month and scope. Generating again returns the existing file unless you choose to replace it. Reports are stored on this server; nothing is emailed.</p></div></div>
+<section class="panel">
+  <h2>Generate a report</h2>
+  <form method="post" action="{{ url_for('reports.generate') }}" class="filters">
+    {{ csrf_field() }}
+    <div class="field"><label for="period">Month</label><input id="period" name="period" type="month" value="{{ default_period }}" required></div>
+    <div class="field"><label for="department_id">Scope</label><select id="department_id" name="department_id">
+      {% if current_user.role == 'hr' %}<option value="">All departments</option>{% endif %}
+      {% for d in departments %}<option value="{{ d.department_id }}">{{ d.name }}</option>{% endfor %}</select></div>
+    <div class="checks"><label><input type="checkbox" name="force" value="1"> Replace an existing report</label></div>
+    <button class="btn" type="submit">Generate report</button>
+  </form>
+  <p class="help">Scheduled runs use <code>python -m hr_analytics run-monthly</code> (see scripts/). The same duplicate protection applies.</p>
+</section>
+<section class="panel">
+  <h2>Report runs</h2>
+  {% if runs %}
+  <div class="table-wrap"><table>
+    <thead><tr><th>#</th><th>Month</th><th>Scope</th><th>Status</th><th>Triggered by</th><th>Started</th><th>Finished</th><th></th></tr></thead>
+    <tbody>{% for r in runs %}<tr><td>{{ r.run_id }}</td><td>{{ r.period }}</td><td>{{ r.scope_label }}</td>
+      <td><span class="badge {{ {'success': 'ok', 'failed': 'bad', 'running': 'warn'}.get(r.status, '') }}">{{ r.status }}</span></td>
+      <td>{{ r.triggered_by }}</td><td class="nowrap">{{ r.started_at }}</td><td class="nowrap">{{ r.finished_at or '' }}</td>
+      <td class="actions">{% if r.file_exists and r.status in ('success', 'superseded') %}<a href="{{ url_for('reports.download', run_id=r.run_id) }}">Download PDF</a>{% elif r.status == 'failed' %}<span class="small muted" title="{{ (r.error or '')[:300] }}">failed, see server log</span>{% endif %}</td></tr>{% endfor %}</tbody>
+  </table></div>
+  {% else %}<div class="empty">No reports yet. Generate one above.</div>{% endif %}
+</section>
+{% endblock %}

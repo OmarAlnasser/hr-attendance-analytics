@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% from "macros.html" import status_chip %}
+{% block title %}Approvals{% endblock %}
+{% macro decide_form(kind, id) -%}
+<form method="post" action="{{ url_for('requests.decide') }}" class="decide">
+  {{ csrf_field() }}<input type="hidden" name="kind" value="{{ kind }}"><input type="hidden" name="id" value="{{ id }}">
+  <input type="text" name="note" maxlength="300" placeholder="Note (required to reject)" aria-label="Decision note">
+  <button class="btn" type="submit" name="decision" value="approve">Approve</button>
+  <button class="btn danger" type="submit" name="decision" value="reject">Reject</button>
+</form>
+{%- endmacro %}
+{% block content %}
+<div class="page-head"><div><h1>Approvals</h1>
+<p>{% if current_user.role == 'hr' %}Requests from every department{% else %}Requests from the departments you manage{% endif %}. Your own requests go to someone else. Approving re-processes only the affected days.</p></div></div>
+
+<section class="panel">
+  <div class="panel-head"><h2>Leave waiting for a decision <span class="badge {{ 'warn' if leaves else '' }}">{{ leaves|length }}</span></h2><span class="small muted">oldest request first</span></div>
+  {% if leaves %}
+  <div class="table-wrap"><table>
+    <thead><tr><th>Employee</th><th>Department</th><th>Type</th><th>Dates</th><th class="num">Days</th><th>Reason</th><th>Requested</th><th>Decision</th></tr></thead>
+    <tbody>{% for l in leaves %}
+    <tr><td><a href="{{ url_for('attendance.employee', employee_id=l.employee_id, period=l.start_date[:7]) }}">{{ l.employee_code }}</a><br><span class="small">{{ l.full_name }}</span></td>
+      <td>{{ l.department_name }}</td><td>{{ l.leave_type|title }}</td>
+      <td class="nowrap">{{ l.start_date }}<br><span class="small muted">to {{ l.end_date }}</span>{% if l.start_date <= today %}<br><span class="badge warn" title="Decide soon: attendance for these days is waiting on this decision">already started</span>{% endif %}</td><td class="num">{{ l.calendar_days|int }}</td>
+      <td class="small">{{ l.reason or '' }}</td><td class="small nowrap">{% if l.requested_at %}{{ l.requested_at[:16] }}{% else %}<span class="muted" title="Loaded from an HR file, not filed through the app">imported</span>{% endif %}</td>
+      <td>{{ decide_form('leave', l.leave_id) }}</td></tr>
+    {% endfor %}</tbody></table></div>
+  {% else %}<div class="empty">No leave requests are waiting.</div>{% endif %}
+</section>
+
+<section class="panel">
+  <div class="panel-head"><h2>Missed-punch corrections <span class="badge {{ 'warn' if corrections else '' }}">{{ corrections|length }}</span></h2><span class="small muted">the day's current result is shown so you can judge the request</span></div>
+  {% if corrections %}
+  <div class="table-wrap"><table>
+    <thead><tr><th>Employee</th><th>Shift date</th><th>Missed</th><th>Claimed time</th><th>Day now</th><th>Recorded punches</th><th>Reason</th><th>Decision</th></tr></thead>
+    <tbody>{% for c in corrections %}
+    <tr><td><a href="{{ url_for('attendance.employee', employee_id=c.employee_id, period=c.shift_date[:7]) }}">{{ c.employee_code }}</a><br><span class="small">{{ c.full_name }}</span></td>
+      <td class="nowrap">{{ c.shift_date }}</td><td>clock-{{ c.punch_kind }}</td><td class="nowrap"><b>{{ c.punch_time[11:16] }}</b>{% if c.punch_time[:10] != c.shift_date %} <span class="small muted">({{ c.punch_time[5:10] }})</span>{% endif %}</td>
+      <td>{% if c.day_status %}{{ status_chip(c.day_status) }}{% else %}<span class="muted small">not processed</span>{% endif %}</td>
+      <td class="small nowrap">{{ (c.first_punch or '')[11:16] }}{% if c.punch_count and c.punch_count > 1 %} to {{ (c.last_punch or '')[11:16] }}{% endif %}{% if not c.first_punch %}none{% endif %}</td>
+      <td class="small">{{ c.reason }}</td>
+      <td>{{ decide_form('correction', c.correction_id) }}</td></tr>
+    {% endfor %}</tbody></table></div>
+  {% else %}<div class="empty">No corrections are waiting.</div>{% endif %}
+</section>
+
+<div class="grid-2">
+<section class="panel">
+  <h2>Recently decided leave</h2>
+  <div class="table-wrap"><table><thead><tr><th>Employee</th><th>Dates</th><th>Status</th><th>By</th></tr></thead><tbody>
+  {% for l in recent_leaves %}<tr><td>{{ l.employee_code }}</td><td class="nowrap small">{{ l.start_date }} to {{ l.end_date }}</td><td>{{ l.status }}</td><td>{{ l.decided_by or '—' }}</td></tr>
+  {% else %}<tr><td colspan="4" class="muted">Nothing yet.</td></tr>{% endfor %}</tbody></table></div>
+</section>
+<section class="panel">
+  <h2>Recently decided corrections</h2>
+  <div class="table-wrap"><table><thead><tr><th>Employee</th><th>Punch</th><th>Status</th><th>By</th></tr></thead><tbody>
+  {% for c in recent_corrections %}<tr><td>{{ c.employee_code }}</td><td class="nowrap small">{{ c.punch_time[:16] }} {{ c.punch_kind }}</td><td>{{ c.status }}</td><td>{{ c.decided_by or '' }}</td></tr>
+  {% else %}<tr><td colspan="4" class="muted">Nothing yet.</td></tr>{% endfor %}</tbody></table></div>
+</section>
+</div>
+{% endblock %}
