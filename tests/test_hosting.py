@@ -102,3 +102,18 @@ class StoredFilesTests(WebTestBase, unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class DatabasePasswordTests(unittest.TestCase):
+    def test_password_is_encoded_into_the_url(self):
+        from hr_analytics.config import Settings, with_password
+        base = "postgresql://postgres.abc@aws-1-eu-central-1.pooler.supabase.com:5432/postgres"
+        self.assertEqual(with_password(base, "s3cr@t/pw "),
+                         "postgresql://postgres.abc:s3cr%40t%2Fpw@aws-1-eu-central-1.pooler.supabase.com:5432/postgres")
+        self.assertEqual(with_password(base.replace(".abc@", ".abc:[YOUR-PASSWORD]@"), "x"),
+                         "postgresql://postgres.abc:x@aws-1-eu-central-1.pooler.supabase.com:5432/postgres")
+        full = base.replace(".abc@", ".abc:already@")
+        self.assertEqual(with_password(full, "other"), full, "an explicit password wins")
+        s = Settings.from_env(DATABASE_URL=base, DATABASE_PASSWORD="pw", SECRET_KEY="k")
+        self.assertIn(":pw@", s.db_target)
+        self.assertNotIn("pw", s.db_label)

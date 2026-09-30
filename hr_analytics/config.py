@@ -27,6 +27,19 @@ def _env(name: str, default):
     return raw
 
 
+def with_password(url: str, password: str) -> str:
+    """postgresql://user@host/db + password -> postgresql://user:<encoded>@host/db (unchanged if it has one)."""
+    from urllib.parse import quote
+    scheme, sep, rest = url.partition("://")
+    if not sep or "@" not in rest:
+        return url
+    userinfo, host = rest.rsplit("@", 1)
+    user = userinfo.split(":", 1)[0]
+    if ":" in userinfo and userinfo.split(":", 1)[1] not in ("", "[YOUR-PASSWORD]"):
+        return url                                  # a real password is already there
+    return f"{scheme}://{user}:{quote(password.strip(), safe='')}@{host}"
+
+
 @dataclass
 class Settings:
     # --- security -------------------------------------------------------
@@ -43,6 +56,9 @@ class Settings:
     # When set (postgresql://user:pass@host:5432/db), PostgreSQL is used instead of the SQLite file.
     # DATABASE_URL (without the HR_ prefix, as set by most hosts) is also accepted.
     DATABASE_URL: str = ""
+    # Optional: the password on its own, so the URL (not secret) and the password (secret) can be
+    # stored separately by a host. It is URL-encoded and inserted into DATABASE_URL.
+    DATABASE_PASSWORD: str = ""
     INSTANCE_DIR: str = str(BASE_DIR / "instance")
     DATA_DIR: str = str(BASE_DIR / "data")
     REPORTS_DIR: str = str(BASE_DIR / "output" / "reports")
@@ -95,6 +111,8 @@ class Settings:
         values.update({k: v for k, v in overrides.items() if k in values})
         if not values.get("DATABASE_URL") and os.environ.get("DATABASE_URL") and "DATABASE_URL" not in overrides:
             values["DATABASE_URL"] = os.environ["DATABASE_URL"]
+        if values.get("DATABASE_URL") and values.get("DATABASE_PASSWORD"):
+            values["DATABASE_URL"] = with_password(values["DATABASE_URL"], values["DATABASE_PASSWORD"])
         settings = cls(**values)
         if not settings.SECRET_KEY:
             # The web app warns about this at start-up (see web.create_app).

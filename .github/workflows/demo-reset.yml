@@ -2,8 +2,10 @@
 # (approvals, imports, new users...) is undone. It also keeps the free Supabase
 # project active: Supabase pauses free projects after a week without activity.
 #
-# Needs one repository secret:  SUPABASE_DB_URL  (Supabase > Connect > Session pooler URI)
-# Optional repository variable: DEMO_SITE_URL    (e.g. https://hr-attendance-analytics.onrender.com)
+# Needs:  repository variable SUPABASE_DB_URL       (Supabase > Connect > Session pooler URI, password part optional)
+#         repository secret   SUPABASE_DB_PASSWORD  (the database password on its own)
+#   (or a single secret SUPABASE_DB_URL containing the full URI with the password)
+# Optional repository variable: DEMO_SITE_URL      (e.g. https://hr-attendance-analytics.onrender.com)
 name: demo-reset
 
 on:
@@ -21,7 +23,8 @@ jobs:
     timeout-minutes: 20
     env:
       TZ: Asia/Riyadh
-      HR_DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+      HR_DATABASE_URL: ${{ secrets.SUPABASE_DB_URL || vars.SUPABASE_DB_URL }}
+      HR_DATABASE_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
       HR_SECRET_KEY: not-used-by-the-cli
     steps:
       - uses: actions/checkout@v4
@@ -31,7 +34,7 @@ jobs:
           cache: pip
       - run: pip install -r requirements.txt
       - name: Check the secret is set
-        run: test -n "$HR_DATABASE_URL" || (echo "Add the SUPABASE_DB_URL repository secret" && exit 1)
+        run: test -n "$HR_DATABASE_URL" || (echo "Add the SUPABASE_DB_URL repository variable (or secret)" && exit 1)
       - name: Rebuild the demo (12 full months ending last month)
         run: |
           export HR_SYNTHETIC_START=$(date -d "$(date +%Y-%m-01) -12 months" +%Y-%m-01)

@@ -1,5 +1,6 @@
-# Render Blueprint: one free web service. The database is external (Supabase PostgreSQL);
-# paste its *Session pooler* connection string into HR_DATABASE_URL when Render asks.
+# Render Blueprint: one free web service. The database is external (Supabase PostgreSQL).
+# When Render asks: HR_DATABASE_URL = the Supabase *Session pooler* URI (the password part may be
+# left out), HR_DATABASE_PASSWORD = the database password on its own.
 # Full walkthrough: docs/deployment.md
 services:
   - type: web
@@ -17,7 +18,9 @@ services:
       - key: TZ
         value: Asia/Riyadh
       - key: HR_DATABASE_URL
-        sync: false              # secret: entered in the Render dashboard, never committed
+        sync: false              # entered in the Render dashboard, never committed
+      - key: HR_DATABASE_PASSWORD
+        sync: false              # secret: only the password, kept apart from the URL
       - key: HR_SECRET_KEY
         generateValue: true
       - key: HR_DEMO_MODE
