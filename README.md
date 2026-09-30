@@ -3,7 +3,7 @@
 **Turns raw time-clock punches and monthly evaluations into trustworthy HR metrics, with a live web app, PostgreSQL, PDF reports, an ML early-warning model and a Power BI kit.**
 
 [![tests](https://github.com/OmarAlnasser/hr-attendance-analytics/actions/workflows/tests.yml/badge.svg)](https://github.com/OmarAlnasser/hr-attendance-analytics/actions/workflows/tests.yml)
-&nbsp;**[▶ Live demo](LIVE_URL)**, no sign-up: pick *HR officer*, *Department manager* or *Employee* on the login page.
+&nbsp;**[▶ Live demo](https://hr-attendance-analytics.onrender.com)**, no sign-up: pick *HR officer*, *Department manager* or *Employee* on the login page.
 
 > The demo runs on a free plan: the first visit after a quiet period takes about a minute to wake up. All data is synthetic (120 invented employees, 12 months) and is rebuilt every night, so click anything.
 
@@ -27,7 +27,7 @@
 
 ## Try it in 60 seconds
 
-1. Open the **[live demo](LIVE_URL)** and choose **HR officer**.
+1. Open the **[live demo](https://hr-attendance-analytics.onrender.com)** and choose **HR officer**.
 2. **Today** → press *Replay* in the yellow note to see a real working morning.
 3. **Approvals** → approve a missed-punch correction, then open that employee: the day turns from *single punch* to *present*. Only that one day is recalculated.
 4. Sign out, choose **Department manager**: the same pages now show only one department, and other departments return *403 Not permitted*.
