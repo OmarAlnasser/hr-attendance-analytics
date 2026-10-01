@@ -1,29 +1,29 @@
 {% extends "base.html" %}
-{% from "macros.html" import dept_select, period_nav %}
-{% block title %}Evaluations {{ period }}{% endblock %}
+{% from "macros.html" import dept_select %}
+{% block title %}{{ _('Evaluations') }} {{ period }}{% endblock %}
 {% block content %}
 <div class="page-head">
-  <div><h1>Monthly evaluations</h1><p>{{ done }} of {{ evaluable }} evaluable employees evaluated for {{ period }} (employed at least {{ min_days }} days of the month). You cannot evaluate yourself.</p></div>
+  <div><h1>{{ _('Monthly evaluations') }}</h1><p>{{ _('{done} of {due} employees due an evaluation have one for {period} (an evaluation is due after working at least {days} days of the month). Nobody evaluates their own record.', done=done, due=evaluable, period=period|month, days=min_days) }}</p></div>
   <form class="filters" method="get">
-    <div class="field"><label for="period">Month</label><input id="period" type="month" name="period" value="{{ period }}"></div>
+    <div class="field"><label for="period">{{ _('Month') }}</label><input id="period" type="month" name="period" value="{{ period }}"></div>
     {{ dept_select(departments, dept) }}
-    <button class="btn secondary" type="submit">Apply</button>
+    <button class="btn secondary" type="submit">{{ _('Show') }}</button>
   </form>
 </div>
 <section class="panel">
 {% if rows %}
 <div class="table-wrap"><table>
-  <thead><tr><th>Employee</th><th>Department</th><th class="num">Days employed</th><th>Status</th><th class="num">Weighted score</th><th>Evaluator</th><th></th></tr></thead>
+  <thead><tr><th>{{ _('Employee') }}</th><th>{{ _('Department') }}</th><th class="num">{{ _('Days employed') }}</th><th>{{ _('Status') }}</th><th class="num">{{ _('Weighted score') }}</th><th>{{ _('Evaluated by') }}</th><th></th></tr></thead>
   <tbody>{% for r in rows %}<tr>
-    <td><a href="{{ url_for('attendance.employee', employee_id=r.employee_id, period=period) }}">{{ r.employee_code }}</a> {{ r.full_name }}</td>
-    <td>{{ r.department_name }}</td><td class="num">{{ r.days_employed }}</td>
-    <td>{% if r.evaluation %}<span class="badge ok">Done</span>{% elif r.evaluable %}<span class="badge warn">Missing</span>{% else %}<span class="badge">Not required</span>{% endif %}</td>
-    <td class="num">{% if r.evaluation %}{{ '%.2f'|format(r.evaluation.weighted_score) }}{% if r.evaluation.weighted_score < threshold %} <span class="badge bad">below {{ threshold }}</span>{% endif %}{% endif %}</td>
-    <td>{{ r.evaluation.evaluator if r.evaluation else '' }}</td>
-    <td class="actions">{% if r.can_evaluate %}<a href="{{ url_for('evaluations.form', employee_id=r.employee_id, period=period) }}">{{ 'Edit' if r.evaluation else 'Evaluate' }}</a>{% endif %}
-      {% if r.evaluation %} · <a href="{{ url_for('evaluations.history', evaluation_id=r.evaluation.evaluation_id) }}">History</a>{% endif %}</td>
+    <td><a href="{{ url_for('attendance.employee', employee_id=r.employee_id, period=period) }}">{{ r.employee_code }}</a> {{ loc(r, 'full_name') }}</td>
+    <td>{{ loc(r, 'department_name') }}</td><td class="num">{{ r.days_employed }}</td>
+    <td>{% if r.evaluation %}<span class="badge ok">{{ _('Done') }}</span>{% elif r.evaluable %}<span class="badge warn">{{ _('Not done yet') }}</span>{% else %}<span class="badge">{{ _('Not due') }}</span>{% endif %}</td>
+    <td class="num">{% if r.evaluation %}{{ '%.2f'|format(r.evaluation.weighted_score) }}{% if r.evaluation.weighted_score < threshold %} <span class="badge bad">{{ _('below {t}', t=threshold) }}</span>{% endif %}{% endif %}</td>
+    <td>{{ (loc(r.evaluation, 'evaluator_name') or r.evaluation.evaluator) if r.evaluation else '' }}</td>
+    <td class="actions">{% if r.can_evaluate %}<a href="{{ url_for('evaluations.form', employee_id=r.employee_id, period=period) }}">{{ _('Edit') if r.evaluation else _('Evaluate') }}</a>{% endif %}
+      {% if r.evaluation %} · <a href="{{ url_for('evaluations.history', evaluation_id=r.evaluation.evaluation_id) }}">{{ _('History') }}</a>{% endif %}</td>
   </tr>{% endfor %}</tbody>
 </table></div>
-{% else %}<div class="empty">No employees were employed in this month within your scope.</div>{% endif %}
+{% else %}<div class="empty">{{ _('No one you can see was employed in this month.') }}</div>{% endif %}
 </section>
 {% endblock %}

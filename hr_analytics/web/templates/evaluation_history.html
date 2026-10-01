@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% block title %}Evaluation history{% endblock %}
+{% block title %}{{ _('Evaluation history') }}{% endblock %}
 {% block content %}
-<div class="page-head"><div><h1>Evaluation history</h1><p>{{ ev.employee_code }} {{ ev.full_name }} · {{ ev.period }} · current weighted score {{ '%.2f'|format(ev.weighted_score) }}</p></div></div>
+<div class="page-head"><div><h1>{{ _('Evaluation history') }}</h1><p>{{ ev.employee_code }} {{ loc(ev, 'full_name') }} · {{ ev.period }} · {{ _('current weighted score {s}', s='%.2f'|format(ev.weighted_score)) }}</p></div></div>
 <section class="panel"><div class="table-wrap"><table>
-<thead><tr><th>When</th><th>By</th><th>Change</th>{% for c in categories %}<th class="num">{{ labels[c] }}</th>{% endfor %}<th class="num">Weighted</th><th>Comments</th></tr></thead>
-<tbody>{% for h in history %}<tr><td class="nowrap">{{ h.changed_at }}</td><td>{{ h.username }}</td><td>{{ h.action }}</td>
+<thead><tr><th>{{ _('When') }}</th><th>{{ _('By') }}</th><th>{{ _('Change') }}</th>{% for c in categories %}<th class="num">{{ _(labels[c]) }}</th>{% endfor %}<th class="num">{{ _('Weighted score') }}</th><th>{{ _('Comments') }}</th></tr></thead>
+<tbody>{% for h in history %}<tr><td class="nowrap">{{ h.changed_at }}</td><td>{{ h.username }}</td><td>{{ _('First saved') if h.action == 'create' else _('Changed') }}</td>
 {% for c in categories %}<td class="num">{% if h.old and h.old['score_' ~ c] != h.new['score_' ~ c] %}<span class="muted"><s>{{ h.old['score_' ~ c] }}</s></span> {% endif %}{{ h.new['score_' ~ c] }}</td>{% endfor %}
-<td class="num">{% if h.old %}<span class="muted">{{ '%.2f'|format(h.old.weighted_score) }} to </span>{% endif %}{{ '%.2f'|format(h.new.weighted_score) }}</td>
-<td class="small">{{ h.new.comments or '' }}</td></tr>{% endfor %}</tbody>
+<td class="num">{% if h.old %}<span class="muted">{{ '%.2f'|format(h.old.weighted_score) }} → </span>{% endif %}{{ '%.2f'|format(h.new.weighted_score) }}</td>
+<td class="small">{{ _(h.new.comments) if h.new.comments else '' }}</td></tr>{% endfor %}</tbody>
 </table></div></section>
 {% endblock %}

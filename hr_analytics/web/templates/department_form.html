@@ -1,17 +1,18 @@
 {% extends "base.html" %}
-{% block title %}Department{% endblock %}
+{% block title %}{{ _('Department') }}{% endblock %}
 {% block content %}
-<div class="page-head"><div><h1>{{ 'Edit department' if dept.department_id else 'Add department' }}</h1>
-<p>Setting a manager gives that person's account the department manager role; removing it returns the account to the employee role. HR accounts are not changed.</p></div></div>
+<div class="page-head"><div><h1>{{ _('Edit department') if dept.department_id else _('Add department') }}</h1>
+<p>{{ _("Choosing a manager gives that person's account the department manager role; removing them returns it to the employee role. HR and General Manager accounts are not changed.") }}</p></div></div>
 <section class="panel"><form method="post">
   {{ csrf_field() }}
   <div class="form-grid">
-    <div class="field"><label for="code">Code</label><input id="code" name="code" type="text" value="{{ dept.code or '' }}" required maxlength="20"></div>
-    <div class="field"><label for="name">Name</label><input id="name" name="name" type="text" value="{{ dept.name or '' }}" required maxlength="80"></div>
-    <div class="field"><label for="manager_employee_id">Manager</label><select id="manager_employee_id" name="manager_employee_id"><option value="">No manager</option>
-      {% for c in candidates %}<option value="{{ c.employee_id }}" {% if dept.manager_employee_id == c.employee_id %}selected{% endif %}>{{ c.employee_code }} {{ c.full_name }}</option>{% endfor %}</select></div>
-    <div class="checks"><label><input type="checkbox" name="is_active" value="1" {% if dept.is_active %}checked{% endif %}> Active</label></div>
+    <div class="field"><label for="code">{{ _('Code') }}</label><input id="code" name="code" type="text" dir="ltr" value="{{ dept.code or '' }}" required maxlength="20"></div>
+    <div class="field"><label for="name">{{ _('Name (English)') }}</label><input id="name" name="name" type="text" dir="ltr" value="{{ dept.name or '' }}" required maxlength="80"></div>
+    <div class="field"><label for="name_ar">{{ _('Name (Arabic)') }}</label><input id="name_ar" name="name_ar" type="text" dir="rtl" lang="ar" value="{{ dept.name_ar or '' }}" maxlength="80"></div>
+    <div class="field"><label for="manager_employee_id">{{ _('Manager') }}</label><select id="manager_employee_id" name="manager_employee_id"><option value="">{{ _('No manager') }}</option>
+      {% for c in candidates %}<option value="{{ c.employee_id }}" {% if dept.manager_employee_id == c.employee_id %}selected{% endif %}>{{ c.employee_code }} {{ loc(c, 'full_name') }}</option>{% endfor %}</select></div>
+    <div class="checks"><label><input type="checkbox" name="is_active" value="1" {% if dept.is_active %}checked{% endif %}> {{ _('Active') }}</label></div>
   </div>
-  <div class="btn-row"><button class="btn" type="submit">Save department</button><a class="btn quiet" href="{{ url_for('admin.departments') }}">Cancel</a></div>
+  <div class="btn-row"><button class="btn" type="submit">{{ _('Save department') }}</button><a class="btn quiet" href="{{ url_for('admin.departments') }}">{{ _('Cancel') }}</a></div>
 </form></section>
 {% endblock %}

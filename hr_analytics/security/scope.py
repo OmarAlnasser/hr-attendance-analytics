@@ -4,12 +4,18 @@ These functions are pure (no Flask) so that the same rules protect the web
 app, the CLI and the tests. Every data query in the web layer passes a
 `UserContext` through `scope_clause()`; hiding UI elements is never relied on.
 
-Roles
------
-hr        organisation-wide data
+Roles (highest first)
+---------------------
+gm        General Manager. Everything HR can do, plus the decisions HR must not
+          take about its own people: granting or removing HR access, managing
+          HR accounts, deciding HR staff's requests and evaluating HR staff.
+hr        organisation-wide data and administration, except over HR/GM accounts
 manager   employees whose *current* department is managed by the user
           (departments.manager_employee_id = user's employee), plus own record
 employee  own record only
+
+Nobody approves or evaluates their own record. The General Manager's own
+requests are recorded as approved (there is no one above to decide them).
 """
 from __future__ import annotations
 
@@ -18,6 +24,10 @@ from dataclasses import dataclass, field
 
 class AccessDenied(Exception):
     pass
+
+
+ORG_WIDE_ROLES = frozenset({"gm", "hr"})      # see the whole organisation
+SENIOR_ROLES = frozenset({"gm", "hr"})        # accounts that only the General Manager may decide about
 
 
 @dataclass(frozen=True)
@@ -31,7 +41,17 @@ class UserContext:
 
     @property
     def is_hr(self) -> bool:
-        return self.role == "hr"
+        """Organisation-wide access (HR, and the General Manager who has every HR power)."""
+        return self.role in ORG_WIDE_ROLES
+
+    @property
+    def is_gm(self) -> bool:
+        return self.role == "gm"
+
+    @property
+    def has_team(self) -> bool:
+        """Sees other people's data: General Manager, HR, department managers."""
+        return self.role in ("gm", "hr", "manager")
 
     @property
     def is_manager(self) -> bool:
@@ -93,28 +113,45 @@ def can_view_employee(conn, user: UserContext, employee_id: int) -> bool:
     return row is not None
 
 
-def can_evaluate(conn, user: UserContext, employee_id: int) -> bool:
-    """HR may evaluate anyone except themselves; managers their department except themselves."""
+def _target_role(conn, employee_id: int) -> str | None:
+    r = conn.execute("SELECT role FROM users WHERE employee_id = ?", (employee_id,)).fetchone()
+    return r[0] if r else None
+
+
+def _decides_about(conn, user: UserContext, employee_id: int) -> bool:
+    """Shared rule for evaluations and requests: the General Manager decides about anyone;
+    HR about anyone except HR/GM accounts; managers about their department. Never oneself."""
     if user.employee_id is not None and user.employee_id == employee_id:
         return False
-    if user.is_hr:
-        return conn.execute("SELECT 1 FROM employees WHERE employee_id = ?", (employee_id,)).fetchone() is not None
-    if user.is_manager and user.managed_department_ids:
-        row = conn.execute("SELECT department_id FROM employees WHERE employee_id = ?", (employee_id,)).fetchone()
-        return row is not None and row["department_id"] in user.managed_department_ids
-    return False
-
-
-def can_approve(conn, user: UserContext, employee_id: int) -> bool:
-    """Leave and correction requests: HR decides anyone's, managers their departments'. Never one's own."""
-    if user.employee_id is not None and user.employee_id == employee_id:
+    row = conn.execute("SELECT department_id FROM employees WHERE employee_id = ?", (employee_id,)).fetchone()
+    if row is None:
+        return False
+    if user.is_gm:
+        return True
+    if _target_role(conn, employee_id) in SENIOR_ROLES:
         return False
     if user.is_hr:
         return True
-    if user.is_manager and user.managed_department_ids:
-        row = conn.execute("SELECT department_id FROM employees WHERE employee_id = ?", (employee_id,)).fetchone()
-        return row is not None and row["department_id"] in user.managed_department_ids
-    return False
+    return user.is_manager and row["department_id"] in user.managed_department_ids
+
+
+def can_evaluate(conn, user: UserContext, employee_id: int) -> bool:
+    return _decides_about(conn, user, employee_id)
+
+
+def can_approve(conn, user: UserContext, employee_id: int) -> bool:
+    """Leave and correction requests follow the same rule as evaluations."""
+    return _decides_about(conn, user, employee_id)
+
+
+def can_manage_account(user: UserContext, target_user_id: int, target_role: str) -> bool:
+    """Account administration: the General Manager manages every account but his own;
+    HR manages manager and employee accounts only."""
+    if target_user_id == user.user_id:
+        return False
+    if user.is_gm:
+        return True
+    return user.is_hr and target_role not in SENIOR_ROLES
 
 
 def can_view_department(user: UserContext, department_id: int | None) -> bool:

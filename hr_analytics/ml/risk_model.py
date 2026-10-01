@@ -15,6 +15,7 @@ Limits        On synthetic data the model can only rediscover the rules written 
 from __future__ import annotations
 
 import json
+import logging
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -32,6 +33,9 @@ from sklearn.preprocessing import StandardScaler
 from ..db import repos
 from ..db.connection import now_str, read_sql, transaction
 from ..domain.scoring import shift_period
+from ..i18n import N_
+
+log = logging.getLogger(__name__)
 
 FEATURES = [
     "weighted_score", "score_punctuality", "score_communication", "score_task_completion", "score_teamwork",
@@ -129,13 +133,15 @@ def train_and_evaluate(conn, *, threshold: float, models_dir: str, n_test_months
     report = EvaluationReport("insufficient_data", threshold, version, now_str())
     panel = monthly_panel(conn)
     if panel.empty:
-        report.reason = "No evaluations in the database."
+        report.reason = N_("There are no evaluations in the database yet.")
         return _save(report, None, models_dir, conn)
     ds = build_dataset(panel, threshold)
     labelled = ds[ds.label_known]
     target_periods = sorted(labelled.target_period.unique())
     if len(target_periods) < n_test_months + MIN_TRAIN_PERIODS:
-        report.reason = f"Only {len(target_periods)} labelled target months; need {n_test_months + MIN_TRAIN_PERIODS}."
+        # stored as a plain sentence (shown in the app in either language); the numbers are in the log
+        log.info("model: %s labelled months, need %s", len(target_periods), n_test_months + MIN_TRAIN_PERIODS)
+        report.reason = N_("There are not enough months of evaluations yet to train and test a model.")
         return _save(report, None, models_dir, conn)
 
     test_periods = target_periods[-n_test_months:]
@@ -150,8 +156,9 @@ def train_and_evaluate(conn, *, threshold: float, models_dir: str, n_test_months
     report.test_positive_rate = float(test.target.mean())
 
     if len(train) < MIN_TRAIN_ROWS or train.target.sum() < MIN_TRAIN_POS or test.target.sum() < MIN_TEST_POS:
-        report.reason = (f"Too few examples (train={len(train)}, train positives={int(train.target.sum())}, "
-                         f"test positives={int(test.target.sum())}). Use the review RULES instead.")
+        log.info("model: train=%s, train positives=%s, test positives=%s", len(train), int(train.target.sum()),
+                 int(test.target.sum()))
+        report.reason = N_("There are too few low scores to train and test a model reliably.")
         return _save(report, None, models_dir, conn)
 
     model = Pipeline([
@@ -191,7 +198,7 @@ def _save(report: EvaluationReport, model, models_dir: str, conn=None) -> Evalua
 def score_latest(conn, models_dir: str) -> dict:
     path = Path(models_dir) / "risk_model.joblib"
     if not path.exists():
-        return {"scored": 0, "reason": "No trained model; review rules are used instead."}
+        return {"scored": 0, "reason": N_("No model has been trained, so only the review rules are used.")}
     bundle = joblib.load(path)
     panel = monthly_panel(conn)
     ds = panel[panel.weighted_score.notna()]

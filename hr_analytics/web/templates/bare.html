@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{% block title %}HR Analytics{% endblock %} · HR Attendance &amp; Performance</title>
+<html lang="{{ lang }}" dir="{{ 'rtl' if rtl else 'ltr' }}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}{{ _('HR Analytics') }}{% endblock %} · {{ _('Attendance and Performance') }}</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}"></head>
 <body><main class="main">{% block content %}{% endblock %}</main></body></html>

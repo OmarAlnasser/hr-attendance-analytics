@@ -11,7 +11,6 @@ from __future__ import annotations
 import getpass
 import json
 import sys
-from datetime import date, datetime
 from pathlib import Path
 
 import click
@@ -164,19 +163,25 @@ def _dept_id(conn, code):
 @click.option("--period", required=True, help="YYYY-MM")
 @click.option("--department", default=None, help="Department code; omit for the whole organisation")
 @click.option("--force", is_flag=True, help="Regenerate even if a successful run exists")
-def report(period, department, force):
+@click.option("--lang", type=click.Choice(["en", "ar", "both"]), default="en", show_default=True,
+              help="Report language (Arabic is laid out right to left)")
+def report(period, department, force, lang):
     from .reports.runner import run_monthly_report
     s, conn = _ctx()
-    out = run_monthly_report(conn, period=period, department_id=_dept_id(conn, department), settings=s,
-                             triggered_by="cli", force=force)
-    click.echo(f"[{out.status}] {out.message} {out.output_path or ''}")
-    sys.exit(0 if out.status in ("success", "skipped") else 1)
+    ok = True
+    for code in (("en", "ar") if lang == "both" else (lang,)):
+        out = run_monthly_report(conn, period=period, department_id=_dept_id(conn, department), settings=s,
+                                 triggered_by="cli", force=force, lang=code)
+        click.echo(f"[{out.status}] {code}: {out.message} {out.output_path or ''}")
+        ok &= out.status in ("success", "skipped")
+    sys.exit(0 if ok else 1)
 
 
 @cli.command("run-monthly")
 @click.option("--period", default=None, help="Defaults to the previous calendar month")
 @click.option("--all-departments", is_flag=True, help="Also produce one report per department")
-def run_monthly(period, all_departments):
+@click.option("--lang", type=click.Choice(["en", "ar", "both"]), default="both", show_default=True)
+def run_monthly(period, all_departments, lang):
     """Entry point for cron / Task Scheduler. Safe to run repeatedly."""
     from .reports.runner import previous_period, run_monthly_report
     s, conn = _ctx()
@@ -186,9 +191,11 @@ def run_monthly(period, all_departments):
         scopes += [r[0] for r in conn.execute("SELECT department_id FROM departments WHERE is_active = 1")]
     failed = 0
     for dept in scopes:
-        out = run_monthly_report(conn, period=period, department_id=dept, settings=s, triggered_by="scheduler")
-        failed += out.status in ("failed", "busy")
-        click.echo(f"[{out.status}] {period} {'org' if dept is None else f'dept {dept}'}: {out.message}")
+        for code in (("en", "ar") if lang == "both" else (lang,)):
+            out = run_monthly_report(conn, period=period, department_id=dept, settings=s, triggered_by="scheduler",
+                                     lang=code)
+            failed += out.status in ("failed", "busy")
+            click.echo(f"[{out.status}] {period} {code} {'org' if dept is None else f'dept {dept}'}: {out.message}")
     sys.exit(1 if failed else 0)
 
 
@@ -204,7 +211,8 @@ def export_pbi(out):
 
 @cli.command("create-user")
 @click.option("--username", required=True)
-@click.option("--role", type=click.Choice(["hr", "manager", "employee"]), required=True)
+@click.option("--role", type=click.Choice(["gm", "hr", "manager", "employee"]), required=True,
+              help="gm = General Manager (highest), hr, manager or employee")
 @click.option("--employee-code", default=None)
 def create_user(username, role, employee_code):
     from .db import repos
@@ -246,8 +254,10 @@ def demo(ctx, employees, months):
                "(pending, see Approvals)")
     last = conn.execute("SELECT MAX(substr(shift_date,1,7)) FROM attendance_daily").fetchone()[0]
     from .reports.runner import run_monthly_report
-    out = run_monthly_report(conn, period=last, department_id=None, settings=s2, triggered_by="demo", force=True)
-    click.echo(f"[{out.status}] sample report: {out.output_path}")
+    for code in ("en", "ar"):
+        out = run_monthly_report(conn, period=last, department_id=None, settings=s2, triggered_by="demo", force=True,
+                                 lang=code)
+        click.echo(f"[{out.status}] sample report ({code}): {out.output_path}")
     click.echo("Next: python -m hr_analytics.web  (then open http://127.0.0.1:5000)")
 
 

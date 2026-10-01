@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block title %}Shifts{% endblock %}
+{% block title %}{{ _('Shifts') }}{% endblock %}
 {% block content %}
-<div class="page-head"><div><h1>Shifts</h1><p>A shift whose end is earlier than its start crosses midnight and belongs to the date it starts.</p></div>
-<a class="btn" href="{{ url_for('admin.shift_form') }}">Add shift</a></div>
+<div class="page-head"><div><h1>{{ _('Shifts') }}</h1><p>{{ _('A shift that ends earlier than it starts runs past midnight and belongs to the day it starts.') }}</p></div>
+<a class="btn" href="{{ url_for('admin.shift_form') }}">{{ _('Add shift') }}</a></div>
 <section class="panel"><div class="table-wrap"><table>
-<thead><tr><th>Code</th><th>Name</th><th>Start</th><th>End</th><th class="num">Late grace</th><th class="num">Early-leave grace</th><th>Working days</th><th>Status</th><th></th></tr></thead>
-<tbody>{% for s in rows %}<tr><td>{{ s.code }}</td><td>{{ s.name }}</td><td>{{ s.start_time }}</td><td>{{ s.end_time }}{% if s.end_time <= s.start_time %} <span class="badge">next day</span>{% endif %}</td>
-<td class="num">{{ s.grace_minutes }} min</td><td class="num">{{ s.early_leave_grace_minutes }} min</td><td>{{ s.workdays.replace(',', ', ') }}</td>
-<td>{% if s.is_active %}<span class="badge ok">Active</span>{% else %}<span class="badge">Inactive</span>{% endif %}</td>
-<td class="actions"><a href="{{ url_for('admin.shift_form', shift_id=s.shift_id) }}">Edit</a></td></tr>{% endfor %}</tbody>
+<thead><tr><th>{{ _('Code') }}</th><th>{{ _('Name') }}</th><th>{{ _('Starts') }}</th><th>{{ _('Ends') }}</th><th class="num">{{ _('Grace for lateness') }}</th><th class="num">{{ _('Grace for leaving early') }}</th><th>{{ _('Working days') }}</th><th>{{ _('Status') }}</th><th></th></tr></thead>
+<tbody>{% for s in rows %}<tr><td>{{ s.code }}</td><td>{{ loc(s, 'name') }}</td><td>{{ s.start_time }}</td><td>{{ s.end_time }}{% if s.end_time <= s.start_time %} <span class="badge">{{ _('next day') }}</span>{% endif %}</td>
+<td class="num">{{ count(s.grace_minutes, 'minute') }}</td><td class="num">{{ count(s.early_leave_grace_minutes, 'minute') }}</td>
+<td>{% for d in s.workdays.split(',') %}{{ L.weekday_name(d|title) }}{% if not loop.last %}{{ '، ' if lang == 'ar' else ', ' }}{% endif %}{% endfor %}</td>
+<td>{% if s.is_active %}<span class="badge ok">{{ _('Active') }}</span>{% else %}<span class="badge">{{ _('Inactive') }}</span>{% endif %}</td>
+<td class="actions"><a href="{{ url_for('admin.shift_form', shift_id=s.shift_id) }}">{{ _('Edit') }}</a></td></tr>{% endfor %}</tbody>
 </table></div></section>
 {% endblock %}

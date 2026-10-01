@@ -8,6 +8,7 @@ from flask import Blueprint, abort, flash, g, redirect, render_template, request
 
 from ...db import repos
 from ...db.connection import transaction
+from ...i18n import _
 from ...domain.metrics import EVALUABLE_MIN_DAYS
 from ...domain.scoring import (CATEGORIES, CATEGORY_LABELS, DEFAULT_WEIGHTS, parse_period, shift_period,
                                validate_weights)
@@ -25,7 +26,7 @@ def index():
     conn = get_db()
     period = get_period()
     first, last = parse_period(period)
-    if g.user.role == "employee":
+    if not g.user.has_team:
         ev = repos.evaluations_frame(conn, g.user, "2000-01", "2999-12")
         return render_template("evaluations_own.html",
                                evals=records(ev.sort_values("period", ascending=False)),
@@ -42,7 +43,8 @@ def index():
         days = (end - start).days + 1
         if days <= 0:
             continue
-        rows.append({**r, "days_employed": days, "evaluable": days >= EVALUABLE_MIN_DAYS,
+        # the General Manager has nobody above in this system, so is never due an evaluation here
+        rows.append({**r, "days_employed": days, "evaluable": days >= EVALUABLE_MIN_DAYS and r.get("app_role") != "gm",
                      "evaluation": by_emp.get(r["employee_id"]),
                      "can_evaluate": can_evaluate(conn, g.user, r["employee_id"])})
     done = sum(1 for r in rows if r["evaluation"] and r["evaluable"])
@@ -64,11 +66,12 @@ def form():
         abort(404)
     # Server-side permission check on both GET and POST (the UI hides the link too, but that is not the control).
     if not can_evaluate(conn, g.user, employee_id):
-        raise AccessDenied("You cannot evaluate this employee (outside your department, or your own record).")
+        raise AccessDenied(_("You cannot evaluate this person: they are outside your area, they are HR staff "
+                             "(evaluated by the General Manager), or it is your own record."))
     try:
         parse_period(period)
     except ValueError:
-        abort(400, description="Period must look like YYYY-MM.")
+        abort(400, description=_("The month must look like 2026-08 (year, then month)."))
     existing = repos.get_evaluation(conn, employee_id, period)
     weights = repos.weights_for_period(conn, period)
     values = {c: (existing or {}).get(f"score_{c}") for c in CATEGORIES}
@@ -78,8 +81,8 @@ def form():
         comments = request.form.get("comments", "")
         res = save_evaluation(conn, g.user, employee_id, period, values, comments, remote_addr=request.remote_addr)
         if res.ok:
-            flash(f"Evaluation {'updated' if res.action == 'update' else 'saved'}: weighted score "
-                  f"{res.weighted_score:.2f}.", "success")
+            flash((_("Evaluation updated. Weighted score: {s}.", s=f"{res.weighted_score:.2f}") if res.action == "update"
+                   else _("Evaluation saved. Weighted score: {s}.", s=f"{res.weighted_score:.2f}")), "success")
             return redirect(url_for("evaluations.index", period=period))
         flash_errors(res.errors)
         return render_template("evaluation_form.html", emp=emp, period=period, values=values, comments=comments,
@@ -97,7 +100,7 @@ def history(evaluation_id: int):
     if ev is None:
         abort(404)
     if not can_view_employee(conn, g.user, ev["employee_id"]):
-        raise AccessDenied("You can only view evaluations within your scope.")
+        raise AccessDenied(_("You can only see evaluations of people within your area."))
     hist = repos.evaluation_history(conn, evaluation_id)
     for h in hist:
         h["old"] = json.loads(h["old_values"]) if h.get("old_values") else None
@@ -124,8 +127,8 @@ def weights():
                 with transaction(conn):
                     wid = repos.upsert_weights(conn, eff, {c: float(w[c]) for c in CATEGORIES}, g.user.user_id)
                     audit("weights_save", "evaluation_weights", wid, {"effective_from": eff, **w})
-                flash(f"Weights saved; they apply to evaluations from {eff} onwards. Existing evaluations keep "
-                      f"the weights they were scored with.", "success")
+                flash(_("Weights saved. They apply to evaluations from {eff}; earlier evaluations keep the weights "
+                        "they were scored with.", eff=eff), "success")
                 return redirect(url_for("evaluations.weights"))
             except ValueError as exc:
                 errors.append(str(exc))

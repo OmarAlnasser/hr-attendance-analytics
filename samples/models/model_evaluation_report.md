@@ -3,7 +3,7 @@
 > **SYNTHETIC DATA.** These numbers describe how well a model recovers patterns that were written into the data generator. They are not evidence about any real workforce. Output is for human review only and must never trigger automatic or disciplinary action.
 
 * Status: **model**
-* Model version: `risk-lr-20260929165253` — created 2026-09-29 16:52:53
+* Model version: `risk-lr-20261001135715` — created 2026-10-01 13:57:15
 * Target: next-month weighted score < **3.0**
 * Temporal split — train targets: 2025-10 … 2026-05 (811 rows, 12.6% positive); test targets: 2026-06, 2026-07, 2026-08 (319 rows, 10.7% positive)
 

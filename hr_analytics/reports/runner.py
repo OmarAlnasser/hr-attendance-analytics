@@ -19,7 +19,15 @@ from ..db.connection import IntegrityError, now_str, transaction
 from ..domain.scoring import period_of, shift_period
 from .monthly import build_monthly_report
 
-REPORT_TYPE = "monthly_hr"
+REPORT_TYPE = "monthly_hr"           # English; the Arabic edition is "monthly_hr_ar"
+
+
+def report_type_for(lang: str) -> str:
+    return REPORT_TYPE + ("_ar" if lang == "ar" else "")
+
+
+def report_language(report_type: str | None) -> str:
+    return "ar" if (report_type or "").endswith("_ar") else "en"
 
 
 @dataclass
@@ -39,10 +47,11 @@ def previous_period(today: date | None = None) -> str:
 
 
 def run_monthly_report(conn, *, period: str, department_id: int | None, settings, triggered_by: str,
-                       force: bool = False) -> RunOutcome:
+                       force: bool = False, lang: str = "en") -> RunOutcome:
     key = scope_key(department_id)
+    rtype = report_type_for(lang)
     existing = conn.execute("""SELECT * FROM report_runs WHERE report_type = ? AND period = ? AND scope_key = ?
-                               AND status IN ('running', 'success')""", (REPORT_TYPE, period, key)).fetchone()
+                               AND status IN ('running', 'success')""", (rtype, period, key)).fetchone()
     if existing and existing["status"] == "running":
         return RunOutcome("busy", existing["run_id"], None, "A run for this report is already in progress.")
     if existing and not force and existing["output_path"] and (
@@ -55,14 +64,16 @@ def run_monthly_report(conn, *, period: str, department_id: int | None, settings
             if existing:
                 conn.execute("UPDATE report_runs SET status = 'superseded' WHERE run_id = ?", (existing["run_id"],))
             cur = conn.execute("""INSERT INTO report_runs(report_type, period, scope_key, status, triggered_by, started_at)
-                                  VALUES (?,?,?,?,?,?)""", (REPORT_TYPE, period, key, "running", triggered_by, now_str()))
+                                  VALUES (?,?,?,?,?,?)""", (rtype, period, key, "running", triggered_by, now_str()))
             run_id = cur.lastrowid
     except IntegrityError:
         return RunOutcome("busy", None, None, "Another run started at the same time.")
 
-    out = Path(settings.REPORTS_DIR) / f"hr_monthly_{period}_{key.replace(':', '-')}_run{run_id}.pdf"
+    suffix = "_ar" if lang == "ar" else ""
+    out = Path(settings.REPORTS_DIR) / f"hr_monthly_{period}_{key.replace(':', '-')}{suffix}_run{run_id}.pdf"
     try:
-        build_monthly_report(conn, period=period, department_id=department_id, settings=settings, out_path=out)
+        build_monthly_report(conn, period=period, department_id=department_id, settings=settings, out_path=out,
+                             lang=lang)
     except Exception as exc:  # noqa: BLE001 - logged and surfaced
         with transaction(conn):
             conn.execute("UPDATE report_runs SET status='failed', finished_at=?, error=? WHERE run_id=?",

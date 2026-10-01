@@ -1,121 +1,122 @@
-EmployeeKey,EmployeeCode,EmployeeName,UserPrincipalName,JobTitle,DepartmentKey,DepartmentCode,DepartmentName,ManagerEmployeeKey,HireDate,TerminationDate,IsActive,IsSynthetic
-1,E0001,Hind Al-Rashidi,e0001@example.com,Operations Manager,1,OPS,Operations,,2015-01-13,,1,1
-2,E0002,Fahad Al-Rashidi,e0002@example.com,Operations Technician,1,OPS,Operations,1,2019-01-31,,1,1
-3,E0003,Abeer Al-Tamimi,e0003@example.com,Logistics Coordinator,1,OPS,Operations,1,2015-02-03,,1,1
-4,E0004,Rana Al-Subaie,e0004@example.com,Shift Supervisor,1,OPS,Operations,1,2023-02-08,,1,1
-5,E0005,Hind Al-Malki,e0005@example.com,Shift Supervisor,1,OPS,Operations,1,2018-04-18,,1,1
-6,E0006,Hamad Al-Dosari,e0006@example.com,Operations Technician,1,OPS,Operations,1,2023-07-14,,1,1
-7,E0007,Rana Al-Khaldi,e0007@example.com,Operations Technician,1,OPS,Operations,1,2020-06-04,,1,1
-8,E0008,Dana Al-Ghamdi,e0008@example.com,Operations Technician,1,OPS,Operations,1,2021-04-26,,1,1
-9,E0009,Maha Al-Tamimi,e0009@example.com,Logistics Coordinator,1,OPS,Operations,1,2025-03-31,,1,1
-10,E0010,Ziyad Al-Otaibi,e0010@example.com,Shift Supervisor,1,OPS,Operations,1,2016-04-03,2026-01-03,0,1
-11,E0011,Joud Al-Juhani,e0011@example.com,Shift Supervisor,1,OPS,Operations,1,2015-10-15,,1,1
-12,E0012,Joud Al-Ghamdi,e0012@example.com,Operations Technician,1,OPS,Operations,1,2025-03-17,,1,1
-13,E0013,Hamad Al-Harbi,e0013@example.com,Logistics Coordinator,1,OPS,Operations,1,2019-06-10,2026-07-21,0,1
-14,E0014,Sara Al-Rashidi,e0014@example.com,Logistics Coordinator,1,OPS,Operations,1,2019-07-06,,1,1
-15,E0015,Lama Al-Juhani,e0015@example.com,Operations Technician,1,OPS,Operations,1,2019-01-24,,1,1
-16,E0016,Hamad Al-Khaldi,e0016@example.com,Logistics Coordinator,1,OPS,Operations,1,2017-08-14,,1,1
-17,E0017,Nasser Al-Rashidi,e0017@example.com,Shift Supervisor,1,OPS,Operations,1,2018-06-28,,1,1
-18,E0018,Lina Al-Otaibi,e0018@example.com,Logistics Coordinator,1,OPS,Operations,1,2015-08-15,,1,1
-19,E0019,Ziyad Al-Juhani,e0019@example.com,Operations Technician,1,OPS,Operations,1,2023-02-12,,1,1
-20,E0020,Nora Al-Omari,e0020@example.com,Operations Technician,1,OPS,Operations,1,2023-01-17,,1,1
-21,E0021,Hamad Al-Rashidi,e0021@example.com,Shift Supervisor,1,OPS,Operations,1,2015-08-15,,1,1
-22,E0022,Fahad Al-Tamimi,e0022@example.com,Shift Supervisor,1,OPS,Operations,1,2019-06-17,,1,1
-23,E0023,Fahad Al-Omari,e0023@example.com,Logistics Coordinator,1,OPS,Operations,1,2021-05-09,,1,1
-24,E0024,Saad Al-Anazi,e0024@example.com,Logistics Coordinator,1,OPS,Operations,1,2017-07-10,,1,1
-25,E0025,Asma Al-Balawi,e0025@example.com,Operations Technician,1,OPS,Operations,1,2016-06-26,,1,1
-26,E0026,Rana Al-Mutairi,e0026@example.com,Logistics Coordinator,1,OPS,Operations,1,2016-09-16,,1,1
-27,E0027,Khalid Al-Omari,e0027@example.com,Shift Supervisor,1,OPS,Operations,1,2017-05-27,,1,1
-28,E0028,Rakan Al-Anazi,e0028@example.com,Shift Supervisor,1,OPS,Operations,1,2023-01-30,,1,1
-29,E0029,Saad Al-Otaibi,e0029@example.com,Operations Technician,1,OPS,Operations,1,2023-06-07,,1,1
-30,E0030,Maha Al-Subaie,e0030@example.com,Logistics Coordinator,1,OPS,Operations,1,2015-01-16,,1,1
-31,E0031,Joud Al-Shehri,e0031@example.com,Customer Service Manager,2,CS,Customer Service,,2015-11-14,,1,1
-32,E0032,Maha Al-Subaie,e0032@example.com,Customer Service Agent,2,CS,Customer Service,31,2019-10-06,,1,1
-33,E0033,Omar Al-Rashidi,e0033@example.com,Service Team Lead,2,CS,Customer Service,31,2016-10-07,,1,1
-34,E0034,Fahad Al-Zahrani,e0034@example.com,Customer Service Agent,2,CS,Customer Service,31,2025-02-12,,1,1
-35,E0035,Joud Al-Subaie,e0035@example.com,Service Team Lead,2,CS,Customer Service,31,2018-03-30,,1,1
-36,E0036,Asma Al-Mutairi,e0036@example.com,Service Team Lead,2,CS,Customer Service,31,2022-11-08,,1,1
-37,E0037,Hamad Al-Juhani,e0037@example.com,Customer Service Agent,2,CS,Customer Service,31,2023-02-21,,1,1
-38,E0038,Joud Al-Harbi,e0038@example.com,Customer Service Agent,2,CS,Customer Service,31,2019-03-07,,1,1
-39,E0039,Omar Al-Khaldi,e0039@example.com,Service Team Lead,2,CS,Customer Service,31,2022-05-12,,1,1
-40,E0040,Rana Al-Otaibi,e0040@example.com,Service Team Lead,2,CS,Customer Service,31,2019-05-14,,1,1
-41,E0041,Rakan Al-Zahrani,e0041@example.com,Service Team Lead,2,CS,Customer Service,31,2021-09-07,,1,1
-42,E0042,Haya Al-Malki,e0042@example.com,Customer Service Agent,2,CS,Customer Service,31,2015-02-05,,1,1
-43,E0043,Mohammed Al-Shammari,e0043@example.com,Customer Service Agent,2,CS,Customer Service,31,2023-02-12,,1,1
-44,E0044,Sultan Al-Rashidi,e0044@example.com,Customer Service Agent,2,CS,Customer Service,31,2021-08-26,,1,1
-45,E0045,Faisal Al-Mutairi,e0045@example.com,Service Team Lead,2,CS,Customer Service,31,2023-03-12,,1,1
-46,E0046,Saad Al-Malki,e0046@example.com,Service Team Lead,2,CS,Customer Service,31,2019-03-07,,1,1
-47,E0047,Ghada Al-Anazi,e0047@example.com,Customer Service Agent,2,CS,Customer Service,31,2015-10-03,,1,1
-48,E0048,Fahad Al-Mutairi,e0048@example.com,Customer Service Agent,2,CS,Customer Service,31,2014-10-02,,1,1
-49,E0049,Ghada Al-Shammari,e0049@example.com,Service Team Lead,2,CS,Customer Service,31,2019-02-10,,1,1
-50,E0050,Yousef Al-Yami,e0050@example.com,Customer Service Agent,2,CS,Customer Service,31,2023-05-10,,1,1
-51,E0051,Hamad Al-Mutairi,e0051@example.com,Customer Service Agent,2,CS,Customer Service,31,2023-11-05,,1,1
-52,E0052,Shahad Al-Shehri,e0052@example.com,Customer Service Agent,2,CS,Customer Service,31,2014-02-11,,1,1
-53,E0053,Sara Al-Zahrani,e0053@example.com,Sales Manager,3,SAL,Sales,,2017-07-02,,1,1
-54,E0054,Khalid Al-Mutairi,e0054@example.com,Account Executive,3,SAL,Sales,53,2015-04-05,2026-06-16,0,1
-55,E0055,Ghada Al-Tamimi,e0055@example.com,Account Executive,3,SAL,Sales,53,2021-08-22,,1,1
-56,E0056,Asma Al-Dosari,e0056@example.com,Account Executive,3,SAL,Sales,53,2015-04-01,,1,1
-57,E0057,Sara Al-Ghamdi,e0057@example.com,Account Executive,3,SAL,Sales,53,2014-06-08,,1,1
-58,E0058,Ghada Al-Zahrani,e0058@example.com,Account Executive,3,SAL,Sales,53,2023-08-12,,1,1
-59,E0059,Lama Al-Shehri,e0059@example.com,Sales Coordinator,3,SAL,Sales,53,2025-01-14,,1,1
-60,E0060,Faisal Al-Shammari,e0060@example.com,Sales Coordinator,3,SAL,Sales,53,2016-12-18,,1,1
-61,E0061,Asma Al-Yami,e0061@example.com,Account Executive,3,SAL,Sales,53,2014-07-10,,1,1
-62,E0062,Rana Al-Balawi,e0062@example.com,Account Executive,3,SAL,Sales,53,2024-04-30,,1,1
-63,E0063,Ziyad Al-Zahrani,e0063@example.com,Account Executive,3,SAL,Sales,53,2024-05-08,,1,1
-64,E0064,Rakan Al-Ghamdi,e0064@example.com,Sales Coordinator,3,SAL,Sales,53,2022-12-11,,1,1
-65,E0065,Majed Al-Mutairi,e0065@example.com,Account Executive,3,SAL,Sales,53,2015-02-04,,1,1
-66,E0066,Abdullah Al-Harbi,e0066@example.com,Account Executive,3,SAL,Sales,53,2024-11-07,,1,1
-67,E0067,Abeer Al-Shammari,e0067@example.com,Account Executive,3,SAL,Sales,53,2023-08-18,,1,1
-68,E0068,Mohammed Al-Shammari,e0068@example.com,Account Executive,3,SAL,Sales,53,2020-12-10,,1,1
-69,E0069,Omar Al-Yami,e0069@example.com,Account Executive,3,SAL,Sales,53,2017-08-05,,1,1
-70,E0070,Ghada Al-Otaibi,e0070@example.com,Account Executive,3,SAL,Sales,53,2019-10-20,,1,1
-71,E0071,Yousef Al-Harbi,e0071@example.com,Information Technology Manager,4,IT,Information Technology,,2016-08-29,,1,1
-72,E0072,Khalid Al-Mutairi,e0072@example.com,Support Engineer,4,IT,Information Technology,71,2025-03-25,,1,1
-73,E0073,Reem Al-Anazi,e0073@example.com,Systems Analyst,4,IT,Information Technology,71,2022-11-16,2026-02-08,0,1
-74,E0074,Dana Al-Qahtani,e0074@example.com,Data Analyst,4,IT,Information Technology,71,2014-04-17,,1,1
-75,E0075,Khalid Al-Omari,e0075@example.com,Data Analyst,4,IT,Information Technology,71,2019-01-10,,1,1
-76,E0076,Omar Al-Harbi,e0076@example.com,Support Engineer,4,IT,Information Technology,71,2025-04-10,,1,1
-77,E0077,Ghada Al-Shehri,e0077@example.com,Systems Analyst,4,IT,Information Technology,71,2017-08-20,2026-02-19,0,1
-78,E0078,Abdullah Al-Omari,e0078@example.com,Support Engineer,4,IT,Information Technology,71,2019-10-13,,1,1
-79,E0079,Khalid Al-Juhani,e0079@example.com,Systems Analyst,4,IT,Information Technology,71,2023-09-28,,1,1
-80,E0080,Ghada Al-Shammari,e0080@example.com,Support Engineer,4,IT,Information Technology,71,2014-01-28,,1,1
-81,E0081,Lina Al-Anazi,e0081@example.com,Support Engineer,4,IT,Information Technology,71,2022-07-21,,1,1
-82,E0082,Abdullah Al-Rashidi,e0082@example.com,Systems Analyst,4,IT,Information Technology,71,2023-10-24,2026-01-25,0,1
-83,E0083,Hind Al-Subaie,e0083@example.com,Systems Analyst,4,IT,Information Technology,71,2016-11-25,,1,1
-84,E0084,Lama Al-Hajri,e0084@example.com,Data Analyst,4,IT,Information Technology,71,2022-11-12,,1,1
-85,E0085,Rakan Al-Harbi,e0085@example.com,Support Engineer,4,IT,Information Technology,71,2017-05-11,,1,1
-86,E0086,Haya Al-Yami,e0086@example.com,Data Analyst,4,IT,Information Technology,71,2015-04-27,2026-02-20,0,1
-87,E0087,Hamad Al-Shehri,e0087@example.com,Finance Manager,5,FIN,Finance,,2017-03-05,,1,1
-88,E0088,Asma Al-Juhani,e0088@example.com,Financial Analyst,5,FIN,Finance,87,2016-11-14,,1,1
-89,E0089,Shahad Al-Qahtani,e0089@example.com,Accountant,5,FIN,Finance,87,2023-06-17,,1,1
-90,E0090,Faisal Al-Khaldi,e0090@example.com,Accountant,5,FIN,Finance,87,2020-11-20,,1,1
-91,E0091,Joud Al-Hajri,e0091@example.com,Financial Analyst,5,FIN,Finance,87,2017-08-06,,1,1
-92,E0092,Reem Al-Shammari,e0092@example.com,Accountant,5,FIN,Finance,87,2015-12-02,,1,1
-93,E0093,Dana Al-Qahtani,e0093@example.com,Accountant,5,FIN,Finance,87,2015-05-04,,1,1
-94,E0094,Rakan Al-Omari,e0094@example.com,Financial Analyst,5,FIN,Finance,87,2016-01-09,,1,1
-95,E0095,Lina Al-Zahrani,e0095@example.com,Financial Analyst,5,FIN,Finance,87,2021-11-20,,1,1
-96,E0096,Hind Al-Balawi,e0096@example.com,Financial Analyst,5,FIN,Finance,87,2019-11-05,,1,1
-97,E0097,Shahad Al-Dosari,e0097@example.com,Accountant,5,FIN,Finance,87,2014-07-03,,1,1
-98,E0098,Ghada Al-Anazi,e0098@example.com,Accountant,5,FIN,Finance,87,2016-11-21,,1,1
-99,E0099,Joud Al-Shehri,e0099@example.com,Financial Analyst,5,FIN,Finance,87,2014-07-28,,1,1
-100,E0100,Khalid Al-Qahtani,e0100@example.com,Accountant,5,FIN,Finance,87,2015-03-07,,1,1
-101,E0101,Maha Al-Qahtani,e0101@example.com,Human Resources Manager,6,HR,Human Resources,,2024-09-18,,1,1
-102,E0102,Joud Al-Dosari,e0102@example.com,Payroll Officer,6,HR,Human Resources,101,2023-04-11,,1,1
-103,E0103,Hind Al-Malki,e0103@example.com,Recruiter,6,HR,Human Resources,101,2020-09-17,,1,1
-104,E0104,Sultan Al-Khaldi,e0104@example.com,Recruiter,6,HR,Human Resources,101,2022-07-24,,1,1
-105,E0105,Rana Al-Khaldi,e0105@example.com,Recruiter,6,HR,Human Resources,101,2025-03-15,,1,1
-106,E0106,Haya Al-Dosari,e0106@example.com,HR Specialist,6,HR,Human Resources,101,2021-12-13,2026-02-14,0,1
-107,E0107,Ziyad Al-Shammari,e0107@example.com,Recruiter,6,HR,Human Resources,101,2019-01-09,,1,1
-108,E0108,Majed Al-Shehri,e0108@example.com,Recruiter,6,HR,Human Resources,101,2017-12-02,,1,1
-109,E0109,Majed Al-Shammari,e0109@example.com,Payroll Officer,6,HR,Human Resources,101,2019-01-10,,1,1
-110,E0110,Ghada Al-Rashidi,e0110@example.com,Payroll Officer,6,HR,Human Resources,101,2023-03-09,,1,1
-111,E0111,Sara Al-Yami,e0111@example.com,Payroll Officer,6,HR,Human Resources,101,2026-02-10,,1,1
-112,E0112,Nora Al-Tamimi,e0112@example.com,Sales Coordinator,3,SAL,Sales,53,2026-03-12,,1,1
-113,E0113,Turki Al-Omari,e0113@example.com,Logistics Coordinator,1,OPS,Operations,1,2025-12-01,,1,1
-114,E0114,Lama Al-Malki,e0114@example.com,Systems Analyst,4,IT,Information Technology,71,2026-05-20,,1,1
-115,E0115,Ghada Al-Juhani,e0115@example.com,Systems Analyst,4,IT,Information Technology,71,2026-04-11,,1,1
-116,E0116,Reem Al-Anazi,e0116@example.com,Payroll Officer,6,HR,Human Resources,101,2026-06-09,,1,1
-117,E0117,Nasser Al-Juhani,e0117@example.com,Recruiter,6,HR,Human Resources,101,2026-05-02,,1,1
-118,E0118,Faisal Al-Harbi,e0118@example.com,Shift Supervisor,1,OPS,Operations,1,2025-10-04,,1,1
-119,E0119,Nora Al-Juhani,e0119@example.com,Logistics Coordinator,1,OPS,Operations,1,2026-03-14,,1,1
-120,E0120,Reem Al-Harbi,e0120@example.com,Payroll Officer,6,HR,Human Resources,101,2026-05-05,,1,1
+EmployeeKey,EmployeeCode,EmployeeName,UserPrincipalName,JobTitle,DepartmentKey,DepartmentCode,DepartmentName,ManagerEmployeeKey,HireDate,TerminationDate,IsActive,IsSynthetic,EmployeeNameAr,JobTitleAr,DepartmentNameAr,Gender,AppRole
+1,E0001,Asma Al-Harbi,e0001@example.com,Operations Manager,1,OPS,Operations,121,2015-01-13,,1,1,أسماء الحربي,مديرة العمليات,العمليات,F,manager
+2,E0002,Yousef Al-Khaldi,e0002@example.com,Operations Technician,1,OPS,Operations,1,2019-01-31,,1,1,يوسف الخالدي,فني عمليات,العمليات,M,employee
+3,E0003,Yousef Al-Sahli,e0003@example.com,Logistics Coordinator,1,OPS,Operations,1,2015-02-03,,1,1,يوسف السهلي,منسق خدمات لوجستية,العمليات,M,employee
+4,E0004,Hamza Al-Tamimi,e0004@example.com,Shift Supervisor,1,OPS,Operations,1,2023-02-08,,1,1,حمزة التميمي,مشرف وردية,العمليات,M,employee
+5,E0005,Lama Al-Balawi,e0005@example.com,Shift Supervisor,1,OPS,Operations,1,2018-04-18,,1,1,لمى البلوي,مشرفة وردية,العمليات,F,employee
+6,E0006,Ziyad Al-Qahtani,e0006@example.com,Operations Technician,1,OPS,Operations,1,2023-07-14,,1,1,زياد القحطاني,فني عمليات,العمليات,M,employee
+7,E0007,Meshari Al-Mutairi,e0007@example.com,Operations Technician,1,OPS,Operations,1,2020-06-04,,1,1,مشاري المطيري,فني عمليات,العمليات,M,employee
+8,E0008,Khalid Al-Harbi,e0008@example.com,Operations Technician,1,OPS,Operations,1,2021-04-26,,1,1,خالد الحربي,فني عمليات,العمليات,M,employee
+9,E0009,Yousef Al-Anazi,e0009@example.com,Logistics Coordinator,1,OPS,Operations,1,2025-03-31,,1,1,يوسف العنزي,منسق خدمات لوجستية,العمليات,M,employee
+10,E0010,Ghada Al-Zahrani,e0010@example.com,Shift Supervisor,1,OPS,Operations,1,2016-04-03,2026-01-03,0,1,غادة الزهراني,مشرفة وردية,العمليات,F,employee
+11,E0011,Yousef Al-Omari,e0011@example.com,Shift Supervisor,1,OPS,Operations,1,2015-10-15,,1,1,يوسف العمري,مشرف وردية,العمليات,M,employee
+12,E0012,Turki Al-Subaie,e0012@example.com,Operations Technician,1,OPS,Operations,1,2025-03-17,,1,1,تركي السبيعي,فني عمليات,العمليات,M,employee
+13,E0013,Meshari Al-Dhafiri,e0013@example.com,Logistics Coordinator,1,OPS,Operations,1,2019-06-10,2026-07-21,0,1,مشاري الظفيري,منسق خدمات لوجستية,العمليات,M,employee
+14,E0014,Shahad Al-Dhafiri,e0014@example.com,Logistics Coordinator,1,OPS,Operations,1,2019-07-06,,1,1,شهد الظفيري,منسقة خدمات لوجستية,العمليات,F,employee
+15,E0015,Rakan Al-Juhani,e0015@example.com,Operations Technician,1,OPS,Operations,1,2019-01-24,,1,1,راكان الجهني,فني عمليات,العمليات,M,employee
+16,E0016,Ahmed Al-Tamimi,e0016@example.com,Logistics Coordinator,1,OPS,Operations,1,2017-08-14,,1,1,أحمد التميمي,منسق خدمات لوجستية,العمليات,M,employee
+17,E0017,Lama Al-Khaldi,e0017@example.com,Shift Supervisor,1,OPS,Operations,1,2018-06-28,,1,1,لمى الخالدي,مشرفة وردية,العمليات,F,employee
+18,E0018,Khalid Al-Qahtani,e0018@example.com,Logistics Coordinator,1,OPS,Operations,1,2015-08-15,,1,1,خالد القحطاني,منسق خدمات لوجستية,العمليات,M,employee
+19,E0019,Sultan Al-Omari,e0019@example.com,Operations Technician,1,OPS,Operations,1,2023-02-12,,1,1,سلطان العمري,فني عمليات,العمليات,M,employee
+20,E0020,Turki Al-Zahrani,e0020@example.com,Operations Technician,1,OPS,Operations,1,2023-01-17,,1,1,تركي الزهراني,فني عمليات,العمليات,M,employee
+21,E0021,Yousef Al-Ghamdi,e0021@example.com,Shift Supervisor,1,OPS,Operations,1,2015-08-15,,1,1,يوسف الغامدي,مشرف وردية,العمليات,M,employee
+22,E0022,Joud Al-Dosari,e0022@example.com,Shift Supervisor,1,OPS,Operations,1,2019-06-17,,1,1,جود الدوسري,مشرفة وردية,العمليات,F,employee
+23,E0023,Waleed Al-Anazi,e0023@example.com,Logistics Coordinator,1,OPS,Operations,1,2021-05-09,,1,1,وليد العنزي,منسق خدمات لوجستية,العمليات,M,employee
+24,E0024,Hind Al-Dhafiri,e0024@example.com,Logistics Coordinator,1,OPS,Operations,1,2017-07-10,,1,1,هند الظفيري,منسقة خدمات لوجستية,العمليات,F,employee
+25,E0025,Ziyad Al-Zahrani,e0025@example.com,Operations Technician,1,OPS,Operations,1,2016-06-26,,1,1,زياد الزهراني,فني عمليات,العمليات,M,employee
+26,E0026,Ali Al-Dhafiri,e0026@example.com,Logistics Coordinator,1,OPS,Operations,1,2016-09-16,,1,1,علي الظفيري,منسق خدمات لوجستية,العمليات,M,employee
+27,E0027,Amal Al-Harbi,e0027@example.com,Shift Supervisor,1,OPS,Operations,1,2017-05-27,,1,1,أمل الحربي,مشرفة وردية,العمليات,F,employee
+28,E0028,Majed Al-Dosari,e0028@example.com,Shift Supervisor,1,OPS,Operations,1,2023-01-30,,1,1,ماجد الدوسري,مشرف وردية,العمليات,M,employee
+29,E0029,Waleed Al-Hajri,e0029@example.com,Operations Technician,1,OPS,Operations,1,2023-06-07,,1,1,وليد الهاجري,فني عمليات,العمليات,M,employee
+30,E0030,Shahad Al-Dosari,e0030@example.com,Logistics Coordinator,1,OPS,Operations,1,2015-01-16,,1,1,شهد الدوسري,منسقة خدمات لوجستية,العمليات,F,employee
+31,E0031,Bandar Al-Sahli,e0031@example.com,Customer Service Manager,2,CS,Customer Service,121,2015-11-14,,1,1,بندر السهلي,مدير خدمة العملاء,خدمة العملاء,M,manager
+32,E0032,Shahad Al-Hajri,e0032@example.com,Customer Service Agent,2,CS,Customer Service,31,2019-10-06,,1,1,شهد الهاجري,موظفة خدمة عملاء,خدمة العملاء,F,employee
+33,E0033,Maha Al-Subaie,e0033@example.com,Service Team Lead,2,CS,Customer Service,31,2016-10-07,,1,1,مها السبيعي,قائدة فريق الخدمة,خدمة العملاء,F,employee
+34,E0034,Ziyad Al-Omari,e0034@example.com,Customer Service Agent,2,CS,Customer Service,31,2025-02-12,,1,1,زياد العمري,موظف خدمة عملاء,خدمة العملاء,M,employee
+35,E0035,Ahmed Al-Subaie,e0035@example.com,Service Team Lead,2,CS,Customer Service,31,2018-03-30,,1,1,أحمد السبيعي,قائد فريق الخدمة,خدمة العملاء,M,employee
+36,E0036,Abdulrahman Al-Subaie,e0036@example.com,Service Team Lead,2,CS,Customer Service,31,2022-11-08,,1,1,عبدالرحمن السبيعي,قائد فريق الخدمة,خدمة العملاء,M,employee
+37,E0037,Ibrahim Al-Khaldi,e0037@example.com,Customer Service Agent,2,CS,Customer Service,31,2023-02-21,,1,1,إبراهيم الخالدي,موظف خدمة عملاء,خدمة العملاء,M,employee
+38,E0038,Waleed Al-Mutairi,e0038@example.com,Customer Service Agent,2,CS,Customer Service,31,2019-03-07,,1,1,وليد المطيري,موظف خدمة عملاء,خدمة العملاء,M,employee
+39,E0039,Mohammed Al-Shammari,e0039@example.com,Service Team Lead,2,CS,Customer Service,31,2022-05-12,,1,1,محمد الشمري,قائد فريق الخدمة,خدمة العملاء,M,employee
+40,E0040,Ziyad Al-Otaibi,e0040@example.com,Service Team Lead,2,CS,Customer Service,31,2019-05-14,,1,1,زياد العتيبي,قائد فريق الخدمة,خدمة العملاء,M,employee
+41,E0041,Saad Al-Shammari,e0041@example.com,Service Team Lead,2,CS,Customer Service,31,2021-09-07,,1,1,سعد الشمري,قائد فريق الخدمة,خدمة العملاء,M,employee
+42,E0042,Meshari Al-Khaldi,e0042@example.com,Customer Service Agent,2,CS,Customer Service,31,2015-02-05,,1,1,مشاري الخالدي,موظف خدمة عملاء,خدمة العملاء,M,employee
+43,E0043,Amal Al-Zahrani,e0043@example.com,Customer Service Agent,2,CS,Customer Service,31,2023-02-12,,1,1,أمل الزهراني,موظفة خدمة عملاء,خدمة العملاء,F,employee
+44,E0044,Abeer Al-Subaie,e0044@example.com,Customer Service Agent,2,CS,Customer Service,31,2021-08-26,,1,1,عبير السبيعي,موظفة خدمة عملاء,خدمة العملاء,F,employee
+45,E0045,Hamad Al-Malki,e0045@example.com,Service Team Lead,2,CS,Customer Service,31,2023-03-12,,1,1,حمد المالكي,قائد فريق الخدمة,خدمة العملاء,M,employee
+46,E0046,Hamza Al-Shehri,e0046@example.com,Service Team Lead,2,CS,Customer Service,31,2019-03-07,,1,1,حمزة الشهري,قائد فريق الخدمة,خدمة العملاء,M,employee
+47,E0047,Bandar Al-Shehri,e0047@example.com,Customer Service Agent,2,CS,Customer Service,31,2015-10-03,,1,1,بندر الشهري,موظف خدمة عملاء,خدمة العملاء,M,employee
+48,E0048,Sultan Al-Balawi,e0048@example.com,Customer Service Agent,2,CS,Customer Service,31,2014-10-02,,1,1,سلطان البلوي,موظف خدمة عملاء,خدمة العملاء,M,employee
+49,E0049,Hamad Al-Sahli,e0049@example.com,Service Team Lead,2,CS,Customer Service,31,2019-02-10,,1,1,حمد السهلي,قائد فريق الخدمة,خدمة العملاء,M,employee
+50,E0050,Waleed Al-Harbi,e0050@example.com,Customer Service Agent,2,CS,Customer Service,31,2023-05-10,,1,1,وليد الحربي,موظف خدمة عملاء,خدمة العملاء,M,employee
+51,E0051,Sultan Al-Yami,e0051@example.com,Customer Service Agent,2,CS,Customer Service,31,2023-11-05,,1,1,سلطان اليامي,موظف خدمة عملاء,خدمة العملاء,M,employee
+52,E0052,Nawaf Al-Zahrani,e0052@example.com,Customer Service Agent,2,CS,Customer Service,31,2014-02-11,,1,1,نواف الزهراني,موظف خدمة عملاء,خدمة العملاء,M,employee
+53,E0053,Rakan Al-Dhafiri,e0053@example.com,Sales Manager,3,SAL,Sales,121,2017-07-02,,1,1,راكان الظفيري,مدير المبيعات,المبيعات,M,manager
+54,E0054,Yazeed Al-Rashidi,e0054@example.com,Account Executive,3,SAL,Sales,53,2015-04-05,2026-06-16,0,1,يزيد الرشيدي,مسؤول حسابات العملاء,المبيعات,M,employee
+55,E0055,Amal Al-Otaibi,e0055@example.com,Account Executive,3,SAL,Sales,53,2021-08-22,,1,1,أمل العتيبي,مسؤولة حسابات العملاء,المبيعات,F,employee
+56,E0056,Ziyad Al-Harbi,e0056@example.com,Account Executive,3,SAL,Sales,53,2015-04-01,,1,1,زياد الحربي,مسؤول حسابات العملاء,المبيعات,M,employee
+57,E0057,Osama Al-Hajri,e0057@example.com,Account Executive,3,SAL,Sales,53,2014-06-08,,1,1,أسامة الهاجري,مسؤول حسابات العملاء,المبيعات,M,employee
+58,E0058,Lama Al-Mutairi,e0058@example.com,Account Executive,3,SAL,Sales,53,2023-08-12,,1,1,لمى المطيري,مسؤولة حسابات العملاء,المبيعات,F,employee
+59,E0059,Turki Al-Shammari,e0059@example.com,Sales Coordinator,3,SAL,Sales,53,2025-01-14,,1,1,تركي الشمري,منسق مبيعات,المبيعات,M,employee
+60,E0060,Maha Al-Juhani,e0060@example.com,Sales Coordinator,3,SAL,Sales,53,2016-12-18,,1,1,مها الجهني,منسقة مبيعات,المبيعات,F,employee
+61,E0061,Lina Al-Khaldi,e0061@example.com,Account Executive,3,SAL,Sales,53,2014-07-10,,1,1,لينا الخالدي,مسؤولة حسابات العملاء,المبيعات,F,employee
+62,E0062,Mansour Al-Subaie,e0062@example.com,Account Executive,3,SAL,Sales,53,2024-04-30,,1,1,منصور السبيعي,مسؤول حسابات العملاء,المبيعات,M,employee
+63,E0063,Fahad Al-Sahli,e0063@example.com,Account Executive,3,SAL,Sales,53,2024-05-08,,1,1,فهد السهلي,مسؤول حسابات العملاء,المبيعات,M,employee
+64,E0064,Mishal Al-Shammari,e0064@example.com,Sales Coordinator,3,SAL,Sales,53,2022-12-11,,1,1,مشعل الشمري,منسق مبيعات,المبيعات,M,employee
+65,E0065,Faisal Al-Shammari,e0065@example.com,Account Executive,3,SAL,Sales,53,2015-02-04,,1,1,فيصل الشمري,مسؤول حسابات العملاء,المبيعات,M,employee
+66,E0066,Badr Al-Anazi,e0066@example.com,Account Executive,3,SAL,Sales,53,2024-11-07,,1,1,بدر العنزي,مسؤول حسابات العملاء,المبيعات,M,employee
+67,E0067,Rakan Al-Shammari,e0067@example.com,Account Executive,3,SAL,Sales,53,2023-08-18,,1,1,راكان الشمري,مسؤول حسابات العملاء,المبيعات,M,employee
+68,E0068,Badr Al-Otaibi,e0068@example.com,Account Executive,3,SAL,Sales,53,2020-12-10,,1,1,بدر العتيبي,مسؤول حسابات العملاء,المبيعات,M,employee
+69,E0069,Ali Al-Mutairi,e0069@example.com,Account Executive,3,SAL,Sales,53,2017-08-05,,1,1,علي المطيري,مسؤول حسابات العملاء,المبيعات,M,employee
+70,E0070,Bandar Al-Khaldi,e0070@example.com,Account Executive,3,SAL,Sales,53,2019-10-20,,1,1,بندر الخالدي,مسؤول حسابات العملاء,المبيعات,M,employee
+71,E0071,Abdulrahman Al-Yami,e0071@example.com,Information Technology Manager,4,IT,Information Technology,121,2016-08-29,,1,1,عبدالرحمن اليامي,مدير تقنية المعلومات,تقنية المعلومات,M,manager
+72,E0072,Abdulrahman Al-Shammari,e0072@example.com,Support Engineer,4,IT,Information Technology,71,2025-03-25,,1,1,عبدالرحمن الشمري,مهندس دعم فني,تقنية المعلومات,M,employee
+73,E0073,Osama Al-Shehri,e0073@example.com,Systems Analyst,4,IT,Information Technology,71,2022-11-16,2026-02-08,0,1,أسامة الشهري,محلل نظم,تقنية المعلومات,M,employee
+74,E0074,Yazeed Al-Khaldi,e0074@example.com,Data Analyst,4,IT,Information Technology,71,2014-04-17,,1,1,يزيد الخالدي,محلل بيانات,تقنية المعلومات,M,employee
+75,E0075,Sara Al-Mutairi,e0075@example.com,Data Analyst,4,IT,Information Technology,71,2019-01-10,,1,1,سارة المطيري,محللة بيانات,تقنية المعلومات,F,employee
+76,E0076,Ziyad Al-Balawi,e0076@example.com,Support Engineer,4,IT,Information Technology,71,2025-04-10,,1,1,زياد البلوي,مهندس دعم فني,تقنية المعلومات,M,employee
+77,E0077,Turki Al-Harbi,e0077@example.com,Systems Analyst,4,IT,Information Technology,71,2017-08-20,2026-02-19,0,1,تركي الحربي,محلل نظم,تقنية المعلومات,M,employee
+78,E0078,Abdullah Al-Malki,e0078@example.com,Support Engineer,4,IT,Information Technology,71,2019-10-13,,1,1,عبدالله المالكي,مهندس دعم فني,تقنية المعلومات,M,employee
+79,E0079,Dana Al-Qahtani,e0079@example.com,Systems Analyst,4,IT,Information Technology,71,2023-09-28,,1,1,دانة القحطاني,محللة نظم,تقنية المعلومات,F,employee
+80,E0080,Hamza Al-Malki,e0080@example.com,Support Engineer,4,IT,Information Technology,71,2014-01-28,,1,1,حمزة المالكي,مهندس دعم فني,تقنية المعلومات,M,employee
+81,E0081,Fahad Al-Anazi,e0081@example.com,Support Engineer,4,IT,Information Technology,71,2022-07-21,,1,1,فهد العنزي,مهندس دعم فني,تقنية المعلومات,M,employee
+82,E0082,Asma Al-Dosari,e0082@example.com,Systems Analyst,4,IT,Information Technology,71,2023-10-24,2026-01-25,0,1,أسماء الدوسري,محللة نظم,تقنية المعلومات,F,employee
+83,E0083,Faisal Al-Subaie,e0083@example.com,Systems Analyst,4,IT,Information Technology,71,2016-11-25,,1,1,فيصل السبيعي,محلل نظم,تقنية المعلومات,M,employee
+84,E0084,Fahad Al-Dhafiri,e0084@example.com,Data Analyst,4,IT,Information Technology,71,2022-11-12,,1,1,فهد الظفيري,محلل بيانات,تقنية المعلومات,M,employee
+85,E0085,Majed Al-Mutairi,e0085@example.com,Support Engineer,4,IT,Information Technology,71,2017-05-11,,1,1,ماجد المطيري,مهندس دعم فني,تقنية المعلومات,M,employee
+86,E0086,Hamad Al-Rashidi,e0086@example.com,Data Analyst,4,IT,Information Technology,71,2015-04-27,2026-02-20,0,1,حمد الرشيدي,محلل بيانات,تقنية المعلومات,M,employee
+87,E0087,Hamza Al-Omari,e0087@example.com,Finance Manager,5,FIN,Finance,121,2017-03-05,,1,1,حمزة العمري,المدير المالي,المالية,M,manager
+88,E0088,Mishal Al-Tamimi,e0088@example.com,Financial Analyst,5,FIN,Finance,87,2016-11-14,,1,1,مشعل التميمي,محلل مالي,المالية,M,employee
+89,E0089,Sultan Al-Zahrani,e0089@example.com,Accountant,5,FIN,Finance,87,2023-06-17,,1,1,سلطان الزهراني,محاسب,المالية,M,employee
+90,E0090,Abdullah Al-Sahli,e0090@example.com,Accountant,5,FIN,Finance,87,2020-11-20,,1,1,عبدالله السهلي,محاسب,المالية,M,employee
+91,E0091,Mishal Al-Otaibi,e0091@example.com,Financial Analyst,5,FIN,Finance,87,2017-08-06,,1,1,مشعل العتيبي,محلل مالي,المالية,M,employee
+92,E0092,Badr Al-Dhafiri,e0092@example.com,Accountant,5,FIN,Finance,87,2015-12-02,,1,1,بدر الظفيري,محاسب,المالية,M,employee
+93,E0093,Maha Al-Mutairi,e0093@example.com,Accountant,5,FIN,Finance,87,2015-05-04,,1,1,مها المطيري,محاسبة,المالية,F,employee
+94,E0094,Ziyad Al-Sahli,e0094@example.com,Financial Analyst,5,FIN,Finance,87,2016-01-09,,1,1,زياد السهلي,محلل مالي,المالية,M,employee
+95,E0095,Bandar Al-Yami,e0095@example.com,Financial Analyst,5,FIN,Finance,87,2021-11-20,,1,1,بندر اليامي,محلل مالي,المالية,M,employee
+96,E0096,Meshari Al-Subaie,e0096@example.com,Financial Analyst,5,FIN,Finance,87,2019-11-05,,1,1,مشاري السبيعي,محلل مالي,المالية,M,employee
+97,E0097,Meshari Al-Sahli,e0097@example.com,Accountant,5,FIN,Finance,87,2014-07-03,,1,1,مشاري السهلي,محاسب,المالية,M,employee
+98,E0098,Shahad Al-Shammari,e0098@example.com,Accountant,5,FIN,Finance,87,2016-11-21,,1,1,شهد الشمري,محاسبة,المالية,F,employee
+99,E0099,Mansour Al-Omari,e0099@example.com,Financial Analyst,5,FIN,Finance,87,2014-07-28,,1,1,منصور العمري,محلل مالي,المالية,M,employee
+100,E0100,Khalid Al-Sahli,e0100@example.com,Accountant,5,FIN,Finance,87,2015-03-07,,1,1,خالد السهلي,محاسب,المالية,M,employee
+101,E0101,Omar Alnasser,e0101@example.com,Human Resources Manager,6,HR,Human Resources,121,2024-09-18,,1,1,عمر الناصر,مدير الموارد البشرية,الموارد البشرية,M,hr
+102,E0102,Saleh Al-Yami,e0102@example.com,Payroll Officer,6,HR,Human Resources,101,2023-04-11,,1,1,صالح اليامي,مسؤول رواتب,الموارد البشرية,M,hr
+103,E0103,Dana Al-Tamimi,e0103@example.com,Recruiter,6,HR,Human Resources,101,2020-09-17,,1,1,دانة التميمي,أخصائية توظيف,الموارد البشرية,F,employee
+104,E0104,Ahmed Al-Harbi,e0104@example.com,Recruiter,6,HR,Human Resources,101,2022-07-24,,1,1,أحمد الحربي,أخصائي توظيف,الموارد البشرية,M,employee
+105,E0105,Haya Al-Qahtani,e0105@example.com,Recruiter,6,HR,Human Resources,101,2025-03-15,,1,1,هيا القحطاني,أخصائية توظيف,الموارد البشرية,F,employee
+106,E0106,Mohammed Al-Qahtani,e0106@example.com,HR Specialist,6,HR,Human Resources,101,2021-12-13,2026-02-14,0,1,محمد القحطاني,أخصائي موارد بشرية,الموارد البشرية,M,employee
+107,E0107,Ali Al-Dosari,e0107@example.com,Recruiter,6,HR,Human Resources,101,2019-01-09,,1,1,علي الدوسري,أخصائي توظيف,الموارد البشرية,M,employee
+108,E0108,Ziyad Al-Dhafiri,e0108@example.com,Recruiter,6,HR,Human Resources,101,2017-12-02,,1,1,زياد الظفيري,أخصائي توظيف,الموارد البشرية,M,employee
+109,E0109,Talal Al-Hajri,e0109@example.com,Payroll Officer,6,HR,Human Resources,101,2019-01-10,,1,1,طلال الهاجري,مسؤول رواتب,الموارد البشرية,M,employee
+110,E0110,Talal Al-Malki,e0110@example.com,Payroll Officer,6,HR,Human Resources,101,2023-03-09,,1,1,طلال المالكي,مسؤول رواتب,الموارد البشرية,M,employee
+111,E0111,Lina Al-Rashidi,e0111@example.com,Payroll Officer,6,HR,Human Resources,101,2026-02-10,,1,1,لينا الرشيدي,مسؤولة رواتب,الموارد البشرية,F,employee
+112,E0112,Ali Al-Juhani,e0112@example.com,Sales Coordinator,3,SAL,Sales,53,2026-03-12,,1,1,علي الجهني,منسق مبيعات,المبيعات,M,employee
+113,E0113,Turki Al-Otaibi,e0113@example.com,Logistics Coordinator,1,OPS,Operations,1,2025-12-01,,1,1,تركي العتيبي,منسق خدمات لوجستية,العمليات,M,employee
+114,E0114,Abdullah Al-Balawi,e0114@example.com,Systems Analyst,4,IT,Information Technology,71,2026-05-20,,1,1,عبدالله البلوي,محلل نظم,تقنية المعلومات,M,employee
+115,E0115,Osama Al-Mutairi,e0115@example.com,Systems Analyst,4,IT,Information Technology,71,2026-04-11,,1,1,أسامة المطيري,محلل نظم,تقنية المعلومات,M,employee
+116,E0116,Joud Al-Shehri,e0116@example.com,Payroll Officer,6,HR,Human Resources,101,2026-06-09,,1,1,جود الشهري,مسؤولة رواتب,الموارد البشرية,F,employee
+117,E0117,Abdullah Al-Harbi,e0117@example.com,Recruiter,6,HR,Human Resources,101,2026-05-02,,1,1,عبدالله الحربي,أخصائي توظيف,الموارد البشرية,M,employee
+118,E0118,Rakan Al-Subaie,e0118@example.com,Shift Supervisor,1,OPS,Operations,1,2025-10-04,,1,1,راكان السبيعي,مشرف وردية,العمليات,M,employee
+119,E0119,Fahad Al-Omari,e0119@example.com,Logistics Coordinator,1,OPS,Operations,1,2026-03-14,,1,1,فهد العمري,منسق خدمات لوجستية,العمليات,M,employee
+120,E0120,Meshari Al-Zahrani,e0120@example.com,Payroll Officer,6,HR,Human Resources,101,2026-05-05,,1,1,مشاري الزهراني,مسؤول رواتب,الموارد البشرية,M,employee
+121,E0000,Abdulaziz Al-Mutlaq,e0000@example.com,General Manager,7,EXEC,Executive Management,,2015-01-04,,1,1,عبدالعزيز المطلق,المدير العام,الإدارة التنفيذية,M,gm

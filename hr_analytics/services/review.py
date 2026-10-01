@@ -3,6 +3,9 @@
 These are transparent RULES, not predictions. A flag means "worth a
 conversation", never an automatic consequence. Thresholds are deliberately
 simple so an HR reviewer can verify each flag from the raw numbers.
+
+Each flag keeps its numbers in `facts`; the wording (rule title, the short
+sentence with the evidence) comes from labels.py in the page language.
 """
 from __future__ import annotations
 
@@ -11,15 +14,19 @@ import pandas as pd
 from ..db import repos
 from ..domain.metrics import grouped_attendance_kpis
 from ..domain.scoring import parse_period, shift_period
+from ..labels import RULES as RULE_TEXT
+from ..labels import rule_description, rule_evidence, rule_title
 from ..security.scope import UserContext
 
-RULES = {
-    "ABSENCE_3PLUS": "3 or more unexcused absences in the month",
-    "LATE_RATE_30": "Late on at least 30% of attended days (minimum 5 attended days)",
-    "INCOMPLETE_3PLUS": "3 or more days with a single punch (missing IN or OUT)",
-    "SCORE_BELOW_THRESHOLD": "Weighted performance score below the review threshold",
-    "SCORE_DROP_1": "Weighted score dropped by 1.0 or more versus the previous month",
-}
+RULE_CODES = list(RULE_TEXT)
+# English description per rule code (kept for the Power BI export and older callers)
+RULES = {code: RULE_TEXT[code][1][0] for code in RULE_CODES}
+NAME_COLS = ["employee_id", "employee_code", "full_name", "full_name_ar", "department_name", "department_name_ar"]
+
+
+def rules_for_display() -> list[tuple[str, str, str]]:
+    """(code, title, description) in the current language."""
+    return [(c, rule_title(c), rule_description(c)) for c in RULE_CODES]
 
 
 def review_cases(conn, user: UserContext, period: str, *, threshold: float,
@@ -27,36 +34,36 @@ def review_cases(conn, user: UserContext, period: str, *, threshold: float,
     first, last = parse_period(period)
     att = repos.attendance_frame(conn, user, first.isoformat(), last.isoformat(), department_id)
     ev = repos.evaluations_frame(conn, user, shift_period(period, -1), period, department_id)
-    cols = ["employee_id", "employee_code", "full_name", "department_name", "rule_code", "rule", "value"]
     flags = []
 
     if not att.empty:
         per_emp = grouped_attendance_kpis(att, "employee_id")
-        names = att.drop_duplicates("employee_id").set_index("employee_id")[["employee_code", "full_name", "department_name"]]
+        names = att.drop_duplicates("employee_id").set_index("employee_id")[NAME_COLS[1:]]
         per_emp = per_emp.join(names, on="employee_id")
         for r in per_emp.to_dict("records"):
-            base = {k: r[k] for k in ("employee_id", "employee_code", "full_name", "department_name")}
+            base = {k: r[k] for k in NAME_COLS}
             if r["absent_days"] >= 3:
-                flags.append({**base, "rule_code": "ABSENCE_3PLUS", "value": f"{r['absent_days']} absences"})
+                flags.append({**base, "rule_code": "ABSENCE_3PLUS", "facts": {"n": r["absent_days"]}})
             if r["attended_days"] >= 5 and (r["late_rate"] or 0) >= 0.30:
                 flags.append({**base, "rule_code": "LATE_RATE_30",
-                              "value": f"{r['late_days']}/{r['attended_days']} days late"})
+                              "facts": {"n": r["late_days"], "of": r["attended_days"]}})
             if r["incomplete_days"] >= 3:
-                flags.append({**base, "rule_code": "INCOMPLETE_3PLUS", "value": f"{r['incomplete_days']} days"})
+                flags.append({**base, "rule_code": "INCOMPLETE_3PLUS", "facts": {"n": r["incomplete_days"]}})
 
     if not ev.empty:
         cur = ev[ev.period == period].set_index("employee_id")
         prev = ev[ev.period == shift_period(period, -1)].set_index("employee_id")["weighted_score"]
         for emp_id, r in cur.iterrows():
-            base = {"employee_id": emp_id, "employee_code": r["employee_code"], "full_name": r["full_name"],
-                    "department_name": r["department_name"]}
+            base = {"employee_id": emp_id, **{k: r[k] for k in NAME_COLS[1:]}}
             if r["weighted_score"] < threshold:
                 flags.append({**base, "rule_code": "SCORE_BELOW_THRESHOLD",
-                              "value": f"{r['weighted_score']:.2f} < {threshold:.2f}"})
+                              "facts": {"score": float(r["weighted_score"]), "threshold": float(threshold)}})
             if emp_id in prev.index and prev[emp_id] - r["weighted_score"] >= 1.0:
                 flags.append({**base, "rule_code": "SCORE_DROP_1",
-                              "value": f"{prev[emp_id]:.2f} -> {r['weighted_score']:.2f}"})
+                              "facts": {"previous": float(prev[emp_id]), "score": float(r["weighted_score"])}})
 
-    df = pd.DataFrame(flags, columns=[c for c in cols if c != "rule"])
-    df["rule"] = df["rule_code"].map(RULES)
+    cols = NAME_COLS + ["rule_code", "rule", "value", "facts"]
+    df = pd.DataFrame(flags, columns=[c for c in cols if c not in ("rule", "value")])
+    df["rule"] = [rule_title(c) for c in df["rule_code"]]
+    df["value"] = [rule_evidence(c, f) for c, f in zip(df["rule_code"], df["facts"])]
     return df[cols].sort_values(["employee_code", "rule_code"]).reset_index(drop=True)

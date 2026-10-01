@@ -10,6 +10,7 @@ from markupsafe import Markup, escape
 
 from ..db import repos
 from ..domain.scoring import parse_period, period_of
+from ..i18n import _
 from ..security.scope import AccessDenied, visible_department_ids
 from . import get_db
 
@@ -31,8 +32,9 @@ def roles_required(*roles):
         @wraps(view)
         @login_required
         def wrapped(*args, **kwargs):
-            if g.user.role not in roles:
-                raise AccessDenied("Your role does not allow this action.")
+            # the General Manager holds every HR power
+            if g.user.role not in roles and not (g.user.is_gm and "hr" in roles):
+                raise AccessDenied(_("Your role does not allow this action."))
             return view(*args, **kwargs)
         return wrapped
     return deco
@@ -65,7 +67,7 @@ def get_period(arg: str = "period") -> str:
     try:
         parse_period(p)
     except ValueError:
-        abort(400, description="Period must look like YYYY-MM.")
+        abort(400, description=_("The month must look like 2026-08 (year, then month)."))
     return p
 
 
@@ -80,10 +82,10 @@ def get_department_filter() -> int | None:
     try:
         dept_id = int(raw)
     except ValueError:
-        abort(400, description="Invalid department.")
+        abort(400, description=_("That department does not exist."))
     allowed = visible_department_ids(get_db(), g.user)
     if allowed is not None and dept_id not in allowed:
-        raise AccessDenied("You can only view departments you manage.")
+        raise AccessDenied(_("You can only view departments you manage."))
     return dept_id
 
 
@@ -101,7 +103,7 @@ def int_arg(name: str, default: int | None = None) -> int | None:
     try:
         return int(raw)
     except ValueError:
-        abort(400, description=f"Invalid value for {name}.")
+        abort(400, description=_("One of the values in the address is not valid."))
 
 
 def records(df, limit: int | None = None) -> list[dict]:
@@ -127,7 +129,7 @@ def line_chart(labels: list[str], series: list[dict], *, height: int = 170, y_mi
     width, pad_l, pad_r, pad_t, pad_b = 520, 40, 10, 10, 24
     n = len(labels)
     if n == 0:
-        return Markup('<p class="muted">No data for this selection.</p>')
+        return Markup(f'<p class="muted">{escape(_("No data for this selection."))}</p>')
     iw, ih = width - pad_l - pad_r, height - pad_t - pad_b
 
     def x(i):

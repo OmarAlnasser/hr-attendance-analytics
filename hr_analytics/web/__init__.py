@@ -16,12 +16,14 @@ import secrets
 import warnings
 from datetime import timedelta
 
-from flask import Flask, abort, g, render_template, request, session
+from flask import Flask, abort, g, redirect, render_template, request, session, url_for
 from markupsafe import Markup
 
 from ..config import Settings
 from ..db.connection import connect, ensure_schema
 from ..domain.metrics import fmt_num, fmt_pct
+from .. import labels
+from ..i18n import LANGS, _, count, is_rtl, loc
 from ..security.scope import AccessDenied, load_user_context
 
 SAFE_METHODS = {"GET", "HEAD", "OPTIONS"}
@@ -72,6 +74,15 @@ def create_app(settings: Settings | None = None, **overrides) -> Flask:
         from werkzeug.middleware.proxy_fix import ProxyFix
         app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)   # real client IP for the login throttle
 
+    @app.route("/lang/<code>")
+    def set_language(code: str):
+        """Switch the interface language and return to the same page."""
+        from .helpers import safe_next
+        if code in LANGS:
+            session["lang"] = code
+        back = safe_next(request.args.get("next"))
+        return redirect(back or url_for("dashboard.index"))
+
     @app.route("/healthz")
     def healthz():
         """Liveness + database check for the host (no login, no data)."""
@@ -81,6 +92,7 @@ def create_app(settings: Settings | None = None, **overrides) -> Flask:
     @app.before_request
     def _load_context():
         g.settings = settings
+        g.lang = session.get("lang") or request.accept_languages.best_match(list(LANGS)) or "en"
         g.user = None
         uid = session.get("uid")
         if uid is not None:
@@ -94,8 +106,8 @@ def create_app(settings: Settings | None = None, **overrides) -> Flask:
         u = g.get("user")
         if u is not None and u.must_change_password and request.endpoint not in (
                 "auth.account", "auth.logout", "static"):
-            from flask import flash, redirect, url_for
-            flash("Your password was reset by HR. Choose a new password to continue.", "info")
+            from flask import flash
+            flash(_("Your password was reset. Choose a new password to continue."), "info")
             return redirect(url_for("auth.account"))
 
     @app.before_request
@@ -105,7 +117,7 @@ def create_app(settings: Settings | None = None, **overrides) -> Flask:
         sent = request.form.get("csrf_token") or request.headers.get("X-CSRF-Token") or ""
         expected = session.get("csrf") or ""
         if not expected or not hmac.compare_digest(sent, expected):
-            abort(400, description="Missing or invalid CSRF token. Reload the page and try again.")
+            abort(400, description=_("This form has expired. Reload the page and try again."))
 
     @app.teardown_appcontext
     def _close_db(exc):
@@ -132,39 +144,73 @@ def create_app(settings: Settings | None = None, **overrides) -> Flask:
     def _denied(exc):
         log.warning("access denied: user=%s path=%s reason=%s",
                     getattr(g.get("user"), "username", None), request.path, exc)
-        return _error(403, "Not permitted", str(exc) or "You do not have access to this data.")
+        return _error(403, _("Not permitted"), str(exc) or _("You do not have access to this data."))
 
     @app.errorhandler(400)
     def _bad(exc):
-        return _error(400, "Bad request", getattr(exc, "description", "") or "The request could not be processed.")
+        return _error(400, _("Something in the request was not right"),
+                      getattr(exc, "description", "") or _("The request could not be processed."))
 
     @app.errorhandler(403)
     def _forbidden(exc):
-        return _error(403, "Not permitted", getattr(exc, "description", "") or "You do not have access to this page.")
+        return _error(403, _("Not permitted"), getattr(exc, "description", "") or _("You do not have access to this page."))
 
     @app.errorhandler(404)
     def _missing(exc):
-        return _error(404, "Not found", "The page or record does not exist.")
+        return _error(404, _("Not found"), _("The page or record does not exist."))
 
     @app.errorhandler(413)
     def _too_large(exc):
-        return _error(413, "File too large", f"Uploads are limited to {settings.MAX_UPLOAD_MB} MB.")
+        return _error(413, _("File too large"), _("Uploads are limited to {mb} MB.", mb=settings.MAX_UPLOAD_MB))
 
     @app.context_processor
     def _inject():
-        synthetic, counts = False, {"to_decide": 0, "mine": 0}
+        synthetic, counts, profile = False, {"to_decide": 0, "mine": 0}, None
         if g.get("user") is not None:
             row = get_db().execute("SELECT 1 FROM employees WHERE is_synthetic = 1 LIMIT 1").fetchone()
             synthetic = row is not None
-            from ..db.repos import pending_counts
+            from ..db.repos import pending_counts, user_profile
             counts = pending_counts(get_db(), g.user)
-        return {"current_user": g.get("user"), "synthetic_data": synthetic, "pending": counts,
-                "demo_mode": settings.DEMO_MODE, "demo_note": settings.DEMO_RESET_NOTE}
+            profile = _profile_card(user_profile(get_db(), g.user.user_id))
+        return {"current_user": g.get("user"), "synthetic_data": synthetic, "pending": counts, "profile": profile,
+                "demo_mode": settings.DEMO_MODE, "lang": g.get("lang", "en"), "rtl": is_rtl(g.get("lang", "en"))}
 
-    app.jinja_env.globals.update(csrf_token=csrf_token, csrf_field=csrf_field, fmt_pct=fmt_pct, fmt_num=fmt_num)
+    app.jinja_env.globals.update(csrf_token=csrf_token, csrf_field=csrf_field, fmt_pct=fmt_pct, fmt_num=fmt_num,
+                                 _=_, count=count, loc=loc, L=labels, LANGS=LANGS)
     app.jinja_env.filters["pct"] = fmt_pct
+    app.jinja_env.filters["month"] = _month_label
     app.jinja_env.filters["num"] = fmt_num
+    app.jinja_env.filters["status"] = labels.status_label
+    app.jinja_env.filters["leave_type"] = labels.leave_type_label
+    app.jinja_env.filters["req_status"] = labels.request_status_label
+    app.jinja_env.filters["punch_kind"] = labels.punch_kind_label
 
     from .views import register_blueprints
     register_blueprints(app)
     return app
+
+
+AVATAR_COLOURS = {"gm": "#7A4E12", "hr": "#1F6F5C", "manager": "#9A6A0A", "employee": "#2F5F97"}
+
+
+def _month_label(period) -> str:
+    """'2026-08' -> 'Aug 2026' / 'أغسطس 2026' (anything else is shown as it is)."""
+    try:
+        return labels.period_label(period)
+    except (ValueError, KeyError, AttributeError):
+        return str(period)
+
+
+def _profile_card(p: dict | None) -> dict | None:
+    """Name, role and an initials picture for the account box at the bottom of the sidebar."""
+    if p is None:
+        return None
+    name = loc(p, "full_name") or p["username"]
+    if g.get("lang") == "ar" and p.get("full_name_ar"):
+        initials = p["full_name_ar"].strip()[:1]                      # one Arabic letter reads cleanly
+    else:
+        parts = [w for w in (p.get("full_name") or p["username"]).replace("-", " ").split() if w[:1].isalpha()]
+        initials = (parts[0][:1] + (parts[-1][:1] if len(parts) > 1 else "")).upper() if parts else "?"
+    return {"name": name, "initials": initials, "role": labels.role_label(p["role"], p.get("gender")),
+            "title": loc(p, "job_title"), "department": loc(p, "department_name"), "username": p["username"],
+            "colour": AVATAR_COLOURS.get(p["role"], "#4A5A6B")}

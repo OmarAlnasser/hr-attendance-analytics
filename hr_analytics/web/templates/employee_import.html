@@ -1,43 +1,43 @@
 {% extends "base.html" %}
-{% block title %}Import employees{% endblock %}
+{% block title %}{{ _('Import employees') }}{% endblock %}
 {% block content %}
-<div class="page-head"><div><h1>Import employees</h1><p>Onboard many people at once from a CSV. Every row is checked first; then either all rows are saved or none.</p></div>
-<div class="btn-row" style="margin:0"><a class="btn secondary" href="{{ url_for('users.import_template') }}">Download template</a></div></div>
+<div class="page-head"><div><h1>{{ _('Import employees') }}</h1><p>{{ _('Add many people at once from a CSV file. Every row is checked first; then either every row is saved or none is.') }}</p></div>
+<div class="btn-row" style="margin:0"><a class="btn secondary" href="{{ url_for('users.import_template') }}">{{ _('Download a template') }}</a></div></div>
 {% include "_issued.html" %}
 <div class="grid-2">
 <section class="panel">
-  <h2>Upload</h2>
+  <h2>{{ _('Upload') }}</h2>
   <form method="post" enctype="multipart/form-data" class="form-grid" style="grid-template-columns:1fr">
     {{ csrf_field() }}
-    <div class="field"><label for="f">CSV file (UTF-8, header row)</label><input id="f" type="file" name="file" accept=".csv,text/csv" required></div>
-    <div class="checks"><label><input type="checkbox" name="create_accounts" value="1"> Also create sign-in accounts</label></div>
-    <p class="help" style="margin-top:-.6rem">Username = employee code in lower case. Temporary passwords are shown once and must be changed at first sign-in.</p>
-    <div class="btn-row"><button class="btn secondary" type="submit" name="mode" value="check">Check only</button><button class="btn" type="submit" name="mode" value="import">Check and import</button></div>
+    <div class="field"><label for="f">{{ _('CSV file (UTF-8, with a header row)') }}</label><input id="f" type="file" name="file" accept=".csv,text/csv" required></div>
+    <div class="checks"><label><input type="checkbox" name="create_accounts" value="1"> {{ _('Also create sign-in accounts') }}</label></div>
+    <p class="help" style="margin-top:-.6rem">{{ _('The username is the employee code in lower case. Temporary passwords are shown once and must be changed at the first sign-in.') }}</p>
+    <div class="btn-row"><button class="btn secondary" type="submit" name="mode" value="check">{{ _('Check only') }}</button><button class="btn" type="submit" name="mode" value="import">{{ _('Check and import') }}</button></div>
   </form>
 </section>
 <section class="panel">
-  <h2>Columns</h2>
-  <p class="small"><code>{{ columns|join(', ') }}</code></p>
+  <h2>{{ _('Columns') }}</h2>
+  <p class="small" dir="ltr"><code>{{ columns|join(', ') }}</code></p>
   <ul class="small">
-    <li><b>department_code</b> and <b>shift_code</b> must already exist (Departments, Shifts).</li>
-    <li><b>hire_date</b> as YYYY-MM-DD. The shift applies from the hire date.</li>
-    <li><b>email</b> and <b>job_title</b> may be empty. Email is the Power BI sign-in for row-level security.</li>
-    <li>Only new employee codes are accepted. Change existing people on their Edit page.</li>
+    <li>{{ _('department_code and shift_code must already exist (see Departments and Shifts).') }}</li>
+    <li>{{ _('hire_date is written as YYYY-MM-DD, and the shift starts on that date.') }}</li>
+    <li>{{ _('email, job_title and the Arabic columns (full_name_ar, job_title_ar) may be left empty; gender is M or F, or empty.') }}</li>
+    <li>{{ _('Only new employee codes are accepted. To change someone already on the system, use their Edit page.') }}</li>
   </ul>
 </section>
 </div>
 {% if errors %}
 <section class="panel" style="margin-top:1.1rem;border-color:#EDBDB9">
-  <h2>{{ errors|length }} row(s) need fixing in {{ filename }}. Nothing was saved.</h2>
+  <h2>{{ _('{n} need fixing in {file}. Nothing was saved.', n=count(errors|length, 'row'), file=filename) }}</h2>
   <ul class="small">{% for e in errors[:200] %}<li>{{ e }}</li>{% endfor %}</ul>
-  {% if errors|length > 200 %}<p class="small muted">and {{ errors|length - 200 }} more.</p>{% endif %}
+  {% if errors|length > 200 %}<p class="small muted">{{ _('and {n} more.', n=errors|length - 200) }}</p>{% endif %}
 </section>
 {% endif %}
 {% if rows %}
 <section class="panel" style="margin-top:1.1rem">
-  <div class="panel-head"><h2>{% if done %}Imported{% elif errors %}Rows that passed{% else %}Ready to import{% endif %}: {{ rows|length }}</h2>{% if checked and not errors and not done %}<span class="small muted">choose the file again and press "Check and import"</span>{% endif %}</div>
-  <div class="table-wrap"><table><thead><tr><th>Code</th><th>Badge</th><th>Name</th><th>Email</th><th>Department</th><th>Shift</th><th>Hired</th></tr></thead><tbody>
-  {% for r in rows[:300] %}<tr><td>{% if r.employee_id %}<a href="{{ url_for('attendance.employee', employee_id=r.employee_id) }}">{{ r.employee_code }}</a>{% else %}{{ r.employee_code }}{% endif %}</td><td>{{ r.badge_id }}</td><td>{{ r.full_name }}</td><td class="small">{{ r.email or '' }}</td><td>{{ r.department }}</td><td>{{ r.shift }}</td><td class="nowrap">{{ r.hire_date }}</td></tr>{% endfor %}
+  <div class="panel-head"><h2>{% if done %}{{ _('Imported') }}{% elif errors %}{{ _('Rows that passed') }}{% else %}{{ _('Ready to import') }}{% endif %}: {{ rows|length }}</h2>{% if checked and not errors and not done %}<span class="small muted">{{ _('Choose the file again and press "Check and import".') }}</span>{% endif %}</div>
+  <div class="table-wrap"><table><thead><tr><th>{{ _('Code') }}</th><th>{{ _('Badge') }}</th><th>{{ _('Name') }}</th><th>{{ _('Email') }}</th><th>{{ _('Department') }}</th><th>{{ _('Shift') }}</th><th>{{ _('Start date') }}</th></tr></thead><tbody>
+  {% for r in rows[:300] %}<tr><td>{% if r.employee_id %}<a href="{{ url_for('attendance.employee', employee_id=r.employee_id) }}">{{ r.employee_code }}</a>{% else %}{{ r.employee_code }}{% endif %}</td><td>{{ r.badge_id }}</td><td>{{ loc(r, 'full_name') }}</td><td class="small">{{ r.email or '' }}</td><td>{{ loc(r, 'department_name') }}</td><td>{{ r.shift }}</td><td class="nowrap">{{ r.hire_date }}</td></tr>{% endfor %}
   </tbody></table></div>
 </section>
 {% endif %}

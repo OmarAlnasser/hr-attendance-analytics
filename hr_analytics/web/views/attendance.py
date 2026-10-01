@@ -1,7 +1,6 @@
 """Attendance list, export, and employee profile."""
 from __future__ import annotations
 
-import calendar
 import io
 from datetime import date, timedelta
 
@@ -12,6 +11,8 @@ from ...db import repos
 from ...domain.attendance_rules import ALL_STATUSES, EXPECTED_STATUSES
 from ...domain.metrics import attendance_kpis
 from ...domain.scoring import CATEGORIES, CATEGORY_LABELS, parse_period, shift_period
+from ...i18n import N_, _, current_lang, loc
+from ...labels import day_note, status_label, weekday_letter, weekday_name
 from ...security.scope import AccessDenied, can_evaluate, can_view_employee
 from .. import get_db
 from ..helpers import audit, records, department_options, get_department_filter, get_period, line_chart, login_required
@@ -19,9 +20,12 @@ from .dashboard import trend_series
 
 bp = Blueprint("attendance", __name__)
 
-EXPORT_COLUMNS = ["shift_date", "employee_code", "full_name", "department_name", "shift_code", "status",
-                  "scheduled_start", "scheduled_end", "first_punch", "last_punch", "punch_count", "is_late",
-                  "late_minutes", "early_leave_minutes", "span_minutes", "leave_type", "holiday_name", "notes"]
+# (column in the data, heading in the file)
+EXPORT_COLUMNS = [("shift_date", N_("Date")), ("employee_code", N_("Employee code")), ("name", N_("Name")),
+                  ("department", N_("Department")), ("shift", N_("Shift")), ("status_text", N_("Status")),
+                  ("late_text", N_("Late")), ("first_punch", N_("Clock-in")), ("last_punch", N_("Clock-out")),
+                  ("late_minutes", N_("Minutes late")), ("early_leave_minutes", N_("Left early (minutes)")),
+                  ("hours_present", N_("Hours present")), ("note", N_("Notes"))]
 MAX_ROWS_ON_PAGE = 1000
 
 
@@ -32,7 +36,7 @@ def _date_arg(name: str, default: date) -> date:
     try:
         return date.fromisoformat(raw)
     except ValueError:
-        abort(400, description=f"{name} must be a date (YYYY-MM-DD).")
+        abort(400, description=_("Please enter a valid date."))
 
 
 def _filters():
@@ -40,12 +44,12 @@ def _filters():
     first, last = parse_period(period)
     start, end = _date_arg("start", first), _date_arg("end", last)
     if end < start:
-        abort(400, description="End date is before start date.")
+        abort(400, description=_("The end date is before the start date."))
     if (end - start).days > 400:
-        abort(400, description="Choose a range of at most 400 days.")
+        abort(400, description=_("Choose a range of at most 400 days."))
     status = (request.args.get("status") or "").strip() or None
     if status and status not in ALL_STATUSES:
-        abort(400, description="Unknown status.")
+        abort(400, description=_("That status is not recognised."))
     q = (request.args.get("q") or "").strip()[:60]
     return {"period": period, "start": start, "end": end, "department_id": get_department_filter(),
             "status": status, "q": q}
@@ -86,8 +90,17 @@ def export(fmt):
     if fmt not in ("csv", "xlsx"):
         abort(404)
     f = _filters()
-    df = _frame(f)
-    out = df.reindex(columns=EXPORT_COLUMNS).map(_csv_safe) if not df.empty else pd.DataFrame(columns=EXPORT_COLUMNS)
+    rows = records(_frame(f))
+    out = pd.DataFrame([{
+        "shift_date": r["shift_date"], "employee_code": r["employee_code"], "name": loc(r, "full_name"),
+        "department": loc(r, "department_name"), "shift": loc(r, "shift_name"),
+        "status_text": status_label(r["status"]),
+        "late_text": _("Yes") if r["is_late"] and r["status"] in ("present", "incomplete") else "",
+        "first_punch": (r["first_punch"] or "")[:16], "last_punch": (r["last_punch"] or "")[:16] if r["punch_count"] > 1 else "",
+        "late_minutes": r["late_minutes"] if r["is_late"] else None, "early_leave_minutes": r["early_leave_minutes"] or None,
+        "hours_present": round(r["span_minutes"] / 60, 2) if r["span_minutes"] is not None else None,
+        "note": day_note(r)} for r in rows], columns=[c for c, _h in EXPORT_COLUMNS])
+    out = out.map(_csv_safe).rename(columns={c: _(h) for c, h in EXPORT_COLUMNS})
     name = f"attendance_{f['start']}_{f['end']}"
     audit("export", "attendance_daily", None, {"format": fmt, "rows": len(out), "start": f["start"],
                                                 "end": f["end"], "department_id": f["department_id"]})
@@ -97,14 +110,18 @@ def export(fmt):
         buf.write(out.to_csv(index=False).encode("utf-8-sig"))
         buf.seek(0)
         return send_file(buf, mimetype="text/csv", as_attachment=True, download_name=name + ".csv")
-    about = pd.DataFrame({"item": ["Period", "Department filter", "Status filter", "Search", "Exported by", "Note"],
-                          "value": [f"{f['start']} to {f['end']}", f["department_id"] or "all in your scope",
-                                    f["status"] or "all", f["q"] or "-", g.user.username,
-                                    "Synthetic demo data where employees are flagged synthetic. "
-                                    "span_minutes = first to last punch, not verified working time."]})
+    about = pd.DataFrame({
+        _("Item"): [_("Dates"), _("Department"), _("Status"), _("Search"), _("Downloaded by"), _("Note")],
+        _("Value"): [f"{f['start']} – {f['end']}", f["department_id"] or _("All departments I can see"),
+                     status_label(f["status"]) if f["status"] else _("Any"), f["q"] or "–", g.user.username,
+                     _("Made-up demonstration data. Hours present run from the first to the last punch and are "
+                       "not verified working hours.")]})
     with pd.ExcelWriter(buf, engine="openpyxl") as xw:
         out.to_excel(xw, sheet_name="attendance", index=False)
         about.to_excel(xw, sheet_name="about", index=False)
+        if current_lang() == "ar":
+            for ws in xw.book.worksheets:
+                ws.sheet_view.rightToLeft = True
     buf.seek(0)
     return send_file(buf, mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                      as_attachment=True, download_name=name + ".xlsx")
@@ -113,12 +130,12 @@ def export(fmt):
 @bp.route("/employees/<int:employee_id>")
 @login_required
 def employee(employee_id: int):
-    conn, s = get_db(), g.settings
+    conn = get_db()
     emp = repos.get_employee(conn, employee_id)
     if emp is None:
         abort(404)
     if not can_view_employee(conn, g.user, employee_id):
-        raise AccessDenied("You can only view employees within your scope.")
+        raise AccessDenied(_("You can only see people within your area."))
     period = get_period()
     first, last = parse_period(period)
     att = repos.attendance_frame(conn, g.user, first.isoformat(), last.isoformat(), employee_id=employee_id)
@@ -131,18 +148,18 @@ def employee(employee_id: int):
     while d <= last:
         r = by_day.get(d.isoformat())
         if r is not None:
-            status = r["status"]
-            cls = "late" if status in ("present", "incomplete") and r["is_late"] else status
+            status = status_label(r["status"])
+            cls = "late" if r["status"] in ("present", "incomplete") and r["is_late"] else r["status"]
         elif d < hire or (term and d > term):
-            status, cls = "not employed", "none"
+            status, cls = _("Not employed"), "none"
         else:
-            status, cls = "not processed", "none"
-        tip = f"{d:%a %d %b}: {status}"
+            status, cls = _("Not calculated yet"), "none"
+        tip = f"{weekday_name(d.weekday())} {d.isoformat()}: {status}"
         if r is not None and r.get("first_punch"):
-            tip += f" | {r['first_punch'][11:16]}" + (f"-{r['last_punch'][11:16]}" if r["punch_count"] > 1 else "")
+            tip += f" · {r['first_punch'][11:16]}" + (f"–{r['last_punch'][11:16]}" if r["punch_count"] > 1 else "")
         if r is not None and r["is_late"]:
-            tip += f" | {r['late_minutes']} min late"
-        ribbon.append({"date": d, "cls": cls, "tip": tip, "weekday": calendar.day_abbr[d.weekday()][0]})
+            tip += " · " + _("{n} min late", n=r["late_minutes"])
+        ribbon.append({"date": d, "cls": cls, "tip": tip, "weekday": weekday_letter(d.weekday())})
         d += timedelta(days=1)
 
     detail = [r for r in att_rows
@@ -152,9 +169,9 @@ def employee(employee_id: int):
     trend = trend_series(conn, g.user, period, 12, employee_id=employee_id)
     labels = [t["period"][2:] for t in trend]
     att_chart = line_chart(labels, [
-        {"name": "Attendance rate", "values": [t["attendance_rate"] for t in trend], "cls": "c-present"},
-        {"name": "Late rate", "values": [t["late_rate"] for t in trend], "cls": "c-late"}])
-    score_chart = line_chart(labels, [{"name": "Weighted score", "values": [t["avg_score"] for t in trend],
+        {"name": _("Attendance rate"), "values": [t["attendance_rate"] for t in trend], "cls": "c-present"},
+        {"name": _("Late rate"), "values": [t["late_rate"] for t in trend], "cls": "c-late"}])
+    score_chart = line_chart(labels, [{"name": _("Weighted score"), "values": [t["avg_score"] for t in trend],
                                        "cls": "c-score"}], y_min=1, y_max=5, y_fmt=lambda v: f"{v:.1f}")
     evals = repos.evaluations_frame(conn, g.user, shift_period(period, -11), period, employee_id=employee_id)
     shift = repos.current_assignment(conn, employee_id)

@@ -1,50 +1,50 @@
 {% extends "base.html" %}
-{% from "macros.html" import kpi, dept_select, period_nav %}
-{% block title %}Overview {{ period }}{% endblock %}
+{% from "macros.html" import kpi, dept_select %}
+{% block title %}{{ _('Overview') }} {{ period }}{% endblock %}
 {% block content %}
 <div class="page-head">
   <div>
-    <h1>Overview</h1>
-    <p>{{ 'All departments' if current_user.role == 'hr' and not dept else ('Department view' if dept else 'Your departments') }} · {{ ak.employees }} employees with attendance records in {{ period }}</p>
+    <h1>{{ _('Overview') }}</h1>
+    <p>{% if dept %}{{ _('One department') }}{% elif current_user.is_hr %}{{ _('Whole organisation') }}{% else %}{{ _('The departments you manage') }}{% endif %} · {{ _('{n} with attendance records in {period}', n=count(ak.employees, 'employee'), period=period|month) }}</p>
   </div>
   <form class="filters" method="get">
-    <div class="field"><label for="period">Month</label><input id="period" type="month" name="period" value="{{ period }}"></div>
+    <div class="field"><label for="period">{{ _('Month') }}</label><input id="period" type="month" name="period" value="{{ period }}"></div>
     {{ dept_select(departments, dept) }}
-    <button class="btn secondary" type="submit">Apply</button>
+    <button class="btn secondary" type="submit">{{ _('Show') }}</button>
   </form>
 </div>
 
-<div class="kpis" aria-label="Key figures for {{ period }}">
-  {{ kpi('Attendance rate', ak.attendance_rate|pct, '%s of %s expected days'|format('{:,}'.format(ak.attended_days), '{:,}'.format(ak.expected_days))) }}
-  {{ kpi('Absence rate', ak.absence_rate|pct, '%s unexcused absences'|format(ak.absent_days)) }}
-  {{ kpi('Late rate', ak.late_rate|pct, '%s late of attended days'|format(ak.late_days)) }}
-  {{ kpi('Average lateness', fmt_num(ak.avg_late_minutes, 0) ~ (' min' if ak.avg_late_minutes is not none else ''), 'on late days, from scheduled start') }}
-  {{ kpi('Evaluation coverage', pk.coverage|pct, '%s of %s evaluable employees'|format(pk.evaluations, pk.evaluable_employee_months)) }}
-  {{ kpi('Average score', fmt_num(pk.avg_weighted_score, 2), 'weighted, scale 1 to 5') }}
-  {{ kpi('Needs review', case_employees, '%s rule flags this month'|format(case_count), alert=case_employees > 0) }}
+<div class="kpis" aria-label="{{ _('Key figures for {period}', period=period|month) }}">
+  {{ kpi(_('Attendance rate'), ak.attendance_rate|pct, _('{a} of {b} working days', a='{:,}'.format(ak.attended_days), b='{:,}'.format(ak.expected_days))) }}
+  {{ kpi(_('Absence rate'), ak.absence_rate|pct, _('{n} days absent without leave', n='{:,}'.format(ak.absent_days))) }}
+  {{ kpi(_('Late rate'), ak.late_rate|pct, _('Late on {n} of the days attended', n='{:,}'.format(ak.late_days))) }}
+  {{ kpi(_('Average lateness'), (_('{n} min', n=fmt_num(ak.avg_late_minutes, 0)) if ak.avg_late_minutes is not none else '–'), _('On late days, counted from the shift start')) }}
+  {{ kpi(_('Evaluations done'), pk.coverage|pct, _('{a} of {b} employees due an evaluation', a=pk.evaluations, b=pk.evaluable_employee_months)) }}
+  {{ kpi(_('Average score'), fmt_num(pk.avg_weighted_score, 2), _('Weighted, on a scale of 1 to 5')) }}
+  {{ kpi(_('Needs review'), case_employees, _('{n} this month', n=count(case_count, 'flag')), alert=case_employees > 0) }}
 </div>
-{% if ak.pending_days %}<p class="small muted">{{ ak.pending_days }} shifts had not finished when the data was processed; they are not counted as absences yet.</p>{% endif %}
+{% if ak.pending_days %}<p class="small muted">{{ _('{n} shifts had not finished when the data was processed, so they are not counted as absences yet.', n=ak.pending_days) }}</p>{% endif %}
 
 <div class="grid-2">
   <section class="panel">
-    <div class="panel-head"><h2>Attendance, last 12 months</h2><span class="small muted">rates pooled over expected days</span></div>
+    <div class="panel-head"><h2>{{ _('Attendance over the last 12 months') }}</h2><span class="small muted">{{ _('All working days in the period counted together') }}</span></div>
     {{ att_chart }}
   </section>
   <section class="panel">
-    <div class="panel-head"><h2>Average weighted score</h2><span class="small muted">threshold for review {{ '%.1f'|format(pk.threshold) }}</span></div>
+    <div class="panel-head"><h2>{{ _('Average performance score') }}</h2><span class="small muted">{{ _('Scores below {t} are flagged for review', t='%.1f'|format(pk.threshold)) }}</span></div>
     {{ score_chart }}
   </section>
 </div>
 
 <section class="panel" style="margin-top:1.1rem">
-  <div class="panel-head"><h2>Departments in {{ period }}</h2><span class="small muted">rates make departments of different size comparable; * fewer than {{ g.settings.SMALL_SAMPLE_EMPLOYEES }} employees</span></div>
+  <div class="panel-head"><h2>{{ _('Departments in {period}', period=period|month) }}</h2><span class="small muted">{{ _('Rates make departments of different sizes comparable. * Fewer than {n} employees, so treat with care.', n=g.settings.SMALL_SAMPLE_EMPLOYEES) }}</span></div>
   {% if by_dept %}
   <div class="table-wrap"><table>
-    <thead><tr><th>Department</th><th class="num">Employees</th><th class="num">Expected days</th><th>Attendance</th><th class="num">Absence</th><th>Late (of attended)</th><th class="num">Incomplete</th><th class="num">Avg score</th><th class="num">Evaluations</th></tr></thead>
+    <thead><tr><th>{{ _('Department') }}</th><th class="num">{{ _('Employees') }}</th><th class="num">{{ _('Working days') }}</th><th>{{ _('Attendance') }}</th><th class="num">{{ _('Absence') }}</th><th>{{ _('Late') }}</th><th class="num">{{ _('Missing punch') }}</th><th class="num">{{ _('Average score') }}</th><th class="num">{{ _('Evaluations') }}</th></tr></thead>
     <tbody>
     {% for r in by_dept %}
       <tr>
-        <td><a href="{{ url_for('dashboard.index', period=period, department_id=r.department_id) }}">{{ r.department_name }}</a>{% if r.small_sample %} *{% endif %}</td>
+        <td><a href="{{ url_for('dashboard.index', period=period, department_id=r.department_id) }}">{{ loc(r, 'department_name') }}</a>{% if r.small_sample %} *{% endif %}</td>
         <td class="num">{{ r.employees }}</td>
         <td class="num">{{ '{:,}'.format(r.expected_days) }}</td>
         <td class="nowrap"><span class="bar" style="width:{{ ((r.attendance_rate or 0) * 60)|round(1) }}px"></span>{{ r.attendance_rate|pct }}</td>
@@ -57,21 +57,21 @@
     {% endfor %}
     </tbody>
   </table></div>
-  {% else %}<div class="empty">No processed attendance for this month. Import punches or pick another month.</div>{% endif %}
+  {% else %}<div class="empty">{{ _('There is no attendance for this month yet. Import punches or choose another month.') }}</div>{% endif %}
 </section>
 
 <section class="panel">
-  <div class="panel-head"><h2>Attendance by week and weekday</h2><span class="small muted">share of expected days attended; hatched = no expected days</span></div>
+  <div class="panel-head"><h2>{{ _('Attendance by week and weekday') }}</h2><span class="small muted">{{ _('Share of working days attended. Hatched cells had no working days.') }}</span></div>
   {% if heat_rows %}
   <div class="table-wrap"><table class="heat">
-    <thead><tr><th class="week">Week of</th>{% for d in ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] %}<th>{{ d }}</th>{% endfor %}</tr></thead>
-    <tbody>{% for w in heat_rows %}<tr><th class="week">{{ w.week.strftime('%d %b') }}</th>
-      {% for c in w.cells %}<td class="{{ c.cls }}" title="{{ c.day }} week of {{ w.week }}: {{ c.rate|pct }}">{{ '%.0f'|format(c.rate * 100) if c.rate is not none else '' }}</td>{% endfor %}</tr>{% endfor %}
+    <thead><tr><th class="week">{{ _('Week starting') }}</th>{% for d in ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] %}<th>{{ L.weekday_name(d) }}</th>{% endfor %}</tr></thead>
+    <tbody>{% for w in heat_rows %}<tr><th class="week">{{ w.week.strftime('%d/%m') }}</th>
+      {% for c in w.cells %}<td class="{{ c.cls }}" title="{{ L.weekday_name(c.day) }} {{ w.week.strftime('%d/%m') }}: {{ c.rate|pct }}">{{ '%.0f'|format(c.rate * 100) if c.rate is not none else '' }}</td>{% endfor %}</tr>{% endfor %}
     </tbody>
   </table></div>
-  <div class="legend-row" style="margin-top:.5rem"><span class="chip" style="--c:#2F7D5D">98% or more</span><span class="chip" style="--c:#6FAE8F">95 to 98%</span><span class="chip" style="--c:#BCD9C9">90 to 95%</span><span class="chip" style="--c:#F1D08A">80 to 90%</span><span class="chip" style="--c:#D9776F">below 80%</span></div>
-  {% else %}<div class="empty">No expected working days in this selection.</div>{% endif %}
+  <div class="legend-row" style="margin-top:.5rem"><span class="chip" style="--c:#2F7D5D">{{ _('98% or more') }}</span><span class="chip" style="--c:#6FAE8F">{{ _('95% to 98%') }}</span><span class="chip" style="--c:#BCD9C9">{{ _('90% to 95%') }}</span><span class="chip" style="--c:#F1D08A">{{ _('80% to 90%') }}</span><span class="chip" style="--c:#D9776F">{{ _('Below 80%') }}</span></div>
+  {% else %}<div class="empty">{{ _('No working days in this selection.') }}</div>{% endif %}
 </section>
 
-<p class="small muted">Definitions: expected day = scheduled working day inside employment, not on approved leave or a public holiday, whose shift has ended. Attended = at least one punch. Late = first punch after start + grace (minute resolution). Presence span (first to last punch) is not verified working time.</p>
+<p class="small muted">{{ _('How these figures are counted: a working day is a scheduled shift within the employment dates that is not approved leave or a public holiday, and whose shift has ended. A day counts as attended when there is at least one punch. Late means the first punch came after the shift start plus the grace period. The time between first and last punch is presence, not verified working hours.') }}</p>
 {% endblock %}

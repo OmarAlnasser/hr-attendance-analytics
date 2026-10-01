@@ -94,8 +94,7 @@ class Settings:
     # Never enable it on a database with real people in it: the buttons skip passwords
     # (they also refuse to work for any employee not flagged synthetic).
     DEMO_MODE: bool = False
-    DEMO_ACCOUNTS: str = "e0101,e0001,e0060"          # HR, department manager, employee
-    DEMO_RESET_NOTE: str = "Everything you change is reset every night."
+    DEMO_ACCOUNTS: str = "e0000,e0101,e0001,e0060"    # General Manager, HR, department manager, employee
     BEHIND_PROXY: bool = False                          # trust one proxy's X-Forwarded-For/Proto (Render, Railway...)
 
     TESTING: bool = False

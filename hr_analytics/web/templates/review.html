@@ -1,54 +1,52 @@
 {% extends "base.html" %}
 {% from "macros.html" import dept_select %}
-{% block title %}Needs review {{ period }}{% endblock %}
+{% block title %}{{ _('Needs review') }} {{ period }}{% endblock %}
 {% block content %}
 <div class="page-head">
-  <div><h1>Cases for a human review</h1><p>Flags suggest where a supportive conversation may help. They are never a decision and must not trigger automatic or disciplinary action.</p></div>
+  <div><h1>{{ _('Worth a conversation') }}</h1><p>{{ _('These flags point to where a supportive conversation may help. They are never a decision on their own and must not lead to automatic or disciplinary action.') }}</p></div>
   <form class="filters" method="get">
-    <div class="field"><label for="period">Month</label><input id="period" type="month" name="period" value="{{ period }}"></div>
+    <div class="field"><label for="period">{{ _('Month') }}</label><input id="period" type="month" name="period" value="{{ period }}"></div>
     {{ dept_select(departments, dept) }}
-    <button class="btn secondary" type="submit">Apply</button>
+    <button class="btn secondary" type="submit">{{ _('Show') }}</button>
   </form>
 </div>
 
 <section class="panel">
-  <div class="panel-head"><h2>Rule-based flags for {{ period }}</h2><span class="small muted">transparent rules; each flag can be checked from the raw numbers</span></div>
+  <div class="panel-head"><h2>{{ _('Rule-based flags for {period}', period=period|month) }}</h2><span class="small muted">{{ _('Simple rules; every flag can be checked against the underlying numbers') }}</span></div>
   <div class="table-wrap"><table style="margin-bottom:1rem">
-    <thead><tr><th>Rule</th><th class="num">Employees flagged</th></tr></thead>
-    <tbody>{% for code, text in rules.items() %}<tr><td>{{ text }}{% if code == 'SCORE_BELOW_THRESHOLD' %} ({{ threshold }}){% endif %}</td><td class="num">{{ rule_counts.get(code, 0) }}</td></tr>{% endfor %}</tbody>
+    <thead><tr><th>{{ _('Rule') }}</th><th>{{ _('What it checks') }}</th><th class="num">{{ _('Employees') }}</th></tr></thead>
+    <tbody>{% for code, title, text in rules %}<tr><td class="nowrap"><b>{{ title }}</b></td><td class="small">{{ text }}{% if code == 'SCORE_BELOW_THRESHOLD' %} ({{ threshold }}){% endif %}</td><td class="num">{{ rule_counts.get(code, 0) }}</td></tr>{% endfor %}</tbody>
   </table></div>
   {% if grouped %}
   <div class="table-wrap"><table>
-    <thead><tr><th>Employee</th><th>Department</th><th>Flags</th></tr></thead>
+    <thead><tr><th>{{ _('Employee') }}</th><th>{{ _('Department') }}</th><th>{{ _('What was found') }}</th></tr></thead>
     <tbody>{% for r in grouped %}<tr>
-      <td class="nowrap"><a href="{{ url_for('attendance.employee', employee_id=r.employee_id, period=period) }}">{{ r.employee_code }}</a> {{ r.full_name }}</td>
-      <td>{{ r.department_name }}</td>
-      <td>{% for f in r.flags %}<div>{{ f.rule }}: <b>{{ f.value }}</b></div>{% endfor %}</td>
+      <td class="nowrap"><a href="{{ url_for('attendance.employee', employee_id=r.employee_id, period=period) }}">{{ r.employee_code }}</a> {{ loc(r, 'full_name') }}</td>
+      <td>{{ loc(r, 'department_name') }}</td>
+      <td>{% for f in r.flags %}<div><b>{{ f.rule }}</b>: {{ f.value }}</div>{% endfor %}</td>
     </tr>{% endfor %}</tbody>
   </table></div>
-  {% else %}<div class="empty">No rule flags in {{ period }} for this scope.</div>{% endif %}
+  {% else %}<div class="empty">{{ _('Nothing was flagged in {period} for the people you can see.', period=period|month) }}</div>{% endif %}
 </section>
 
 <section class="panel">
-  <div class="panel-head"><h2>Experimental: chance of a low score next month</h2><span class="badge exp">experimental model</span></div>
+  <div class="panel-head"><h2>{{ _('Trial: chance of a low score next month') }}</h2><span class="badge exp">{{ _('Trial model') }}</span></div>
   {% if not summary %}
-    <div class="empty">No model has been trained. Run <code>python -m hr_analytics train-model</code>. Until then only the rules above are used.</div>
+    <div class="empty">{{ _('No model has been trained yet, so only the rules above are used.') }}</div>
   {% elif summary.status != 'model' %}
-    <p><b>No model is used.</b> {{ summary.reason }} The rule-based flags above are the only review signal.</p>
+    <p><b>{{ _('No model is in use.') }}</b> {{ _(summary.reason) }} {{ _('The rule-based flags above are the only review signal.') }}</p>
   {% else %}
-    <p class="small">Logistic regression trained on months up to {{ summary.train_periods[-1] }} and tested on {{ summary.test_periods|join(', ') }} ({{ summary.n_test }} employee-months). Test results at a 0.5 cut-off:
-    precision {{ '%.2f'|format(summary.model_metrics.precision) }}, recall {{ '%.2f'|format(summary.model_metrics.recall) }}, F1 {{ '%.2f'|format(summary.model_metrics.f1) }};
-    simple baseline (last month below threshold) F1 {{ '%.2f'|format(summary.baseline_metrics.f1) }}.
-    {% if synthetic_data %}Trained on synthetic data, where these patterns were written into the generator, so the numbers say nothing about real people.{% endif %}
-    Features use only data available before the predicted month; no protected attributes or department are used. Probabilities are associations, not causes.</p>
+    <p class="small">{{ _('A logistic regression trained on the months up to {last} and tested on {test} ({n} employee-months). At a 0.5 cut-off it found {recall} of the real low scores, and {precision} of the people it flagged really scored low (F1 {f1}). A simple rule, "scored low last month", reached F1 {base}.', last=summary.train_periods[-1], test=summary.test_periods|join(', '), n=summary.n_test, recall=summary.model_metrics.recall|pct, precision=summary.model_metrics.precision|pct, f1='%.2f'|format(summary.model_metrics.f1), base='%.2f'|format(summary.baseline_metrics.f1)) }}
+    {% if synthetic_data %}{{ _('It was trained on made-up data in which these patterns were built in on purpose, so the figures say nothing about real people.') }}{% endif %}
+    {{ _('It only uses information available before the month it predicts, and never gender, age, nationality or department. A probability shows an association, not a cause.') }}</p>
     {% if risk_rows %}
     <div class="table-wrap"><table>
-      <thead><tr><th>Employee</th><th>Department</th><th>Based on</th><th>Predicting</th><th class="num">Estimated probability</th></tr></thead>
-      <tbody>{% for r in risk_rows %}<tr><td><a href="{{ url_for('attendance.employee', employee_id=r.employee_id, period=r.feature_period) }}">{{ r.employee_code }}</a> {{ r.full_name }}</td>
-      <td>{{ r.department_name }}</td><td>{{ r.feature_period }}</td><td>{{ r.target_period }}</td><td class="num">{{ '%.0f'|format(r.probability * 100) }}%</td></tr>{% endfor %}</tbody>
+      <thead><tr><th>{{ _('Employee') }}</th><th>{{ _('Department') }}</th><th>{{ _('Based on') }}</th><th>{{ _('Predicting') }}</th><th class="num">{{ _('Estimated chance') }}</th></tr></thead>
+      <tbody>{% for r in risk_rows %}<tr><td><a href="{{ url_for('attendance.employee', employee_id=r.employee_id, period=r.feature_period) }}">{{ r.employee_code }}</a> {{ loc(r, 'full_name') }}</td>
+      <td>{{ loc(r, 'department_name') }}</td><td>{{ r.feature_period }}</td><td>{{ r.target_period }}</td><td class="num">{{ '%.0f'|format(r.probability * 100) }}%</td></tr>{% endfor %}</tbody>
     </table></div>
-    <p class="help">Showing the 25 highest in your scope for {{ risk_period }}. Use only to decide whom to check in with first.</p>
-    {% else %}<div class="empty">No scores in your scope.</div>{% endif %}
+    <p class="help">{{ _('The 25 highest among the people you can see, for {period}. Use it only to decide whom to check in with first.', period=risk_period|month) }}</p>
+    {% else %}<div class="empty">{{ _('No estimates for the people you can see.') }}</div>{% endif %}
   {% endif %}
 </section>
 {% endblock %}

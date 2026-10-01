@@ -19,6 +19,9 @@ threadpoolctl==3.6.0
 matplotlib==3.10.8
 pillow==12.1.1
 reportlab==4.4.10
+# Arabic PDF (v3): letter joining and right-to-left ordering for ReportLab and matplotlib
+arabic-reshaper==3.0.1
+python-bidi==0.6.11
 # Windows has no system time-zone database; zoneinfo needs this package there.
 # It could not be installed in the build environment (no network), so this is the only
 # line without an exact tested version.

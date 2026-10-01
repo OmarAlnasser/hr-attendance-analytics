@@ -1,32 +1,32 @@
 {% extends "base.html" %}
-{% block title %}Evaluate {{ emp.employee_code }}{% endblock %}
+{% block title %}{{ _('Evaluate') }} {{ emp.employee_code }}{% endblock %}
 {% block content %}
-<div class="page-head"><div><h1>Evaluate {{ emp.full_name }} for {{ period }}</h1>
-<p>{{ emp.employee_code }} · {{ emp.department_name }}{% if existing %} · Editing the saved evaluation; the previous values are kept in its history.{% endif %}</p></div></div>
+<div class="page-head"><div><h1>{{ _('Evaluation of {name} for {period}', name=loc(emp, 'full_name'), period=period|month) }}</h1>
+<p>{{ emp.employee_code }} · {{ loc(emp, 'department_name') }}{% if existing %} · {{ _('You are changing a saved evaluation; the earlier scores stay in its history.') }}{% endif %}</p></div></div>
 <section class="panel">
 {% if not weights %}
-  <div class="empty">No score weights apply to {{ period }}. HR needs to set weights first.</div>
+  <div class="empty">{{ _('No score weights apply to {period}. HR needs to set them first.', period=period|month) }}</div>
 {% else %}
 <form method="post">
   {{ csrf_field() }}
   <input type="hidden" name="employee_id" value="{{ emp.employee_id }}"><input type="hidden" name="period" value="{{ period }}">
   <fieldset>
-    <legend>Score each area from 1 (well below expectations) to 5 (well above). Weights for {{ period }} are shown under each area and add up to 100%.</legend>
+    <legend>{{ _('Score each area from 1 (well below expectations) to 5 (well above). The weight of each area for {period} is shown under its name; together they make 100%.', period=period|month) }}</legend>
     {% for c in categories %}
     <div class="scale" role="radiogroup" aria-labelledby="cat-{{ c }}">
-      <div class="cat" id="cat-{{ c }}">{{ labels[c] }}<small>weight {{ '%g'|format(weights['w_' ~ c]) }}%</small></div>
+      <div class="cat" id="cat-{{ c }}">{{ _(labels[c]) }}<small>{{ _('weight {w}%', w='%g'|format(weights['w_' ~ c])) }}</small></div>
       {% for v in range(1, 6) %}
         <span><input type="radio" id="{{ c }}-{{ v }}" name="{{ c }}" value="{{ v }}" {% if values[c]|string == v|string %}checked{% endif %} required><label class="pt" for="{{ c }}-{{ v }}">{{ v }}</label></span>
       {% endfor %}
-      <span class="anchor">1 well below · 3 meets · 5 well above</span>
+      <span class="anchor">{{ _('1 well below · 3 as expected · 5 well above') }}</span>
     </div>
     {% endfor %}
   </fieldset>
-  <div class="field" style="margin-top:1rem;max-width:48rem"><label for="comments">Comments for the employee (optional, up to 2,000 characters)</label>
+  <div class="field" style="margin-top:1rem;max-width:48rem"><label for="comments">{{ _('Comments for the employee (optional, up to 2,000 characters)') }}</label>
     <textarea id="comments" name="comments" maxlength="2000">{{ comments }}</textarea>
-    <span class="help">Describe observable work and agreed next steps. Scores are one input to a conversation, not an automatic decision.</span></div>
-  <div class="btn-row"><button class="btn" type="submit">Save evaluation</button>
-  <a class="btn quiet" href="{{ url_for('evaluations.index', period=period) }}">Cancel</a></div>
+    <span class="help">{{ _('Describe the work you observed and the next steps you agreed. A score is one input to a conversation, not an automatic decision.') }}</span></div>
+  <div class="btn-row"><button class="btn" type="submit">{{ _('Save evaluation') }}</button>
+  <a class="btn quiet" href="{{ url_for('evaluations.index', period=period) }}">{{ _('Cancel') }}</a></div>
 </form>
 {% endif %}
 </section>

@@ -1,9 +1,9 @@
-StatusCode,StatusLabel,IsExpected,IsAttended,SortOrder
-present,Present,1,1,1
-incomplete,Incomplete (single punch),1,1,2
-absent,Absent,1,0,3
-leave,Approved leave,0,0,4
-holiday,Public holiday,0,0,5
-day_off,Day off,0,0,6
-pending,Pending (shift not finished),0,0,7
-unscheduled_work,Work on day off / holiday,0,0,8
+StatusCode,StatusLabel,StatusLabelAr,IsExpected,IsAttended,SortOrder
+present,Present,حاضر,1,1,1
+incomplete,Missing punch,بصمة ناقصة,1,1,2
+absent,Absent,غائب,1,0,3
+leave,On leave,في إجازة,0,0,4
+holiday,Public holiday,إجازة رسمية,0,0,5
+day_off,Day off,يوم راحة,0,0,6
+pending,Shift in progress,الوردية لم تنتهِ,0,0,7
+unscheduled_work,Worked on a day off,عمل في يوم راحة,0,0,8

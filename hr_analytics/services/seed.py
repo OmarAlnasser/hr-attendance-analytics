@@ -16,6 +16,7 @@ from werkzeug.security import generate_password_hash
 from ..db import repos
 from ..db.connection import transaction
 from ..domain.scoring import DEFAULT_WEIGHTS
+from ..i18n import N_
 from ..security.scope import load_user_context
 from .evaluations import save_evaluation
 
@@ -142,8 +143,11 @@ def seed_demo_requests(conn, settings, max_each: int = 4) -> dict:
            WHERE a.status = 'incomplete' AND a.shift_date >= ? AND s.code = 'DAY'
            ORDER BY a.shift_date DESC, a.employee_id""", (last[:8] + "01",)).fetchall()
     made, used = 0, set()
-    reasons = ["Badge reader at the main gate was not responding", "Forgot my badge at home, signed the visitor log",
-               "Left through the warehouse exit which has no reader", "Clock showed an error, security can confirm"]
+    # stored in English like any typed reason; the Arabic pages show these demo sentences in Arabic
+    reasons = [N_("Badge reader at the main gate was not responding"),
+               N_("Forgot my badge at home, signed the visitor log"),
+               N_("Left through the warehouse exit which has no reader"),
+               N_("Clock showed an error, security can confirm")]
     for c in candidates:
         if made >= max_each or c["employee_id"] in used:
             continue
@@ -171,7 +175,7 @@ def seed_demo_requests(conn, settings, max_each: int = 4) -> dict:
         emp = repos.get_employee(conn, p["employee_id"])
         v = rq.validate_leave(conn, emp, {"leave_type": "annual", "start_date": s0.isoformat(),
                                           "end_date": (s0 + timedelta(days=2 + i)).isoformat(),
-                                          "reason": "Family visit" if i == 0 else ""}, date.today())
+                                          "reason": N_("Family visit") if i == 0 else ""}, date.today())
         if v.ok:
             with transaction(conn):
                 uid = conn.execute("SELECT user_id FROM users WHERE employee_id = ?", (emp["employee_id"],)).fetchone()[0]

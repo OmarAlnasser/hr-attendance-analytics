@@ -297,7 +297,8 @@ def attendance_frame(conn, user: UserContext, start: str, end: str, department_i
                      employee_id: int | None = None, status: str | None = None) -> pd.DataFrame:
     clause, params = scope_clause(user, "e")
     sql = f"""SELECT a.*, e.employee_code, e.full_name, e.full_name_ar, e.department_id, d.name AS department_name,
-                     d.name_ar AS department_name_ar, s.code AS shift_code, h.name_ar AS holiday_name_ar
+                     d.name_ar AS department_name_ar, s.code AS shift_code, s.name AS shift_name,
+                     s.name_ar AS shift_name_ar, h.name_ar AS holiday_name_ar
               FROM attendance_daily a
               JOIN employees e ON e.employee_id = a.employee_id
               JOIN departments d ON d.department_id = e.department_id
@@ -401,11 +402,12 @@ def evaluations_frame(conn, user: UserContext, period_from: str, period_to: str,
     clause, params = scope_clause(user, "e")
     sql = f"""SELECT p.*, e.employee_code, e.full_name, e.full_name_ar, e.department_id, d.name AS department_name,
                      d.name_ar AS department_name_ar,
-                     u.username AS evaluator
+                     u.username AS evaluator, ue.full_name AS evaluator_name, ue.full_name_ar AS evaluator_name_ar
               FROM performance_evaluations p
               JOIN employees e ON e.employee_id = p.employee_id
               JOIN departments d ON d.department_id = e.department_id
               JOIN users u ON u.user_id = p.evaluator_user_id
+              LEFT JOIN employees ue ON ue.employee_id = u.employee_id
               WHERE p.period BETWEEN ? AND ? AND {clause}"""
     params = [period_from, period_to, *params]
     if department_id:
@@ -684,6 +686,9 @@ def _approver_clause(user: UserContext, emp_alias: str = "e") -> tuple[str, list
     if user.employee_id is not None:
         clause = f"({clause}) AND {emp_alias}.employee_id <> ?"
         params = [*params, user.employee_id]
+    if not user.is_gm:     # requests from HR staff and the General Manager go to the General Manager
+        clause += (f" AND NOT EXISTS (SELECT 1 FROM users ux WHERE ux.employee_id = {emp_alias}.employee_id"
+                   " AND ux.role IN ('hr', 'gm'))")
     return clause, params
 
 
@@ -692,10 +697,12 @@ def list_leave_requests(conn, user: UserContext, *, statuses: tuple[str, ...] | 
     clause, params = _approver_clause(user) if for_approval else scope_clause(user, "e")
     sql = f"""SELECT l.*, e.employee_code, e.full_name, e.full_name_ar, d.name AS department_name,
                      d.name_ar AS department_name_ar,
-                     u.username AS decided_by, r.username AS requested_by
+                     u.username AS decided_by, r.username AS requested_by,
+                     ue.full_name AS decided_by_name, ue.full_name_ar AS decided_by_name_ar
               FROM leave_requests l JOIN employees e ON e.employee_id = l.employee_id
               JOIN departments d ON d.department_id = e.department_id
               LEFT JOIN users u ON u.user_id = l.approved_by_user_id
+              LEFT JOIN employees ue ON ue.employee_id = u.employee_id
               LEFT JOIN users r ON r.user_id = l.requested_by_user_id
               WHERE {clause}"""
     if statuses:
@@ -718,10 +725,12 @@ def list_corrections(conn, user: UserContext, *, statuses: tuple[str, ...] | Non
     clause, params = _approver_clause(user) if for_approval else scope_clause(user, "e")
     sql = f"""SELECT c.*, e.employee_code, e.full_name, e.full_name_ar, d.name AS department_name,
                      d.name_ar AS department_name_ar, u.username AS decided_by,
+                     ue.full_name AS decided_by_name, ue.full_name_ar AS decided_by_name_ar,
                      a.status AS day_status, a.first_punch, a.last_punch, a.punch_count
               FROM attendance_corrections c JOIN employees e ON e.employee_id = c.employee_id
               JOIN departments d ON d.department_id = e.department_id
               LEFT JOIN users u ON u.user_id = c.decided_by_user_id
+              LEFT JOIN employees ue ON ue.employee_id = u.employee_id
               LEFT JOIN attendance_daily a ON a.employee_id = c.employee_id AND a.shift_date = c.shift_date
               WHERE {clause}"""
     if statuses:
@@ -741,7 +750,7 @@ def list_corrections(conn, user: UserContext, *, statuses: tuple[str, ...] | Non
 def pending_counts(conn, user: UserContext) -> dict:
     """Sidebar badges: requests waiting for this user's decision, and the user's own open requests."""
     out = {"to_decide": 0, "mine": 0}
-    if user.role in ("hr", "manager"):
+    if user.has_team:
         clause, params = _approver_clause(user)
         out["to_decide"] = conn.execute(
             f"""SELECT (SELECT COUNT(*) FROM leave_requests l JOIN employees e ON e.employee_id = l.employee_id

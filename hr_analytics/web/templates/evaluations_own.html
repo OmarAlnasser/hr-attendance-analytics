@@ -1,15 +1,15 @@
 {% extends "base.html" %}
-{% block title %}My evaluations{% endblock %}
+{% block title %}{{ _('My evaluations') }}{% endblock %}
 {% block content %}
-<div class="page-head"><div><h1>My evaluations</h1><p>Scores from 1 (well below expectations) to 5 (well above). The weighted score uses the weights in force when the evaluation was saved.</p></div></div>
+<div class="page-head"><div><h1>{{ _('My evaluations') }}</h1><p>{{ _('Scores run from 1 (well below expectations) to 5 (well above). The weighted score uses the weights that applied when each evaluation was saved.') }}</p></div></div>
 <section class="panel">
 {% if evals %}
 <div class="table-wrap"><table>
-  <thead><tr><th>Period</th>{% for c in categories %}<th class="num">{{ labels[c] }}</th>{% endfor %}<th class="num">Weighted</th><th>Evaluator</th><th>Comments</th><th></th></tr></thead>
+  <thead><tr><th>{{ _('Month') }}</th>{% for c in categories %}<th class="num">{{ _(labels[c]) }}</th>{% endfor %}<th class="num">{{ _('Weighted score') }}</th><th>{{ _('Evaluated by') }}</th><th>{{ _('Comments') }}</th><th></th></tr></thead>
   <tbody>{% for e in evals %}<tr><td>{{ e.period }}</td>{% for c in categories %}<td class="num">{{ e['score_' ~ c] }}</td>{% endfor %}
-  <td class="num"><b>{{ '%.2f'|format(e.weighted_score) }}</b></td><td>{{ e.evaluator }}</td><td class="small">{{ e.comments or '' }}</td>
-  <td class="actions"><a href="{{ url_for('evaluations.history', evaluation_id=e.evaluation_id) }}">History</a></td></tr>{% endfor %}</tbody>
+  <td class="num"><b>{{ '%.2f'|format(e.weighted_score) }}</b></td><td>{{ loc(e, 'evaluator_name') or e.evaluator }}</td><td class="small">{{ _(e.comments) if e.comments else '' }}</td>
+  <td class="actions"><a href="{{ url_for('evaluations.history', evaluation_id=e.evaluation_id) }}">{{ _('History') }}</a></td></tr>{% endfor %}</tbody>
 </table></div>
-{% else %}<div class="empty">No evaluations recorded yet.</div>{% endif %}
+{% else %}<div class="empty">{{ _('No evaluations yet.') }}</div>{% endif %}
 </section>
 {% endblock %}

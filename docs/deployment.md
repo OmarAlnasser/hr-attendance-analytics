@@ -54,7 +54,11 @@ GitHub repo ──push──▶ Render web service (gunicorn, Flask)  ──SQL�
 | `HR_DEMO_MODE=1` | one-click role buttons; showcase accounts cannot be locked or changed by visitors |
 | `HR_BEHIND_PROXY=1`, `HR_SESSION_COOKIE_SECURE=1`, `TZ=Asia/Riyadh` | correct client IPs, HTTPS-only cookies, local time |
 
-Every push to `main` redeploys automatically.
+Every push to `main` redeploys automatically when the service was created from the Blueprint. A service created
+from the repository's public URL has auto-deploy off: use **Manual Deploy → Deploy latest commit** after a push.
+
+The Arabic PDF needs `arabic-reshaper` and `python-bidi` (in `requirements.txt`) and the Tajawal font, which ships
+in `hr_analytics/web/static/fonts`, so nothing has to be installed on the server.
 
 ## Security notes for a real deployment
 

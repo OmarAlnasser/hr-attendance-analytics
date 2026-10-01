@@ -1,9 +1,9 @@
 {% if issued %}
 <section class="panel" style="border-color:#EFD39A">
-  <h2>Temporary password{{ 's' if issued|length > 1 }}: shown once</h2>
-  <p class="small">Give each person their password privately. It will not be shown again, and it only opens the Change password page: they must pick their own at first sign-in. If one is lost, use <b>Reset password</b>.</p>
-  <div class="table-wrap"><table><thead><tr><th>Username</th><th>Name</th><th>For</th><th>Temporary password</th></tr></thead><tbody>
-  {% for i in issued %}<tr><td><b>{{ i.username }}</b></td><td>{{ i.name }}</td><td class="small">{{ i.what }}</td><td><span class="pw-once">{{ i.password }}</span></td></tr>{% endfor %}
+  <h2>{{ _('Temporary passwords: shown only once') }}</h2>
+  <p class="small">{{ _('Give each person their password privately. It will not be shown again, and it only opens the page for choosing a new password, which they must do at their first sign-in. If one is lost, use "Reset password".') }}</p>
+  <div class="table-wrap"><table><thead><tr><th>{{ _('Username') }}</th><th>{{ _('Name') }}</th><th>{{ _('For') }}</th><th>{{ _('Temporary password') }}</th></tr></thead><tbody>
+  {% for i in issued %}<tr><td dir="ltr"><b>{{ i.username }}</b></td><td>{{ i.name }}</td><td class="small">{{ _('A new account') if i.what == 'new account' else _('A password reset') }}</td><td><span class="pw-once" dir="ltr">{{ i.password }}</span></td></tr>{% endfor %}
   </tbody></table></div>
 </section>
 {% endif %}

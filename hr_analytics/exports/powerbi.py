@@ -17,7 +17,7 @@ validation/expected_kpis.csv  numbers computed by Python to reconcile the DAX me
 """
 from __future__ import annotations
 
-from datetime import date, timedelta
+from datetime import date
 from pathlib import Path
 
 import pandas as pd
@@ -27,11 +27,13 @@ from ..domain.attendance_rules import ALL_STATUSES, ATTENDED_STATUSES, EXPECTED_
 from ..domain.metrics import grouped_attendance_kpis
 from ..domain.scoring import parse_period
 from ..reports.monthly import EVALUABLE_MIN_DAYS, SYSTEM_USER
+from .. import labels as L
+from ..i18n import use_lang
 from ..services.review import RULES, review_cases
 
-STATUS_LABELS = {"present": "Present", "incomplete": "Incomplete (single punch)", "absent": "Absent",
-                 "leave": "Approved leave", "holiday": "Public holiday", "day_off": "Day off",
-                 "pending": "Pending (shift not finished)", "unscheduled_work": "Work on day off / holiday"}
+# English and Arabic wording for each status (same words as the app and the PDF)
+STATUS_LABELS = {code: pair[0] for code, pair in L.STATUS.items()}
+STATUS_LABELS_AR = {code: pair[1] for code, pair in L.STATUS.items()}
 
 
 def _key(d) -> int:
@@ -53,7 +55,9 @@ def export_powerbi(conn, out_dir: str | Path, *, settings) -> dict:
     att = read_sql("SELECT * FROM attendance_daily", conn)
     ev = read_sql("SELECT p.*, w.w_punctuality, w.w_communication, w.w_task_completion, w.w_teamwork "
                            "FROM performance_evaluations p JOIN evaluation_weights w ON w.weights_id = p.weights_id", conn)
-    emp = read_sql("""SELECT e.*, d.code AS department_code, d.name AS department_name
+    emp = read_sql("""SELECT e.*, d.code AS department_code, d.name AS department_name,
+                                      d.name_ar AS department_name_ar,
+                                      (SELECT u.role FROM users u WHERE u.employee_id = e.employee_id) AS app_role
                                FROM employees e JOIN departments d ON d.department_id = e.department_id""", conn)
     hol = read_sql("SELECT * FROM holidays", conn)
     if att.empty:
@@ -87,7 +91,10 @@ def export_powerbi(conn, out_dir: str | Path, *, settings) -> dict:
         "DepartmentKey": emp.department_id, "DepartmentCode": emp.department_code,
         "DepartmentName": emp.department_name, "ManagerEmployeeKey": emp.manager_employee_id.astype("Int64"),
         "HireDate": emp.hire_date, "TerminationDate": emp.termination_date,
-        "IsActive": emp.termination_date.isna().astype(int), "IsSynthetic": emp.is_synthetic})
+        "IsActive": emp.termination_date.isna().astype(int), "IsSynthetic": emp.is_synthetic,
+        # schema v3: Arabic names for an Arabic report page, and the app role (gm/hr/manager/employee)
+        "EmployeeNameAr": emp.full_name_ar, "JobTitleAr": emp.job_title_ar, "DepartmentNameAr": emp.department_name_ar,
+        "Gender": emp.gender, "AppRole": emp.app_role})
     write("DimEmployee", dim_emp)
 
     shifts = read_sql("SELECT * FROM shifts", conn)
@@ -97,7 +104,8 @@ def export_powerbi(conn, out_dir: str | Path, *, settings) -> dict:
         "CrossesMidnight": (shifts.end_time <= shifts.start_time).astype(int), "Workdays": shifts.workdays}))
 
     write("DimAttendanceStatus", pd.DataFrame([{
-        "StatusCode": s, "StatusLabel": STATUS_LABELS[s], "IsExpected": int(s in EXPECTED_STATUSES),
+        "StatusCode": s, "StatusLabel": STATUS_LABELS[s], "StatusLabelAr": STATUS_LABELS_AR[s],
+        "IsExpected": int(s in EXPECTED_STATUSES),
         "IsAttended": int(s in ATTENDED_STATUSES), "SortOrder": i + 1} for i, s in enumerate(ALL_STATUSES)]))
 
     # ---------------------------------------------------- FactAttendanceDaily
@@ -135,7 +143,8 @@ def export_powerbi(conn, out_dir: str | Path, *, settings) -> dict:
             n = (end - start).days + 1
             if n > 0:
                 em_rows.append({"EmployeeKey": r.employee_id, "PeriodDateKey": _key(first), "Period": p,
-                                "DaysEmployed": n, "IsEvaluable": int(n >= EVALUABLE_MIN_DAYS)})
+                                "DaysEmployed": n,
+                                "IsEvaluable": int(n >= EVALUABLE_MIN_DAYS and getattr(r, "app_role", None) != "gm")})
     write("FactEmployeeMonth", pd.DataFrame(em_rows))
 
     # --------------------------------------------------------- FactReviewFlag
@@ -143,11 +152,15 @@ def export_powerbi(conn, out_dir: str | Path, *, settings) -> dict:
     for p in periods:
         c = review_cases(conn, SYSTEM_USER, p, threshold=settings.LOW_SCORE_THRESHOLD)
         for r in c.itertuples():
+            with use_lang("ar"):
+                title_ar, evidence_ar = L.rule_title(r.rule_code), L.rule_evidence(r.rule_code, r.facts)
             flags.append({"EmployeeKey": r.employee_id, "PeriodDateKey": _key(parse_period(p)[0]), "Period": p,
                           "RuleCode": r.rule_code, "RuleDescription": RULES[r.rule_code], "Evidence": r.value,
-                          "Method": "rule"})
+                          "Method": "rule", "RuleTitle": L.RULES[r.rule_code][0][0], "RuleTitleAr": title_ar,
+                          "EvidenceAr": evidence_ar})
     write("FactReviewFlag", pd.DataFrame(flags, columns=["EmployeeKey", "PeriodDateKey", "Period", "RuleCode",
-                                                         "RuleDescription", "Evidence", "Method"]))
+                                                         "RuleDescription", "Evidence", "Method", "RuleTitle",
+                                                         "RuleTitleAr", "EvidenceAr"]))
 
     risk = read_sql("SELECT * FROM risk_scores", conn)
     write("FactRiskScore", pd.DataFrame({
@@ -162,7 +175,8 @@ def export_powerbi(conn, out_dir: str | Path, *, settings) -> dict:
     write("SecurityManagerDepartment", sec)
     roles = read_sql("""SELECT lower(e.email) AS "UserPrincipalName", u.role AS "AppRole"
                                  FROM users u JOIN employees e ON e.employee_id = u.employee_id""", conn)
-    write("SecurityRoleAssignment", roles, sub="validation")   # reference for assigning Power BI roles, not loaded
+    # reference for assigning Power BI roles, not loaded: gm and hr both map to the organisation-wide role
+    write("SecurityRoleAssignment", roles, sub="validation")
 
     synthetic = int(emp.is_synthetic.sum() > 0)
     write("ExportInfo", pd.DataFrame([{"ExportedAt": now_str(), "RuleVersion": settings.RULE_VERSION,

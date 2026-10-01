@@ -8,6 +8,7 @@ from ...db import repos
 from ...domain.metrics import (attendance_kpis, evaluable_employee_months, grouped_attendance_kpis,
                                performance_kpis, weekday_week_heatmap)
 from ...domain.scoring import parse_period, shift_period
+from ...i18n import _
 from ...services.review import review_cases
 from .. import get_db
 from ..helpers import department_options, get_department_filter, get_period, heat_class, line_chart, login_required
@@ -43,10 +44,10 @@ def trend_series(conn, user, period: str, months: int = 12, department_id=None, 
 @bp.route("/")
 @login_required
 def index():
-    if g.user.role == "employee":
+    if not g.user.has_team:
         if g.user.employee_id is None:
-            return render_template("error.html", code=200, title="No employee record",
-                                   message="This account is not linked to an employee record.")
+            return render_template("error.html", code=200, title=_("No employee record"),
+                                   message=_("This account is not linked to an employee record."))
         return redirect(url_for("attendance.employee", employee_id=g.user.employee_id))
 
     conn, s = get_db(), g.settings
@@ -62,7 +63,7 @@ def index():
 
     by_dept = []
     if not att.empty:
-        gd = grouped_attendance_kpis(att, ["department_id", "department_name"])
+        gd = grouped_attendance_kpis(att, ["department_id", "department_name", "department_name_ar"])
         scores = ev.groupby("department_id")["weighted_score"].agg(["mean", "count"]) if not ev.empty else pd.DataFrame()
         for r in gd.sort_values("department_name").to_dict("records"):
             sc = scores.loc[r["department_id"]] if not scores.empty and r["department_id"] in scores.index else None
@@ -83,12 +84,12 @@ def index():
     trend = trend_series(conn, g.user, period, 12, dept)
     labels = [t["period"][2:] for t in trend]
     att_chart = line_chart(labels, [
-        {"name": "Attendance rate", "values": [t["attendance_rate"] for t in trend], "cls": "c-present"},
-        {"name": "Late rate (of attended days)", "values": [t["late_rate"] for t in trend], "cls": "c-late"},
-        {"name": "Absence rate", "values": [t["absence_rate"] for t in trend], "cls": "c-absent"},
+        {"name": _("Attendance rate"), "values": [t["attendance_rate"] for t in trend], "cls": "c-present"},
+        {"name": _("Late rate (of days attended)"), "values": [t["late_rate"] for t in trend], "cls": "c-late"},
+        {"name": _("Absence rate"), "values": [t["absence_rate"] for t in trend], "cls": "c-absent"},
     ])
     score_chart = line_chart(labels, [
-        {"name": "Average weighted score", "values": [t["avg_score"] for t in trend], "cls": "c-score"},
+        {"name": _("Average weighted score"), "values": [t["avg_score"] for t in trend], "cls": "c-score"},
     ], y_min=1, y_max=5, y_fmt=lambda v: f"{v:.1f}", ticks=4)
 
     cases = review_cases(conn, g.user, period, threshold=s.LOW_SCORE_THRESHOLD, department_id=dept)

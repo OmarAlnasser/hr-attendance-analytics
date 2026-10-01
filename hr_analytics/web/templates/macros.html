@@ -3,27 +3,30 @@
 {%- endmacro %}
 
 {% macro status_chip(status, is_late=0) -%}
-{%- set key = 'late' if (status in ('present', 'incomplete') and is_late) else status -%}
-<span class="chip s-{{ key }}">{{ status.replace('_', ' ') }}{% if is_late and status in ('present', 'incomplete') %}<span class="flag-small">late</span>{% endif %}</span>
+{%- set late = is_late and status in ('present', 'incomplete') -%}
+<span class="chip s-{{ 'late' if late else status }}">{{ status|status }}{% if late %}<span class="flag-small">{{ L.pick(L.LATE) }}</span>{% endif %}</span>
 {%- endmacro %}
 
-{% macro dept_select(departments, selected, all_label='All departments in my scope') -%}
-<div class="field"><label for="department_id">Department</label>
+{% macro dept_select(departments, selected, all_label=none) -%}
+<div class="field"><label for="department_id">{{ _('Department') }}</label>
 <select id="department_id" name="department_id">
-  <option value="">{{ all_label }}</option>
-  {% for d in departments %}<option value="{{ d.department_id }}" {% if selected == d.department_id %}selected{% endif %}>{{ d.name }}</option>{% endfor %}
+  <option value="">{{ all_label or _('All departments I can see') }}</option>
+  {% for d in departments %}<option value="{{ d.department_id }}" {% if selected == d.department_id %}selected{% endif %}>{{ loc(d, 'name') }}</option>{% endfor %}
 </select></div>
 {%- endmacro %}
 
 {% macro period_nav(endpoint, period, prev_period, next_period) -%}
-<span class="period-nav small"><a href="{{ url_for(endpoint, period=prev_period, **kwargs) }}" aria-label="Previous month">‹ {{ prev_period }}</a>
+<span class="period-nav small"><a href="{{ url_for(endpoint, period=prev_period, **kwargs) }}" aria-label="{{ _('Previous month') }}"><span class="arrow">‹</span> {{ prev_period }}</a>
 <b>{{ period }}</b>
-<a href="{{ url_for(endpoint, period=next_period, **kwargs) }}" aria-label="Next month">{{ next_period }} ›</a></span>
+<a href="{{ url_for(endpoint, period=next_period, **kwargs) }}" aria-label="{{ _('Next month') }}">{{ next_period }} <span class="arrow">›</span></a></span>
 {%- endmacro %}
 
 {% macro status_legend() -%}
 <div class="legend-row">
-  {% for s, l in [('present','On time'),('late','Late'),('incomplete','Single punch'),('absent','Absent'),('leave','Approved leave'),('holiday','Public holiday'),('day_off','Day off'),('unscheduled_work','Worked on day off'),('pending','Shift not finished')] %}
-  <span class="chip s-{{ s }}">{{ l }}</span>{% endfor %}
+  {% for key, text in L.legend() %}<span class="chip s-{{ key }}">{{ text }}</span>{% endfor %}
 </div>
+{%- endmacro %}
+
+{% macro person(r, link=true) -%}
+{%- if link and r.employee_id -%}<a href="{{ url_for('attendance.employee', employee_id=r.employee_id) }}">{{ r.employee_code }}</a>{%- else -%}{{ r.employee_code }}{%- endif %} {{ loc(r, 'full_name') }}
 {%- endmacro %}

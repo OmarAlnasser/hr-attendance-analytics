@@ -1,29 +1,30 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{ lang }}" dir="{{ 'rtl' if rtl else 'ltr' }}">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sign in · HR Attendance &amp; Performance</title>
+<title>{{ _('Sign in') }} · {{ _('Attendance and Performance') }}</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
 </head>
 <body>
 <div class="login">
   <section class="intro">
     <div>
-      <h1>Attendance and performance, one month at a glance</h1>
-      <p>Time-clock punches become daily results with stated rules; monthly evaluations sit beside them. Flags point to conversations, never to automatic decisions.</p>
+      <div class="lang-switch">{% if lang == 'ar' %}<a href="{{ url_for('set_language', code='en', next=request.full_path.rstrip('?')) }}" lang="en">English</a>{% else %}<a href="{{ url_for('set_language', code='ar', next=request.full_path.rstrip('?')) }}" lang="ar">العربية</a>{% endif %}</div>
+      <h1>{{ _('Attendance and performance, one month at a glance') }}</h1>
+      <p>{{ _('Punches from the time clock become a clear daily record using rules anyone can check, and monthly evaluations sit right beside them. Anything flagged is a reason to talk, never an automatic decision.') }}</p>
       <div class="ribbon" aria-hidden="true">
         {% for c in ['present','present','late','present','present','day_off','day_off','present','present','present','incomplete','present','day_off','day_off','leave','leave','present','present','absent','day_off','day_off','present','holiday','present','present','late','day_off','day_off','present','present','present'] %}
         <div class="day s-{{ c }}"><div class="cell"></div></div>{% endfor %}
       </div>
     </div>
-    <p class="small">{% if demo %}Live demo on synthetic data: 120 invented employees, 12 months of punches. Nothing you change is permanent: the data is rebuilt every night.{% else %}Local installation. Demo accounts are created by the seed command.{% endif %}</p>
+    <p class="small">{% if demo %}{{ _('A live demo with made-up data: 121 employees and twelve months of punches. Nothing you change is permanent; the data is rebuilt every night.') }}{% else %}{{ _('Local installation. Demo accounts are created by the seed command.') }}{% endif %}</p>
   </section>
   <section class="form-side">
     <div class="login-stack">
     {% if demo %}
     <div class="demo-pick">
-      <h2>Explore the live demo</h2>
-      <p class="small muted">No sign-up. Pick a role to see what that person sees; permissions are enforced on the server.</p>
+      <h2>{{ _('Try the live demo') }}</h2>
+      <p class="small muted">{{ _('No sign-up needed. Choose a role to see exactly what that person sees; access is checked on the server for every page.') }}</p>
       {% for a in demo %}
       <form method="post" action="{{ url_for('auth.demo_login') }}">
         {{ csrf_field() }}<input type="hidden" name="username" value="{{ a.username }}">
@@ -34,17 +35,17 @@
       </form>
       {% endfor %}
     </div>
-    <details class="other-signin" {% if username or get_flashed_messages() %}open{% endif %}><summary>Sign in with a username and password</summary>
+    <details class="other-signin" {% if username or get_flashed_messages() %}open{% endif %}><summary>{{ _('Sign in with a username and password') }}</summary>
     {% endif %}
     <form method="post" autocomplete="on">
-      <h2>Sign in</h2>
+      <h2>{{ _('Sign in') }}</h2>
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}<ul class="flashes">{% for cat, m in messages %}<li class="flash {{ cat }}" role="alert">{{ m }}</li>{% endfor %}</ul>{% endif %}
       {% endwith %}
       {{ csrf_field() }}
-      <div class="field"><label for="username">Username</label><input id="username" name="username" type="text" value="{{ username }}" autocomplete="username" required {% if not demo %}autofocus{% endif %}></div>
-      <div class="field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required></div>
-      <button class="btn" type="submit">Sign in</button>
+      <div class="field"><label for="username">{{ _('Username') }}</label><input id="username" name="username" type="text" dir="ltr" value="{{ username }}" autocomplete="username" required {% if not demo %}autofocus{% endif %}></div>
+      <div class="field"><label for="password">{{ _('Password') }}</label><input id="password" name="password" type="password" dir="ltr" autocomplete="current-password" required></div>
+      <button class="btn" type="submit">{{ _('Sign in') }}</button>
     </form>
     {% if demo %}</details>{% endif %}
     </div>

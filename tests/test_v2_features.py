@@ -212,7 +212,7 @@ class CorrectionTests(WebTestBase, unittest.TestCase):
         cases = {
             "2026-03-25T08:00": "future",
             "2026-03-02T08:21": "already recorded",      # device punch at 08:20 exists
-            "2026-03-06T02:00": "outside all of your scheduled shift windows",
+            "2026-03-06T02:00": "not close to any of your shifts",
             "2026-01-05T08:00": "last 60 days",
         }
         for when, expect in cases.items():
@@ -222,7 +222,7 @@ class CorrectionTests(WebTestBase, unittest.TestCase):
         self.assertEqual(self._report(emp, "2026-03-03T08:00", reason="x").status_code, 422, "reason too short")
         self.assertEqual(self._report(emp, "2026-03-03T08:00").status_code, 302)
         r = self._report(emp, "2026-03-03T08:03")
-        self.assertTrue(any("already have a pending" in m for m in flashes(r)))
+        self.assertTrue(any("already reported this missed punch" in m for m in flashes(r)))
         self.assertEqual(self.conn.execute("SELECT COUNT(*) FROM attendance_corrections").fetchone()[0], 1)
 
     def test_night_shift_clock_out_maps_to_the_previous_shift_date(self):
@@ -253,9 +253,9 @@ class CorrectionTests(WebTestBase, unittest.TestCase):
 
     def test_profile_offers_report_link_on_own_problem_days_only(self):
         own = self.client_for("emp_ops").get(f"/employees/{self.ids['E002']}?period=2026-03").get_data(as_text=True)
-        self.assertIn("Report missed punch", own)
+        self.assertIn("Report a missed punch", own)
         mgr_view = self.client_for("mgr_ops").get(f"/employees/{self.ids['E002']}?period=2026-03").get_data(as_text=True)
-        self.assertNotIn("Report missed punch", mgr_view)
+        self.assertNotIn("Report a missed punch", mgr_view)
 
 
 # ==================================================================== today ==
@@ -293,7 +293,7 @@ class TodayBoardTests(WebTestBase, unittest.TestCase):
         self.assertEqual(self.client_for("emp_ops").get("/today").status_code, 403)
         live = self.client_for("hr1").get("/today").get_data(as_text=True)
         self.assertIn('http-equiv="refresh"', live)
-        self.assertIn("latest punch received", live, "a stale feed is announced, not shown as mass absence")
+        self.assertIn("most recent punch received", live, "a stale feed is announced, not shown as mass absence")
         self.assertEqual(self.client_for("hr1").get("/today?date=2999-01-01").status_code, 400)
         self.assertEqual(self.conn.execute("SELECT COUNT(*) FROM audit_log WHERE action='process_attendance'").fetchone()[0],
                          1, "the board writes nothing")
@@ -308,7 +308,7 @@ class UserAdminTests(WebTestBase, unittest.TestCase):
     @staticmethod
     def _temp_pw(resp):
         import re
-        m = re.search(r'class="pw-once">([^<]+)<', resp.get_data(as_text=True))
+        m = re.search(r'class="pw-once"[^>]*>([^<]+)<', resp.get_data(as_text=True))
         assert m, "temporary password not shown"
         return m.group(1)
 
@@ -343,9 +343,18 @@ class UserAdminTests(WebTestBase, unittest.TestCase):
         self._post(hr, f"/users/{uid}/enable")
         self.assertEqual(repos.get_user(self.conn, uid)["is_active"], 1)
 
-        self._post(hr, f"/users/{self.ids['user_mgr_ops']}/grant_hr")
+        # only the General Manager gives or removes HR access
+        self.assertEqual(self._post(hr, f"/users/{self.ids['user_mgr_ops']}/grant_hr").status_code, 403)
+        self.assertEqual(repos.get_user(self.conn, self.ids["user_mgr_ops"])["role"], "manager")
+        h = __import__("werkzeug.security", fromlist=["x"]).generate_password_hash(PASSWORD, method="pbkdf2:sha256:1000")
+        repos.create_user(self.conn, "gm1", h, "gm", None)
+        self.conn.commit()
+        gm = self.client_for("gm1")
+        self._post(gm, f"/users/{self.ids['user_mgr_ops']}/grant_hr")
         self.assertEqual(repos.get_user(self.conn, self.ids["user_mgr_ops"])["role"], "hr")
-        self._post(hr, f"/users/{self.ids['user_mgr_ops']}/revoke_hr")
+        self.assertEqual(self._post(hr, f"/users/{self.ids['user_mgr_ops']}/reset").status_code, 403,
+                         "HR cannot reset another HR account")
+        self._post(gm, f"/users/{self.ids['user_mgr_ops']}/revoke_hr")
         self.assertEqual(repos.get_user(self.conn, self.ids["user_mgr_ops"])["role"], "manager",
                          "removing HR falls back to the role the org chart implies")
         # HR cannot lock themselves out here
@@ -359,7 +368,7 @@ class UserAdminTests(WebTestBase, unittest.TestCase):
         repos.create_user(self.conn, "leaver", h, "employee", self.ids["E007"])     # terminated 2026-03-05
         self.conn.commit()
         hr = self.client_for("hr1")
-        self.assertIn("Disable leavers", hr.get("/users").get_data(as_text=True))
+        self.assertIn("Switch off leavers", hr.get("/users").get_data(as_text=True))
         self._post(hr, "/users/disable-leavers")
         self.assertEqual(repos.get_user_by_username(self.conn, "leaver")["is_active"], 0)
         self.assertEqual(repos.get_user_by_username(self.conn, "emp_ops")["is_active"], 1)
@@ -408,8 +417,8 @@ class BulkImportTests(WebTestBase, unittest.TestCase):
         r = self._upload(hr, csv)
         self.assertEqual(r.status_code, 422)
         body = r.get_data(as_text=True)
-        for expect in ("Row 3", "already exists", "Row 4", "B002 is already used", "unknown department_code",
-                       "hire_date must be YYYY-MM-DD", "appears twice"):
+        for expect in ("Row 3", "already exists", "Row 4", "badge B002 is already in use",
+                       "there is no department with the code", "joining date must look like", "appears twice"):
             self.assertIn(expect, body)
         self.assertIsNone(repos.get_employee_by_code(self.conn, "E201"), "all or nothing")
         self.assertEqual(self._upload(hr, "code,name\nX,Y\n").status_code, 422)

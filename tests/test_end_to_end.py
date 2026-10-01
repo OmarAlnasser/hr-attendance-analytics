@@ -100,12 +100,15 @@ class EndToEndTests(unittest.TestCase):
     def test_04_monthly_report_once_per_period(self):
         first = self.runner.invoke(cli, ["run-monthly", "--period", "2026-05", "--all-departments"])
         self.assertEqual(first.exit_code, 0, first.output)
-        self.assertEqual(first.output.count("[success]"), 8)       # organisation + 7 departments (incl. executive)
+        # organisation + 7 departments (incl. executive), each in English and in Arabic
+        self.assertEqual(first.output.count("[success]"), 16)
         second = self.runner.invoke(cli, ["run-monthly", "--period", "2026-05", "--all-departments"])
-        self.assertEqual(second.output.count("[skipped]"), 8)
-        runs = self.conn.execute("SELECT status, output_path FROM report_runs WHERE period='2026-05'").fetchall()
-        self.assertEqual(len(runs), 8)
-        for status, path in runs:
+        self.assertEqual(second.output.count("[skipped]"), 16)
+        runs = self.conn.execute("SELECT status, output_path, report_type FROM report_runs "
+                                 "WHERE period='2026-05'").fetchall()
+        self.assertEqual(len(runs), 16)
+        self.assertEqual(sum(1 for r in runs if r[2] == "monthly_hr_ar"), 8)
+        for status, path, _type in runs:
             self.assertEqual(status, "success")
             self.assertTrue(Path(path).read_bytes().startswith(b"%PDF"))
         forced = self.runner.invoke(cli, ["report", "--period", "2026-05", "--force"])

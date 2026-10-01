@@ -7,8 +7,8 @@ shift_date        The calendar date on which the shift STARTS. A 22:00-06:00
                   its punches end on Monday.
 punch window      A punch belongs to shift_date D if it falls inside
                   [start(D) - window_before, end(D) + window_after].
-collapsed punches Punches closer than `debounce_minutes` to the previously
-                  kept punch are treated as one (double taps on the device).
+double taps      Punches closer than `debounce_minutes` to the previously
+                  kept punch are treated as one (someone tapping twice).
 minute resolution Rules compare times truncated to the minute (seconds dropped).
 late              first punch (minute) > scheduled start + grace minutes.
                   Exactly at start + grace is ON TIME.
@@ -190,8 +190,8 @@ def evaluate_day(
         "holiday_name": holiday_name,
         "rule_version": cfg.version,
     }
-    if len(punches) > n:
-        notes.append(f"collapsed_{len(punches) - n}_near_duplicate_punches")
+    # Double taps merged into one punch are routine and not noted; raw_punch_count
+    # versus punch_count still shows how many were merged.
 
     workday = shift.is_workday(shift_date)
     if leave_type:

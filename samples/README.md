@@ -2,8 +2,9 @@
 
 | المسار | المحتوى |
 |---|---|
-| `reports/hr_monthly_2026-08_org_run1.pdf` | التقرير الشهري للمؤسسة، أغسطس 2026 |
-| `reports/hr_monthly_2026-08_dept-1_run2.pdf` | التقرير الشهري لقسم Operations وحده |
+| `reports/hr_monthly_2026-08_org_ar.pdf` | التقرير الشهري للمؤسسة بالعربية، أغسطس 2026 |
+| `reports/hr_monthly_2026-08_org_en.pdf` | التقرير نفسه بالإنجليزية |
+| `reports/hr_monthly_2026-08_operations_en.pdf` | التقرير الشهري لقسم العمليات وحده |
 | `models/model_evaluation_report.md` | تقرير تقييم النموذج التجريبي، ومعه نسخة JSON |
 | `powerbi/` | ملفات النموذج النجمي. يمكن توجيه المعامل `DataFolder` إلى هذا المجلد لبناء التقرير مباشرة |
 

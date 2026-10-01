@@ -22,7 +22,7 @@ class HealthTests(WebTestBase, unittest.TestCase):
 
     def test_demo_login_is_off_by_default(self):
         c = self.app.test_client()
-        self.assertNotIn("Explore the live demo", c.get("/login").get_data(as_text=True))
+        self.assertNotIn("Try the live demo", c.get("/login").get_data(as_text=True))
         tok = csrf_from(c.get("/login").get_data(as_text=True))
         self.assertEqual(c.post("/demo-login", data={"csrf_token": tok, "username": "hr1"}).status_code, 404)
 
@@ -44,7 +44,7 @@ class DemoModeTests(WebTestBase, unittest.TestCase):
 
     def test_one_click_login_for_each_showcase_role(self):
         page = self.app.test_client().get("/login").get_data(as_text=True)
-        self.assertIn("Explore the live demo", page)
+        self.assertIn("Try the live demo", page)
         self.assertEqual(len(re.findall(r'action="/demo-login"', page)), 3)
         for username, landing in (("hr1", "Overview"), ("mgr_ops", "Overview"), ("emp_ops", "My requests")):
             c, r = self.demo_client(username)

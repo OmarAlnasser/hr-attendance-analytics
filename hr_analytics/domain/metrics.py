@@ -102,10 +102,12 @@ def grouped_attendance_kpis(df: pd.DataFrame, by: str | list[str]) -> pd.DataFra
     sums = g[[c for c in w.columns if c.startswith("_") and c != "_emp"]].sum()
     emps = g["_emp"].nunique() if "employee_id" in df else None
     rows = []
-    for key, r in sums.iterrows():
+    # positional: both come from the same groupby, and .loc cannot look up a key that holds NaN
+    # (e.g. a department without an Arabic name)
+    for i, (key, r) in enumerate(sums.iterrows()):
         exp, att, late_n = int(r["_expected"]), int(r["_attended"]), int(r["_late"])
         k = {
-            "employees": int(emps.loc[key]) if emps is not None else 0,
+            "employees": int(emps.iloc[i]) if emps is not None else 0,
             "expected_days": exp,
             "attended_days": att,
             "absent_days": int(r["_absent"]),
@@ -166,9 +168,12 @@ def fmt_num(v, digits: int = 1) -> str:
 def evaluable_employee_months(emps: pd.DataFrame, first: date, last: date,
                               min_days: int = EVALUABLE_MIN_DAYS) -> int:
     """Employees employed for at least `min_days` days between first and last.
-    Denominator of evaluation coverage."""
+    Denominator of evaluation coverage. The General Manager is left out: nobody
+    above them evaluates in this system."""
     n = 0
     for r in emps.itertuples():
+        if getattr(r, "app_role", None) == "gm":
+            continue
         start = max(first, date.fromisoformat(r.hire_date))
         term = r.termination_date if isinstance(r.termination_date, str) and r.termination_date else None
         end = min(last, date.fromisoformat(term)) if term else last

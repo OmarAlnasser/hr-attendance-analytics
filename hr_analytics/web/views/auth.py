@@ -11,6 +11,8 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from ...db import repos
 from ...db.connection import transaction
 from .. import get_db
+from ...i18n import _, loc
+from ...labels import role_label
 from ..helpers import audit, login_required, safe_next
 
 bp = Blueprint("auth", __name__)
@@ -52,7 +54,7 @@ def login():
         password = request.form.get("password") or ""
         key = (username, request.remote_addr or "")
         if _recent_failures(key) >= MAX_FAILURES:
-            flash("Too many failed attempts. Wait a few minutes and try again.", "error")
+            flash(_("Too many attempts that did not work. Please wait a few minutes and try again."), "error")
             return render_template("login.html", username=username, demo=_demo_accounts(get_db())), 429
         conn = get_db()
         user = repos.get_user_by_username(conn, username) if username else None
@@ -60,7 +62,7 @@ def login():
         ok = check_password_hash(user["password_hash"] if user else _dummy_hash(), password)
         if user and ok and user["is_active"]:
             nxt = safe_next(request.args.get("next"))
-            session.clear()                      # new session on login (fixation)
+            _fresh_session()                     # new session on login (fixation), keeping the language
             session.permanent = True
             session["uid"] = user["user_id"]
             session["csrf"] = secrets.token_urlsafe(32)
@@ -71,26 +73,37 @@ def login():
         _record_failure(key)
         with transaction(conn):
             repos.audit(conn, None, "login_failed", "user", None, {"username": username[:64]}, request.remote_addr)
-        flash("Username or password is incorrect.", "error")
+        flash(_("Username or password is incorrect."), "error")
         return render_template("login.html", username=username, demo=_demo_accounts(conn)), 401
     return render_template("login.html", username="", demo=_demo_accounts(get_db()))
+
+
+def _fresh_session() -> None:
+    lang = session.get("lang")
+    session.clear()
+    if lang:
+        session["lang"] = lang
+
+
+ROLE_ORDER = {"gm": 0, "hr": 1, "manager": 2, "employee": 3}
 
 
 def _demo_accounts(conn) -> list[dict]:
     """The one-click showcase accounts that exist, are active and belong to synthetic employees."""
     s = current_app.extensions["hr_settings"]
-    labels = {"hr": "HR officer", "manager": "Department manager", "employee": "Employee"}
-    blurbs = {"hr": "Whole organisation: Today board, approvals, imports, users, reports.",
-              "manager": "Own department only: approve leave and punch corrections, evaluate the team.",
-              "employee": "Own record: request leave, report a missed punch, see your month."}
+    blurbs = {"gm": _("Above HR: decides on HR staff and who gets HR access, and sees the whole organisation."),
+              "hr": _("The whole organisation: the Today board, approvals, imports, accounts and reports."),
+              "manager": _("One department: approve leave and punch corrections, and evaluate the team."),
+              "employee": _("Their own record: request leave, report a missed punch and see the month.")}
     out = []
     for name in s.demo_usernames:
         u = repos.get_user_by_username(conn, name)
         emp = repos.get_employee(conn, u["employee_id"]) if u and u["employee_id"] else None
         if u and u["is_active"] and emp and emp["is_synthetic"]:
-            out.append({"username": name, "role": u["role"], "label": labels[u["role"]], "blurb": blurbs[u["role"]],
-                        "name": emp["full_name"], "department": emp["department_name"]})
-    return out
+            out.append({"username": name, "role": u["role"], "label": role_label(u["role"], emp.get("gender")),
+                        "blurb": blurbs[u["role"]], "name": loc(emp, "full_name"),
+                        "department": loc(emp, "department_name")})
+    return sorted(out, key=lambda a: ROLE_ORDER.get(a["role"], 9))
 
 
 @bp.route("/demo-login", methods=["POST"])
@@ -104,7 +117,7 @@ def demo_login():
     if acct is None:
         abort(404)
     user = repos.get_user_by_username(conn, wanted)
-    session.clear()
+    _fresh_session()
     session.permanent = True
     session["uid"] = user["user_id"]
     session["csrf"] = secrets.token_urlsafe(32)
@@ -119,8 +132,8 @@ def logout():
     if g.user is not None:
         with transaction(get_db()):
             audit("logout", "user", g.user.user_id)
-    session.clear()
-    flash("You have signed out.", "info")
+    _fresh_session()
+    flash(_("You have signed out."), "info")
     return redirect(url_for("auth.login"))
 
 
@@ -128,7 +141,7 @@ def logout():
 @login_required
 def account():
     if request.method == "POST" and current_app.extensions["hr_settings"].is_protected_demo_account(g.user.username):
-        flash("This is a shared demo account, so its password cannot be changed.", "info")
+        flash(_("This is a shared demo account, so its password cannot be changed."), "info")
         return redirect(url_for("auth.account"))
     if request.method == "POST":
         conn = get_db()
@@ -138,13 +151,13 @@ def account():
         repeat = request.form.get("repeat_password") or ""
         errors = []
         if not check_password_hash(user["password_hash"], current):
-            errors.append("Current password is incorrect.")
+            errors.append(_("The current password is not right."))
         if len(new) < 12:
-            errors.append("New password must be at least 12 characters.")
+            errors.append(_("The new password must be at least 12 characters long."))
         if new != repeat:
-            errors.append("The two new passwords do not match.")
+            errors.append(_("The two new passwords are not the same."))
         if new and new == current:
-            errors.append("Choose a password different from the current one.")
+            errors.append(_("Choose a password that is different from the current one."))
         if errors:
             for e in errors:
                 flash(e, "error")
@@ -153,6 +166,6 @@ def account():
             with transaction(conn):
                 repos.update_password(conn, g.user.user_id, generate_password_hash(new, method=method))
                 audit("password_change", "user", g.user.user_id)
-            flash("Password changed.", "success")
+            flash(_("Password changed."), "success")
             return redirect(url_for("auth.account"))
     return render_template("account.html")

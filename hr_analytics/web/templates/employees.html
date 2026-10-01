@@ -1,32 +1,32 @@
 {% extends "base.html" %}
 {% from "macros.html" import dept_select %}
-{% block title %}Employees{% endblock %}
+{% block title %}{{ _('Employees') }}{% endblock %}
 {% block content %}
 <div class="page-head">
-  <div><h1>Employees</h1><p>{{ rows|length }} records in your scope.{% if current_user.role == 'manager' %} Read only; HR maintains employee records.{% endif %}</p></div>
-  {% if current_user.role == 'hr' %}<div class="btn-row" style="margin:0"><a class="btn secondary" href="{{ url_for('users.bulk_import') }}">Import from CSV</a><a class="btn" href="{{ url_for('admin.employee_form') }}">Add employee</a></div>{% endif %}
+  <div><h1>{{ _('Employees') }}</h1><p>{{ _('{n} you can see.', n=count(rows|length, 'employee')) }}{% if current_user.is_manager %} {{ _('Read only; HR keeps employee records up to date.') }}{% endif %}</p></div>
+  {% if current_user.is_hr %}<div class="btn-row" style="margin:0"><a class="btn secondary" href="{{ url_for('users.bulk_import') }}">{{ _('Import from CSV') }}</a><a class="btn" href="{{ url_for('admin.employee_form') }}">{{ _('Add employee') }}</a></div>{% endif %}
 </div>
 <section class="panel">
 <form class="filters" method="get">
   {{ dept_select(departments, dept) }}
-  <div class="field"><label for="q">Search</label><input id="q" name="q" type="text" value="{{ q }}" placeholder="Name, code or badge"></div>
-  <div class="checks"><label><input type="checkbox" name="active" value="1" {% if active_only %}checked{% endif %}> Current employees only</label></div>
-  <button class="btn secondary" type="submit">Apply</button>
+  <div class="field"><label for="q">{{ _('Search') }}</label><input id="q" name="q" type="text" value="{{ q }}" placeholder="{{ _('Name, code or badge') }}"></div>
+  <div class="checks"><label><input type="checkbox" name="active" value="1" {% if active_only %}checked{% endif %}> {{ _('Current employees only') }}</label></div>
+  <button class="btn secondary" type="submit">{{ _('Show') }}</button>
 </form>
 </section>
 <section class="panel">
 {% if rows %}
 <div class="table-wrap"><table>
-  <thead><tr><th>Code</th><th>Name</th><th>Department</th><th>Job title</th><th>Badge</th><th>Shift</th><th>Hired</th><th>Left</th>{% if current_user.role == 'hr' %}<th></th>{% endif %}</tr></thead>
+  <thead><tr><th>{{ _('Code') }}</th><th>{{ _('Name') }}</th><th>{{ _('Department') }}</th><th>{{ _('Job title') }}</th><th>{{ _('Badge') }}</th><th>{{ _('Shift') }}</th><th>{{ _('Joined') }}</th><th>{{ _('Left') }}</th>{% if current_user.is_hr %}<th></th>{% endif %}</tr></thead>
   <tbody>{% for e in rows %}
   <tr>
     <td><a href="{{ url_for('attendance.employee', employee_id=e.employee_id) }}">{{ e.employee_code }}</a></td>
-    <td>{{ e.full_name }}</td><td>{{ e.department_name }}</td><td>{{ e.job_title or '' }}</td>
+    <td>{{ loc(e, 'full_name') }}</td><td>{{ loc(e, 'department_name') }}</td><td>{{ loc(e, 'job_title') }}</td>
     <td>{{ e.badge_id }}</td><td>{{ e.shift_code or '' }}</td><td class="nowrap">{{ e.hire_date }}</td>
     <td class="nowrap">{% if e.termination_date %}<span class="badge">{{ e.termination_date }}</span>{% endif %}</td>
-    {% if current_user.role == 'hr' %}<td class="actions"><a href="{{ url_for('admin.employee_form', employee_id=e.employee_id) }}">Edit</a></td>{% endif %}
+    {% if current_user.is_hr %}<td class="actions"><a href="{{ url_for('admin.employee_form', employee_id=e.employee_id) }}">{{ _('Edit') }}</a></td>{% endif %}
   </tr>{% endfor %}</tbody>
 </table></div>
-{% else %}<div class="empty">No employees match these filters.</div>{% endif %}
+{% else %}<div class="empty">{{ _('No employees match these filters.') }}</div>{% endif %}
 </section>
 {% endblock %}

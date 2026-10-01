@@ -29,6 +29,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from ..i18n import N_
+
 SHIFTS = [
     # code, name, start, end, grace, early grace, workdays
     ("DAY", "Day shift", "08:00", "16:00", 15, 5, "SUN,MON,TUE,WED,THU"),
@@ -405,9 +407,10 @@ def generate(out_dir: str | Path, *, seed: int = 42, start: str = "2025-09-01", 
             else:
                 evaluator = e["manager_code"]
             avg = (p + c + t + w) / 4
-            comment = ("Consistently strong month." if avg >= 4.2 else
-                       "Meets expectations." if avg >= 3.2 else
-                       "Below expectations this month; follow-up conversation recommended.")
+            # English in the data; the Arabic pages show them in Arabic (i18n_ar.py)
+            comment = (N_("Consistently strong month.") if avg >= 4.2 else
+                       N_("Meets expectations.") if avg >= 3.2 else
+                       N_("Below expectations this month; follow-up conversation recommended."))
             evals.append({"employee_code": code, "period": f"{m_first:%Y-%m}", "evaluator_username": evaluator.lower(),
                           "punctuality": p, "communication": c, "task_completion": t, "teamwork": w,
                           "comments": comment})

@@ -26,6 +26,8 @@ from datetime import date, datetime, timedelta
 from ..db import repos
 from ..db.connection import now_str, transaction
 from ..domain.attendance_rules import RuleConfig, ShiftDef, window
+from ..i18n import _
+from ..labels import leave_type_label, punch_kind_label, request_status_label
 from ..pipeline.processor import process_attendance
 
 LEAVE_TYPES = ("annual", "sick", "unpaid", "other")
@@ -50,21 +52,21 @@ class Validated:
 def _parse_date(value: str | None, label: str, errors: list[str]) -> date | None:
     value = (value or "").strip()
     if not value:
-        errors.append(f"{label} is required.")
+        errors.append(_("{label} is required.", label=label))
         return None
     try:
         return date.fromisoformat(value)
     except ValueError:
-        errors.append(f"{label} must be a date (YYYY-MM-DD).")
+        errors.append(_("{label} is not a valid date.", label=label))
         return None
 
 
 def _employment_errors(emp: dict, start: date, end: date) -> list[str]:
     errs = []
     if start < date.fromisoformat(emp["hire_date"]):
-        errs.append(f"The dates start before the hire date ({emp['hire_date']}).")
+        errs.append(_("The dates start before the joining date ({date}).", date=emp["hire_date"]))
     if emp["termination_date"] and end > date.fromisoformat(emp["termination_date"]):
-        errs.append(f"The dates run past the end of employment ({emp['termination_date']}).")
+        errs.append(_("The dates run past the last day of employment ({date}).", date=emp["termination_date"]))
     return errs
 
 
@@ -74,28 +76,31 @@ def validate_leave(conn, emp: dict, form: dict, today: date) -> Validated:
     errors: list[str] = []
     ltype = (form.get("leave_type") or "").strip()
     if ltype not in LEAVE_TYPES:
-        errors.append("Choose a leave type.")
-    start = _parse_date(form.get("start_date"), "Start date", errors)
-    end = _parse_date(form.get("end_date"), "End date", errors)
+        errors.append(_("Choose a leave type."))
+    start = _parse_date(form.get("start_date"), _("Start date"), errors)
+    end = _parse_date(form.get("end_date"), _("End date"), errors)
     reason = (form.get("reason") or "").strip()[:500] or None
     if ltype == "other" and not reason:
-        errors.append("Give a short reason for leave of type 'other'.")
+        errors.append(_("Please give a short reason when the leave type is Other."))
     if start and end:
         if end < start:
-            errors.append("End date is before start date.")
+            errors.append(_("The end date is before the start date."))
         elif (end - start).days + 1 > MAX_LEAVE_DAYS:
-            errors.append(f"One request can cover at most {MAX_LEAVE_DAYS} days. Split longer leave.")
+            errors.append(_("One request can cover at most {n} days. Please split longer leave into several requests.",
+                            n=MAX_LEAVE_DAYS))
         if start < today - timedelta(days=LEAVE_BACKDATE_DAYS):
-            errors.append(f"Leave can be requested at most {LEAVE_BACKDATE_DAYS} days after it started. Contact HR.")
+            errors.append(_("Leave can be requested up to {n} days after it started. For anything older, please contact HR.",
+                            n=LEAVE_BACKDATE_DAYS))
         if end > today + timedelta(days=LEAVE_AHEAD_DAYS):
-            errors.append("Leave can be requested at most one year ahead.")
+            errors.append(_("Leave can be requested up to one year ahead."))
         if not errors:
             errors += _employment_errors(emp, start, end)
         if not errors:
             clash = repos.overlapping_leave(conn, emp["employee_id"], start.isoformat(), end.isoformat())
             if clash:
-                errors.append(f"These dates overlap {clash['status']} {clash['leave_type']} leave "
-                              f"{clash['start_date']} to {clash['end_date']}.")
+                errors.append(_("These dates overlap another request: {kind} from {start} to {end} ({status}).",
+                                kind=leave_type_label(clash["leave_type"]), start=clash["start_date"],
+                                end=clash["end_date"], status=request_status_label(clash["status"])))
     return Validated({"employee_id": emp["employee_id"], "leave_type": ltype,
                       "start_date": start.isoformat() if start else None,
                       "end_date": end.isoformat() if end else None, "reason": reason}, errors)
@@ -135,35 +140,37 @@ def validate_correction(conn, settings, emp: dict, form: dict, now: datetime) ->
     errors: list[str] = []
     kind = (form.get("punch_kind") or "").strip()
     if kind not in PUNCH_KINDS:
-        errors.append("Say whether the missed punch was a clock-in or a clock-out.")
+        errors.append(_("Choose whether the missed punch was a clock-in or a clock-out."))
     raw = (form.get("punch_time") or "").strip().replace("T", " ")
     ts = None
     try:
         ts = datetime.fromisoformat(raw).replace(second=0, microsecond=0)
     except ValueError:
-        errors.append("Enter the date and time of the missed punch.")
+        errors.append(_("Enter the date and time of the missed punch."))
     reason = (form.get("reason") or "").strip()
     if not 5 <= len(reason) <= 500:
-        errors.append("Explain what happened in 5 to 500 characters (e.g. 'badge reader was down at gate 2').")
+        errors.append(_("Briefly explain what happened, in 5 to 500 characters (for example: the badge reader at gate 2 was not working)."))
     shift_date = None
     if ts is not None:
         if ts > now:
-            errors.append("The punch time is in the future.")
+            errors.append(_("The punch time is in the future."))
         elif ts < now - timedelta(days=CORRECTION_BACKDATE_DAYS):
-            errors.append(f"Corrections can be requested for the last {CORRECTION_BACKDATE_DAYS} days only.")
+            errors.append(_("Missed punches can be reported for the last {n} days only.", n=CORRECTION_BACKDATE_DAYS))
         else:
             shift_date = shift_date_for_punch(conn, settings, emp["employee_id"], ts)
             if shift_date is None:
-                errors.append("That time is outside all of your scheduled shift windows, so it would not count "
-                              "towards any day. Check the date, or contact HR.")
+                errors.append(_("That time is not close to any of your shifts, so it would not count towards any "
+                                "day. Please check the date, or contact HR."))
             else:
                 errors += _employment_errors(emp, shift_date, shift_date)
     if not errors and ts is not None and shift_date is not None:
         near = repos.punches_near(conn, emp["employee_id"], ts.isoformat(sep=" "), settings.PUNCH_DEBOUNCE_MINUTES)
         if near:
-            errors.append(f"A punch at {near[0]['punch_time_local'][11:16]} is already recorded for that time.")
+            errors.append(_("A punch at {time} is already recorded around that time.",
+                            time=near[0]["punch_time_local"][11:16]))
         elif repos.pending_correction_for(conn, emp["employee_id"], shift_date.isoformat(), kind):
-            errors.append(f"You already have a pending clock-{kind} correction for {shift_date}.")
+            errors.append(_("You have already reported this missed punch ({kind}) for {date}, and it is waiting "
+                            "for a decision.", kind=punch_kind_label(kind), date=shift_date.isoformat()))
     return Validated({"employee_id": emp["employee_id"], "punch_kind": kind, "reason": reason,
                       "punch_time": ts.isoformat(sep=" ") if ts else None,
                       "shift_date": shift_date.isoformat() if shift_date else None}, errors)
@@ -175,7 +182,7 @@ def approve_correction(conn, corr: dict, settings, user_id: int, note: str | Non
     digest = hashlib.sha256(f"manual-correction:{corr['correction_id']}".encode()).hexdigest()
     with transaction(conn):
         if repos.get_correction(conn, corr["correction_id"])["status"] != "pending":
-            raise ValueError("This request was already decided.")
+            raise ValueError(_("This request has already been decided."))
         bid = repos.insert_batch(conn, {
             "source_type": "manual", "source_name": f"Correction #{corr['correction_id']} ({corr['employee_code']})",
             "stored_path": None, "source_device": MANUAL_DEVICE, "source_timezone": settings.ORG_TIMEZONE,
@@ -186,10 +193,10 @@ def approve_correction(conn, corr: dict, settings, user_id: int, note: str | Non
         added = repos.insert_raw_punches(conn, [(bid, 1, corr["badge_id"], corr["employee_id"], corr["punch_time"],
                                                  corr["punch_time"], corr["punch_kind"].upper(), MANUAL_DEVICE)])
         if added != 1:
-            raise ValueError("An identical manual punch already exists.")
+            raise ValueError(_("The same punch has already been added."))
         punch_id = repos.punch_id_in_batch(conn, bid)
         if not repos.decide_correction(conn, corr["correction_id"], "approved", user_id, note, punch_id):
-            raise ValueError("This request was already decided.")
+            raise ValueError(_("This request has already been decided."))
         repos.audit(conn, user_id, "correction_approve", "attendance_correction", corr["correction_id"],
                     {"employee_id": corr["employee_id"], "punch_time": corr["punch_time"], "punch_id": punch_id,
                      "batch_id": bid})
@@ -210,4 +217,4 @@ def reprocess_range(conn, settings, start: str | date, end: str | date, employee
     if lo > hi:
         return None
     s = process_attendance(conn, lo, hi, settings=settings, employee_ids=employee_ids, user_id=user_id)
-    return f"Attendance re-processed for {s.start} to {s.end} ({s.rows_written:,} employee-days)."
+    return _("Attendance was recalculated from {start} to {end}.", start=s.start, end=s.end)

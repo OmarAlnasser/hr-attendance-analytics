@@ -6,6 +6,7 @@ from datetime import date
 
 from ..db import repos
 from ..db.connection import transaction
+from ..i18n import _
 from ..domain.scoring import CATEGORIES, validate_period_for_employee, validate_scores, weighted_score
 from ..security.scope import UserContext, can_evaluate
 
@@ -27,18 +28,18 @@ def save_evaluation(conn, actor: UserContext, employee_id: int, period: str, sco
                     comments: str | None, today: date | None = None, remote_addr: str | None = None) -> SaveResult:
     today = today or date.today()
     if not can_evaluate(conn, actor, employee_id):
-        return SaveResult(False, errors=["You are not allowed to evaluate this employee."])
+        return SaveResult(False, errors=[_("You are not allowed to evaluate this employee.")])
     emp = repos.get_employee(conn, employee_id)
     errors = validate_period_for_employee(period, emp["hire_date"], emp["termination_date"], today)
     errors += validate_scores(scores)
     comments = (comments or "").strip()
     if len(comments) > 2000:
-        errors.append("Comments must be 2000 characters or fewer.")
+        errors.append(_("Comments can be at most 2000 characters."))
     weights_row = None
     if not errors:
         weights_row = repos.weights_for_period(conn, period)
         if weights_row is None:
-            errors.append(f"No evaluation weights are configured for {period}. Ask HR to set them.")
+            errors.append(_("No score weights are set for {period}. Please ask HR to set them.", period=period))
     if errors:
         return SaveResult(False, errors=errors)
 

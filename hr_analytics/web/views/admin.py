@@ -16,6 +16,8 @@ from ...db.connection import IntegrityError, transaction
 from ...domain.attendance_rules import RuleConfig, ShiftDef, parse_hhmm, parse_workdays, validate_shift
 from ...pipeline.processor import process_attendance
 from .. import get_db
+from ...i18n import _
+from ...labels import request_status_label
 from ..helpers import audit, department_options, flash_errors, get_department_filter, int_arg, roles_required
 
 bp = Blueprint("admin", __name__)
@@ -29,12 +31,12 @@ def _iso(value: str, label: str, errors: list, required: bool = True) -> str | N
     value = (value or "").strip()
     if not value:
         if required:
-            errors.append(f"{label} is required.")
+            errors.append(_("{label} is required.", label=label))
         return None
     try:
         return date.fromisoformat(value).isoformat()
     except ValueError:
-        errors.append(f"{label} must be a date (YYYY-MM-DD).")
+        errors.append(_("{label} must be a valid date.", label=label))
         return None
 
 
@@ -50,7 +52,7 @@ def reprocess(start: str | date, employee_ids: list[int] | None = None, end: str
         return None
     summ = process_attendance(conn, start, stop, settings=g.settings, employee_ids=employee_ids,
                               user_id=g.user.user_id)
-    return f"Attendance re-processed for {summ.start} to {summ.end} ({summ.rows_written:,} employee-days)."
+    return _("Attendance recalculated from {start} to {end}.", start=summ.start, end=summ.end)
 
 
 def _sync_manager_roles(conn, employee_ids: set[int]) -> None:
@@ -59,7 +61,7 @@ def _sync_manager_roles(conn, employee_ids: set[int]) -> None:
         if emp_id is None:
             continue
         user = conn.execute("SELECT user_id, role FROM users WHERE employee_id = ?", (emp_id,)).fetchone()
-        if user is None or user["role"] == "hr":
+        if user is None or user["role"] in ("hr", "gm"):
             continue
         manages = conn.execute("SELECT 1 FROM departments WHERE manager_employee_id = ?", (emp_id,)).fetchone()
         new_role = "manager" if manages else "employee"
@@ -100,30 +102,33 @@ def employee_form(employee_id: int | None = None):
             "employee_code": f.get("employee_code", "").strip().upper(),
             "badge_id": f.get("badge_id", "").strip(),
             "full_name": f.get("full_name", "").strip(),
+            "full_name_ar": f.get("full_name_ar", "").strip() or None,
+            "gender": f.get("gender") if f.get("gender") in ("M", "F") else None,
             "email": f.get("email", "").strip().lower() or None,
             "job_title": f.get("job_title", "").strip() or None,
+            "job_title_ar": f.get("job_title_ar", "").strip() or None,
         }
         if not CODE_RE.match(data["employee_code"]):
-            errors.append("Employee code: 1-20 letters, digits, '-' or '_'.")
+            errors.append(_("The employee code can have 1 to 20 English letters, digits, '-' or '_'."))
         if not CODE_RE.match(data["badge_id"]):
-            errors.append("Badge ID: 1-20 letters, digits, '-' or '_'.")
+            errors.append(_("The badge number can have 1 to 20 English letters, digits, '-' or '_'."))
         if not (2 <= len(data["full_name"]) <= 120):
-            errors.append("Full name must be 2-120 characters.")
+            errors.append(_("The name must be 2 to 120 characters long."))
         if data["email"] and not EMAIL_RE.match(data["email"]):
-            errors.append("Email address is not valid.")
+            errors.append(_("That email address does not look right."))
         dept_id = int_arg("department_id")
         dept = repos.get_department(conn, dept_id) if dept_id else None
         if dept is None:
-            errors.append("Choose a department.")
+            errors.append(_("Choose a department."))
         data["department_id"] = dept_id
-        data["hire_date"] = _iso(f.get("hire_date"), "Hire date", errors)
-        data["termination_date"] = _iso(f.get("termination_date"), "Termination date", errors, required=False)
+        data["hire_date"] = _iso(f.get("hire_date"), _("The start date"), errors)
+        data["termination_date"] = _iso(f.get("termination_date"), _("The last working day"), errors, required=False)
         if data["hire_date"] and data["termination_date"] and data["termination_date"] < data["hire_date"]:
-            errors.append("Termination date cannot be before the hire date.")
+            errors.append(_("The last working day cannot be before the start date."))
         shift_id = int_arg("shift_id")
         if shift_id is None or repos.get_shift(conn, shift_id) is None:
-            errors.append("Choose a shift.")
-        shift_from = _iso(f.get("shift_effective_from") or data.get("hire_date") or "", "Shift effective date", errors)
+            errors.append(_("Choose a shift."))
+        shift_from = _iso(f.get("shift_effective_from") or data.get("hire_date") or "", _("The shift start date"), errors)
         if dept and dept["manager_employee_id"] and dept["manager_employee_id"] != employee_id:
             data["manager_employee_id"] = dept["manager_employee_id"]
         else:
@@ -143,7 +148,7 @@ def employee_form(employee_id: int | None = None):
                       {k: data[k] for k in ("employee_code", "department_id", "hire_date", "termination_date")}
                       | ({"shift_id": shift_id, "shift_from": shift_from} if shift_changed else {}))
         except IntegrityError:
-            flash("Employee code, badge ID and email must be unique.", "error")
+            flash(_("Another employee already uses this code, badge number or email."), "error")
             form.update(data, shift_id=shift_id)
             return render_template("employee_form.html", form=form, emp=emp, shifts=shifts,
                                    departments=repos.list_departments(conn)), 422
@@ -158,7 +163,7 @@ def employee_form(employee_id: int | None = None):
         if shift_changed and cur_assign is not None:
             starts.append(shift_from)
         msg = reprocess(min(starts), [new_id]) if starts else None
-        flash("Employee saved." + (f" {msg}" if msg else ""), "success")
+        flash(_("Employee saved.") + (f" {msg}" if msg else ""), "success")
         return redirect(url_for("attendance.employee", employee_id=new_id))
     return render_template("employee_form.html", form=form, emp=emp, shifts=shifts,
                            departments=repos.list_departments(conn))
@@ -180,20 +185,21 @@ def department_form(department_id: int | None = None):
     dept = repos.get_department(conn, department_id) if department_id else None
     if department_id and dept is None:
         abort(404)
-    candidates = conn.execute("""SELECT employee_id, employee_code, full_name FROM employees
+    candidates = conn.execute("""SELECT employee_id, employee_code, full_name, full_name_ar FROM employees
                                  WHERE termination_date IS NULL ORDER BY employee_code""").fetchall()
     if request.method == "POST":
         errors = []
         data = {"code": request.form.get("code", "").strip().upper(),
                 "name": request.form.get("name", "").strip(),
+                "name_ar": request.form.get("name_ar", "").strip() or None,
                 "manager_employee_id": int_arg("manager_employee_id"),
                 "is_active": 1 if request.form.get("is_active") else 0}
         if not CODE_RE.match(data["code"]):
-            errors.append("Code: 1-20 letters, digits, '-' or '_'.")
+            errors.append(_("The code can have 1 to 20 English letters, digits, '-' or '_'."))
         if not (2 <= len(data["name"]) <= 80):
-            errors.append("Name must be 2-80 characters.")
+            errors.append(_("The name must be 2 to 80 characters long."))
         if data["manager_employee_id"] and repos.get_employee(conn, data["manager_employee_id"]) is None:
-            errors.append("Unknown manager.")
+            errors.append(_("That manager was not found."))
         if errors:
             flash_errors(errors)
             return render_template("department_form.html", dept=data | {"department_id": department_id},
@@ -204,10 +210,10 @@ def department_form(department_id: int | None = None):
                 _sync_manager_roles(conn, {data["manager_employee_id"], dept["manager_employee_id"] if dept else None})
                 audit("department_update" if department_id else "department_create", "department", new_id, data)
         except IntegrityError:
-            flash("Department code must be unique.", "error")
+            flash(_("Another department already uses this code."), "error")
             return render_template("department_form.html", dept=data | {"department_id": department_id},
                                    candidates=candidates), 422
-        flash("Department saved. Manager access follows the manager field immediately.", "success")
+        flash(_("Department saved. The manager's access changes straight away."), "success")
         return redirect(url_for("admin.departments"))
     return render_template("department_form.html", dept=dept or {"is_active": 1}, candidates=candidates)
 
@@ -232,21 +238,23 @@ def shift_form(shift_id: int | None = None):
         f = request.form
         errors = []
         data = {"code": f.get("code", "").strip().upper(), "name": f.get("name", "").strip(),
+                "name_ar": f.get("name_ar", "").strip() or None,
                 "start_time": f.get("start_time", "").strip()[:5], "end_time": f.get("end_time", "").strip()[:5],
                 "workdays": ",".join(d for d in ("SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT")
                                      if f.get(f"wd_{d}")),
                 "is_active": 1 if f.get("is_active") else 0}
-        for k, label in (("grace_minutes", "Grace period"), ("early_leave_grace_minutes", "Early-leave grace")):
+        for k, label in (("grace_minutes", _("The grace for lateness")),
+                         ("early_leave_grace_minutes", _("The grace for leaving early"))):
             try:
                 data[k] = int(f.get(k, ""))
                 if not 0 <= data[k] <= 120:
                     raise ValueError
             except ValueError:
-                errors.append(f"{label} must be a whole number of minutes between 0 and 120.")
+                errors.append(_("{label} must be a whole number of minutes from 0 to 120.", label=label))
         if not CODE_RE.match(data["code"]):
-            errors.append("Code: 1-20 letters, digits, '-' or '_'.")
+            errors.append(_("The code can have 1 to 20 English letters, digits, '-' or '_'."))
         if not data["name"]:
-            errors.append("Name is required.")
+            errors.append(_("The name is required."))
         try:
             sd = ShiftDef(shift_id or 0, data["code"], parse_hhmm(data["start_time"]), parse_hhmm(data["end_time"]),
                           data.get("grace_minutes", 0), data.get("early_leave_grace_minutes", 0),
@@ -263,10 +271,10 @@ def shift_form(shift_id: int | None = None):
                 new_id = repos.save_shift(conn, data, shift_id)
                 audit("shift_update" if shift_id else "shift_create", "shift", new_id, data)
         except IntegrityError:
-            flash("Shift code must be unique.", "error")
+            flash(_("Another shift already uses this code."), "error")
             return render_template("shift_form.html", shift=data | {"shift_id": shift_id}), 422
-        flash("Shift saved. Already-processed days keep their results until they are re-processed "
-              "(Imports > Re-process).", "success")
+        flash(_("Shift saved. Days already calculated keep their results until they are recalculated "
+                "(Import punches, then Recalculate)."), "success")
         return redirect(url_for("admin.shifts"))
     return render_template("shift_form.html", shift=shift or {"grace_minutes": 15, "early_leave_grace_minutes": 5,
                                                              "workdays": "SUN,MON,TUE,WED,THU", "is_active": 1})
@@ -282,42 +290,44 @@ def calendar_view():
         action = request.form.get("action")
         errors: list[str] = []
         if action == "add_holiday":
-            d = _iso(request.form.get("holiday_date"), "Holiday date", errors)
+            d = _iso(request.form.get("holiday_date"), _("The date"), errors)
             name = (request.form.get("name") or "").strip()
+            name_ar = (request.form.get("name_ar") or "").strip()[:80] or None
             if not (2 <= len(name) <= 80):
-                errors.append("Holiday name must be 2-80 characters.")
+                errors.append(_("The holiday name must be 2 to 80 characters long."))
             if not errors:
                 with transaction(conn):
-                    repos.save_holiday(conn, d, name)
-                    audit("holiday_save", "holiday", d, {"name": name})
+                    repos.save_holiday(conn, d, name, name_ar)
+                    audit("holiday_save", "holiday", d, {"name": name, "name_ar": name_ar})
                 msg = reprocess(d, end=d)
-                flash(f"Holiday saved. {msg or ''}", "success")
+                flash(_("Public holiday saved.") + (f" {msg}" if msg else ""), "success")
         elif action == "delete_holiday":
-            d = _iso(request.form.get("holiday_date"), "Holiday date", errors)
+            d = _iso(request.form.get("holiday_date"), _("The date"), errors)
             if not errors:
                 with transaction(conn):
                     repos.delete_holiday(conn, d)
                     audit("holiday_delete", "holiday", d)
                 msg = reprocess(d, end=d)
-                flash(f"Holiday removed. {msg or ''}", "success")
+                flash(_("Public holiday removed.") + (f" {msg}" if msg else ""), "success")
         elif action == "add_leave":
             emp = repos.get_employee_by_code(conn, (request.form.get("employee_code") or "").strip().upper())
             if emp is None:
-                errors.append("Unknown employee code.")
+                errors.append(_("No employee has that code."))
             ltype = request.form.get("leave_type")
             if ltype not in LEAVE_TYPES:
-                errors.append("Choose a leave type.")
-            s = _iso(request.form.get("start_date"), "Start date", errors)
-            e = _iso(request.form.get("end_date"), "End date", errors)
+                errors.append(_("Choose a type of leave."))
+            s = _iso(request.form.get("start_date"), _("The first day"), errors)
+            e = _iso(request.form.get("end_date"), _("The last day"), errors)
             if s and e and e < s:
-                errors.append("End date is before start date.")
+                errors.append(_("The last day is before the first day."))
             if s and e and (date.fromisoformat(e) - date.fromisoformat(s)).days > 180:
-                errors.append("A single leave record can cover at most 180 days.")
+                errors.append(_("One leave record can cover at most 180 days."))
             if not errors:
                 clash = repos.overlapping_leave(conn, emp["employee_id"], s, e)
                 if clash:
-                    errors.append(f"Overlaps {clash['status']} leave {clash['start_date']} to {clash['end_date']} "
-                                  f"for {emp['employee_code']}. Decide or cancel that one first (Approvals).")
+                    errors.append(_("These dates overlap leave from {a} to {b} for {code} that is {status}. Decide or "
+                                    "cancel that request first (Approvals).", a=clash["start_date"], b=clash["end_date"],
+                                    code=emp["employee_code"], status=request_status_label(clash["status"]).lower()))
             if not errors:
                 with transaction(conn):
                     lid = repos.insert_leave(conn, emp["employee_id"], ltype, s, e, "approved", g.user.user_id,
@@ -325,7 +335,8 @@ def calendar_view():
                     audit("leave_approve", "leave_request", lid, {"employee_id": emp["employee_id"], "type": ltype,
                                                                   "start": s, "end": e})
                 msg = reprocess(s, [emp["employee_id"]], end=e)
-                flash(f"Approved leave recorded for {emp['employee_code']}. {msg or ''}", "success")
+                flash(_("Approved leave recorded for {code}.", code=emp["employee_code"]) + (f" {msg}" if msg else ""),
+                      "success")
         else:
             abort(400)
         flash_errors(errors)

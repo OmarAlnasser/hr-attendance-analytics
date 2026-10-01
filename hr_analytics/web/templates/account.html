@@ -1,14 +1,14 @@
 {% extends "base.html" %}
-{% block title %}Password{% endblock %}
+{% block title %}{{ _('Password') }}{% endblock %}
 {% block content %}
-<div class="page-head"><div><h1>Change password</h1><p>At least 12 characters. The password is stored only as a salted hash.</p></div></div>
+<div class="page-head"><div><h1>{{ _('Change password') }}</h1><p>{{ _('At least 12 characters. Passwords are never stored as they are typed, only as a secure hash.') }}</p></div></div>
 <section class="panel">
 <form method="post" class="form-grid" style="max-width:28rem;grid-template-columns:1fr">
   {{ csrf_field() }}
-  <div class="field"><label for="cp">Current password</label><input id="cp" name="current_password" type="password" autocomplete="current-password" required></div>
-  <div class="field"><label for="np">New password</label><input id="np" name="new_password" type="password" autocomplete="new-password" minlength="12" required></div>
-  <div class="field"><label for="rp">Repeat new password</label><input id="rp" name="repeat_password" type="password" autocomplete="new-password" minlength="12" required></div>
-  <div><button class="btn" type="submit">Change password</button></div>
+  <div class="field"><label for="cp">{{ _('Current password') }}</label><input id="cp" name="current_password" type="password" dir="ltr" autocomplete="current-password" required></div>
+  <div class="field"><label for="np">{{ _('New password') }}</label><input id="np" name="new_password" type="password" dir="ltr" autocomplete="new-password" minlength="12" required></div>
+  <div class="field"><label for="rp">{{ _('New password again') }}</label><input id="rp" name="repeat_password" type="password" dir="ltr" autocomplete="new-password" minlength="12" required></div>
+  <div><button class="btn" type="submit">{{ _('Change password') }}</button></div>
 </form>
 </section>
 {% endblock %}

@@ -1,63 +1,77 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{ lang }}" dir="{{ 'rtl' if rtl else 'ltr' }}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{% block title %}HR Analytics{% endblock %} · HR Attendance &amp; Performance</title>
+<title>{% block title %}{{ _('HR Analytics') }}{% endblock %} · {{ _('Attendance and Performance') }}</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
 {% block head %}{% endblock %}
 </head>
 <body>
 {% set ep = request.endpoint or '' %}
+{% set nav_q = request.full_path.rstrip('?') %}
 <div class="shell">
   <aside class="side">
-    <div class="brand"><strong>HR Analytics</strong><span>Attendance &amp; performance</span></div>
-    {% if current_user.role in ('hr', 'manager') %}
+    <div class="brand"><strong>{{ _('HR Analytics') }}</strong><span>{{ _('Attendance and performance') }}</span></div>
+    {% if current_user.has_team %}
     <form class="side-search" method="get" action="{{ url_for('admin.employees') }}" role="search">
-      <input type="search" name="q" placeholder="Find employee…" title="Search by name, employee code or badge" aria-label="Find employee" value="{{ request.args.get('q', '') if ep == 'admin.employees' else '' }}">
+      <input type="search" name="q" placeholder="{{ _('Find an employee…') }}" title="{{ _('Search by name, employee code or badge') }}" aria-label="{{ _('Find an employee') }}" value="{{ request.args.get('q', '') if ep == 'admin.employees' else '' }}">
     </form>
     {% endif %}
-    <nav class="nav" aria-label="Main">
-      {% if current_user.role in ('hr', 'manager') %}
-        <a href="{{ url_for('dashboard.index') }}" {% if ep == 'dashboard.index' %}aria-current="page"{% endif %}>Overview</a>
-        <a href="{{ url_for('today.index') }}" {% if ep == 'today.index' %}aria-current="page"{% endif %}>Today</a>
+    <nav class="nav" aria-label="{{ _('Main menu') }}">
+      {% if current_user.has_team %}
+        <a href="{{ url_for('dashboard.index') }}" {% if ep == 'dashboard.index' %}aria-current="page"{% endif %}>{{ _('Overview') }}</a>
+        <a href="{{ url_for('today.index') }}" {% if ep == 'today.index' %}aria-current="page"{% endif %}>{{ _('Today') }}</a>
       {% else %}
-        <a href="{{ url_for('dashboard.index') }}" {% if ep == 'attendance.employee' %}aria-current="page"{% endif %}>My month</a>
+        <a href="{{ url_for('dashboard.index') }}" {% if ep == 'attendance.employee' %}aria-current="page"{% endif %}>{{ _('My month') }}</a>
       {% endif %}
-      <a href="{{ url_for('attendance.index') }}" {% if ep == 'attendance.index' %}aria-current="page"{% endif %}>Attendance</a>
-      {% if current_user.role in ('hr', 'manager') %}
-        <a href="{{ url_for('admin.employees') }}" {% if ep in ('admin.employees', 'admin.employee_form') %}aria-current="page"{% endif %}>Employees</a>
+      <a href="{{ url_for('attendance.index') }}" {% if ep == 'attendance.index' %}aria-current="page"{% endif %}>{{ _('Attendance') }}</a>
+      {% if current_user.has_team %}
+        <a href="{{ url_for('admin.employees') }}" {% if ep in ('admin.employees', 'admin.employee_form') %}aria-current="page"{% endif %}>{{ _('Employees') }}</a>
       {% endif %}
-      <a href="{{ url_for('evaluations.index') }}" {% if ep in ('evaluations.index', 'evaluations.form', 'evaluations.history') %}aria-current="page"{% endif %}>Evaluations</a>
-      {% if current_user.role in ('hr', 'manager') %}
-        <a href="{{ url_for('requests.approvals') }}" {% if ep == 'requests.approvals' %}aria-current="page"{% endif %}>Approvals{% if pending.to_decide %}<span class="count" aria-label="{{ pending.to_decide }} waiting">{{ pending.to_decide }}</span>{% endif %}</a>
-        <a href="{{ url_for('review.index') }}" {% if ep == 'review.index' %}aria-current="page"{% endif %}>Needs review</a>
-        <a href="{{ url_for('reports.index') }}" {% if ep == 'reports.index' %}aria-current="page"{% endif %}>Monthly reports</a>
+      <a href="{{ url_for('evaluations.index') }}" {% if ep in ('evaluations.index', 'evaluations.form', 'evaluations.history') %}aria-current="page"{% endif %}>{{ _('Evaluations') }}</a>
+      {% if current_user.has_team %}
+        <a href="{{ url_for('requests.approvals') }}" {% if ep == 'requests.approvals' %}aria-current="page"{% endif %}>{{ _('Approvals') }}{% if pending.to_decide %}<span class="count" aria-label="{{ _('{n} waiting', n=pending.to_decide) }}">{{ pending.to_decide }}</span>{% endif %}</a>
+        <a href="{{ url_for('review.index') }}" {% if ep == 'review.index' %}aria-current="page"{% endif %}>{{ _('Needs review') }}</a>
+        <a href="{{ url_for('reports.index') }}" {% if ep == 'reports.index' %}aria-current="page"{% endif %}>{{ _('Monthly reports') }}</a>
       {% endif %}
       {% if current_user.employee_id %}
-        <a href="{{ url_for('requests.mine') }}" {% if ep == 'requests.mine' %}aria-current="page"{% endif %}>My requests{% if pending.mine %}<span class="count" aria-label="{{ pending.mine }} open">{{ pending.mine }}</span>{% endif %}</a>
+        <a href="{{ url_for('requests.mine') }}" {% if ep == 'requests.mine' %}aria-current="page"{% endif %}>{{ _('My requests') }}{% if pending.mine %}<span class="count" aria-label="{{ _('{n} open', n=pending.mine) }}">{{ pending.mine }}</span>{% endif %}</a>
       {% endif %}
-      {% if current_user.role == 'hr' %}
-        <span class="group">Data &amp; settings</span>
-        <a href="{{ url_for('imports.index') }}" {% if ep.startswith('imports.') %}aria-current="page"{% endif %}>Import punches</a>
-        <a href="{{ url_for('users.bulk_import') }}" {% if ep == 'users.bulk_import' %}aria-current="page"{% endif %}>Import employees</a>
-        <a href="{{ url_for('admin.calendar_view') }}" {% if ep == 'admin.calendar_view' %}aria-current="page"{% endif %}>Holidays &amp; leave</a>
-        <a href="{{ url_for('admin.departments') }}" {% if ep.startswith('admin.department') %}aria-current="page"{% endif %}>Departments</a>
-        <a href="{{ url_for('admin.shifts') }}" {% if ep.startswith('admin.shift') %}aria-current="page"{% endif %}>Shifts</a>
-        <a href="{{ url_for('evaluations.weights') }}" {% if ep == 'evaluations.weights' %}aria-current="page"{% endif %}>Score weights</a>
-        <a href="{{ url_for('users.index') }}" {% if ep == 'users.index' %}aria-current="page"{% endif %}>User accounts</a>
-        <a href="{{ url_for('admin.audit_log') }}" {% if ep == 'admin.audit_log' %}aria-current="page"{% endif %}>Audit log</a>
+      {% if current_user.is_hr %}
+        <span class="group">{{ _('Data and settings') }}</span>
+        <a href="{{ url_for('imports.index') }}" {% if ep.startswith('imports.') %}aria-current="page"{% endif %}>{{ _('Import punches') }}</a>
+        <a href="{{ url_for('users.bulk_import') }}" {% if ep == 'users.bulk_import' %}aria-current="page"{% endif %}>{{ _('Import employees') }}</a>
+        <a href="{{ url_for('admin.calendar_view') }}" {% if ep == 'admin.calendar_view' %}aria-current="page"{% endif %}>{{ _('Holidays and leave') }}</a>
+        <a href="{{ url_for('admin.departments') }}" {% if ep.startswith('admin.department') %}aria-current="page"{% endif %}>{{ _('Departments') }}</a>
+        <a href="{{ url_for('admin.shifts') }}" {% if ep.startswith('admin.shift') %}aria-current="page"{% endif %}>{{ _('Shifts') }}</a>
+        <a href="{{ url_for('evaluations.weights') }}" {% if ep == 'evaluations.weights' %}aria-current="page"{% endif %}>{{ _('Score weights') }}</a>
+        <a href="{{ url_for('users.index') }}" {% if ep == 'users.index' %}aria-current="page"{% endif %}>{{ _('User accounts') }}</a>
+        <a href="{{ url_for('admin.audit_log') }}" {% if ep == 'admin.audit_log' %}aria-current="page"{% endif %}>{{ _('Activity log') }}</a>
       {% endif %}
     </nav>
     <div class="who">
-      <b>{{ current_user.username }}</b> <span class="role">{{ {'hr': 'HR', 'manager': 'Department manager', 'employee': 'Employee'}[current_user.role] }}</span><br>
-      <a class="linklike" href="{{ url_for('auth.account') }}">Password</a> ·
-      <form method="post" action="{{ url_for('auth.logout') }}">{{ csrf_field() }}<button class="linklike" type="submit">Sign out</button></form>
+      {% if profile %}
+      <div class="profile">
+        <span class="avatar" style="--av:{{ profile.colour }}" aria-hidden="true">{{ profile.initials }}</span>
+        <div class="profile-text">
+          <b class="profile-name">{{ profile.name }}</b>
+          <span class="profile-role">{{ profile.role }}{% if profile.department %} · {{ profile.department }}{% endif %}</span>
+        </div>
+      </div>
+      {% endif %}
+      <div class="who-links">
+        <a class="linklike" href="{{ url_for('auth.account') }}">{{ _('Password') }}</a>
+        <span aria-hidden="true">·</span>
+        {% if lang == 'ar' %}<a class="linklike" href="{{ url_for('set_language', code='en', next=nav_q) }}" lang="en">English</a>{% else %}<a class="linklike" href="{{ url_for('set_language', code='ar', next=nav_q) }}" lang="ar">العربية</a>{% endif %}
+        <span aria-hidden="true">·</span>
+        <form method="post" action="{{ url_for('auth.logout') }}">{{ csrf_field() }}<button class="linklike" type="submit">{{ _('Sign out') }}</button></form>
+      </div>
     </div>
   </aside>
   <main class="main" id="content">
     {% if synthetic_data %}
-      <div class="synthetic" role="note">{% if demo_mode %}<b>Public demo.</b> Synthetic data: no real people. Click anything, approve or reject requests, import files. {{ demo_note }}{% else %}Synthetic demonstration data. Figures show how the system works and are not evidence about any real organisation.{% endif %}</div>
+      <div class="synthetic" role="note">{% if demo_mode %}<b>{{ _('Public demo.') }}</b> {{ _('All people and figures are made up. Feel free to click anything, approve or reject requests and import files: the data is rebuilt every night.') }}{% else %}{{ _('Demonstration data: all people and figures are made up and say nothing about a real organisation.') }}{% endif %}</div>
     {% endif %}
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}<ul class="flashes">{% for cat, m in messages %}<li class="flash {{ cat }}" role="status">{{ m }}</li>{% endfor %}</ul>{% endif %}

@@ -1,266 +1,266 @@
-EmployeeKey,PeriodDateKey,Period,RuleCode,RuleDescription,Evidence,Method
-2,20250901,2025-09,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),7/21 days late,rule
-10,20250901,2025-09,ABSENCE_3PLUS,3 or more unexcused absences in the month,3 absences,rule
-10,20250901,2025-09,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.15 < 3.00,rule
-11,20250901,2025-09,ABSENCE_3PLUS,3 or more unexcused absences in the month,4 absences,rule
-11,20250901,2025-09,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),8/17 days late,rule
-11,20250901,2025-09,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.10 < 3.00,rule
-15,20250901,2025-09,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.50 < 3.00,rule
-16,20250901,2025-09,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.70 < 3.00,rule
-19,20250901,2025-09,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.90 < 3.00,rule
-26,20250901,2025-09,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),7/21 days late,rule
-26,20250901,2025-09,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.00 < 3.00,rule
-32,20250901,2025-09,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.70 < 3.00,rule
-36,20250901,2025-09,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.80 < 3.00,rule
-46,20250901,2025-09,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.90 < 3.00,rule
-71,20250901,2025-09,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.85 < 3.00,rule
-77,20250901,2025-09,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.70 < 3.00,rule
-84,20250901,2025-09,INCOMPLETE_3PLUS,3 or more days with a single punch (missing IN or OUT),3 days,rule
-85,20250901,2025-09,ABSENCE_3PLUS,3 or more unexcused absences in the month,3 absences,rule
-100,20250901,2025-09,ABSENCE_3PLUS,3 or more unexcused absences in the month,5 absences,rule
-100,20250901,2025-09,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,1.80 < 3.00,rule
-13,20251001,2025-10,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.45 < 3.00,rule
-16,20251001,2025-10,ABSENCE_3PLUS,3 or more unexcused absences in the month,3 absences,rule
-16,20251001,2025-10,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.20 < 3.00,rule
-22,20251001,2025-10,INCOMPLETE_3PLUS,3 or more days with a single punch (missing IN or OUT),3 days,rule
-31,20251001,2025-10,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),7/21 days late,rule
-31,20251001,2025-10,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.80 < 3.00,rule
-39,20251001,2025-10,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.85 < 3.00,rule
-45,20251001,2025-10,ABSENCE_3PLUS,3 or more unexcused absences in the month,3 absences,rule
-46,20251001,2025-10,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),7/20 days late,rule
-46,20251001,2025-10,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.05 < 3.00,rule
-49,20251001,2025-10,SCORE_DROP_1,Weighted score dropped by 1.0 or more versus the previous month,4.20 -> 3.00,rule
-51,20251001,2025-10,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.85 < 3.00,rule
-68,20251001,2025-10,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.70 < 3.00,rule
-71,20251001,2025-10,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.90 < 3.00,rule
-72,20251001,2025-10,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.80 < 3.00,rule
-73,20251001,2025-10,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.70 < 3.00,rule
-77,20251001,2025-10,INCOMPLETE_3PLUS,3 or more days with a single punch (missing IN or OUT),3 days,rule
-77,20251001,2025-10,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.70 < 3.00,rule
-88,20251001,2025-10,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),9/21 days late,rule
-88,20251001,2025-10,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.95 < 3.00,rule
-92,20251001,2025-10,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.65 < 3.00,rule
-99,20251001,2025-10,ABSENCE_3PLUS,3 or more unexcused absences in the month,4 absences,rule
-100,20251001,2025-10,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.80 < 3.00,rule
-106,20251001,2025-10,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),6/20 days late,rule
-106,20251001,2025-10,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.45 < 3.00,rule
-11,20251101,2025-11,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.70 < 3.00,rule
-16,20251101,2025-11,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),9/20 days late,rule
-16,20251101,2025-11,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.20 < 3.00,rule
-24,20251101,2025-11,SCORE_DROP_1,Weighted score dropped by 1.0 or more versus the previous month,4.10 -> 3.00,rule
-31,20251101,2025-11,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.80 < 3.00,rule
-46,20251101,2025-11,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.45 < 3.00,rule
-72,20251101,2025-11,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.50 < 3.00,rule
-95,20251101,2025-11,SCORE_DROP_1,Weighted score dropped by 1.0 or more versus the previous month,4.25 -> 3.05,rule
-97,20251101,2025-11,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.90 < 3.00,rule
-100,20251101,2025-11,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.80 < 3.00,rule
-102,20251101,2025-11,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.40 < 3.00,rule
-106,20251101,2025-11,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),7/21 days late,rule
-106,20251101,2025-11,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.65 < 3.00,rule
-1,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.60 < 3.00,rule
-1,20251201,2025-12,SCORE_DROP_1,Weighted score dropped by 1.0 or more versus the previous month,3.65 -> 2.60,rule
-11,20251201,2025-12,ABSENCE_3PLUS,3 or more unexcused absences in the month,3 absences,rule
-11,20251201,2025-12,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),7/20 days late,rule
-11,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.00 < 3.00,rule
-13,20251201,2025-12,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),9/22 days late,rule
-14,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.45 < 3.00,rule
-14,20251201,2025-12,SCORE_DROP_1,Weighted score dropped by 1.0 or more versus the previous month,3.70 -> 2.45,rule
-15,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,1.90 < 3.00,rule
-15,20251201,2025-12,SCORE_DROP_1,Weighted score dropped by 1.0 or more versus the previous month,3.25 -> 1.90,rule
-16,20251201,2025-12,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),7/23 days late,rule
-26,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.85 < 3.00,rule
-31,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.80 < 3.00,rule
-39,20251201,2025-12,ABSENCE_3PLUS,3 or more unexcused absences in the month,3 absences,rule
-42,20251201,2025-12,SCORE_DROP_1,Weighted score dropped by 1.0 or more versus the previous month,5.00 -> 3.80,rule
-46,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.70 < 3.00,rule
-47,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.65 < 3.00,rule
-47,20251201,2025-12,SCORE_DROP_1,Weighted score dropped by 1.0 or more versus the previous month,3.90 -> 2.65,rule
-51,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.70 < 3.00,rule
-68,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.90 < 3.00,rule
-70,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.95 < 3.00,rule
-71,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.70 < 3.00,rule
-72,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.85 < 3.00,rule
-77,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.25 < 3.00,rule
-77,20251201,2025-12,SCORE_DROP_1,Weighted score dropped by 1.0 or more versus the previous month,3.25 -> 2.25,rule
-83,20251201,2025-12,SCORE_DROP_1,Weighted score dropped by 1.0 or more versus the previous month,4.05 -> 3.00,rule
-87,20251201,2025-12,INCOMPLETE_3PLUS,3 or more days with a single punch (missing IN or OUT),3 days,rule
-87,20251201,2025-12,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),7/23 days late,rule
-88,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.75 < 3.00,rule
-89,20251201,2025-12,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),6/20 days late,rule
-95,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.75 < 3.00,rule
-100,20251201,2025-12,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),7/23 days late,rule
-100,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.70 < 3.00,rule
-2,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.80 < 3.00,rule
-3,20260101,2026-01,ABSENCE_3PLUS,3 or more unexcused absences in the month,3 absences,rule
-11,20260101,2026-01,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),6/20 days late,rule
-11,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.40 < 3.00,rule
-13,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.80 < 3.00,rule
-14,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.90 < 3.00,rule
-15,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,1.90 < 3.00,rule
-16,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.45 < 3.00,rule
-19,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.90 < 3.00,rule
-31,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.75 < 3.00,rule
-36,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.65 < 3.00,rule
-46,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.75 < 3.00,rule
-51,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.80 < 3.00,rule
-52,20260101,2026-01,ABSENCE_3PLUS,3 or more unexcused absences in the month,3 absences,rule
-56,20260101,2026-01,SCORE_DROP_1,Weighted score dropped by 1.0 or more versus the previous month,4.25 -> 3.00,rule
-69,20260101,2026-01,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),6/20 days late,rule
-71,20260101,2026-01,ABSENCE_3PLUS,3 or more unexcused absences in the month,3 absences,rule
-71,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.40 < 3.00,rule
-77,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.70 < 3.00,rule
-87,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.75 < 3.00,rule
-97,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.85 < 3.00,rule
-100,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.70 < 3.00,rule
-103,20260101,2026-01,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),6/16 days late,rule
-103,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.50 < 3.00,rule
-106,20260101,2026-01,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),8/21 days late,rule
-106,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.20 < 3.00,rule
-109,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.90 < 3.00,rule
-1,20260201,2026-02,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),5/12 days late,rule
-2,20260201,2026-02,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),7/18 days late,rule
-11,20260201,2026-02,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.15 < 3.00,rule
-15,20260201,2026-02,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.50 < 3.00,rule
-34,20260201,2026-02,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.80 < 3.00,rule
-37,20260201,2026-02,INCOMPLETE_3PLUS,3 or more days with a single punch (missing IN or OUT),3 days,rule
-67,20260201,2026-02,ABSENCE_3PLUS,3 or more unexcused absences in the month,4 absences,rule
-67,20260201,2026-02,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.75 < 3.00,rule
-68,20260201,2026-02,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.45 < 3.00,rule
-70,20260201,2026-02,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.90 < 3.00,rule
-71,20260201,2026-02,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),6/18 days late,rule
-71,20260201,2026-02,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.25 < 3.00,rule
-73,20260201,2026-02,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),2/6 days late,rule
-77,20260201,2026-02,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.50 < 3.00,rule
-79,20260201,2026-02,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.70 < 3.00,rule
-87,20260201,2026-02,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.55 < 3.00,rule
-96,20260201,2026-02,INCOMPLETE_3PLUS,3 or more days with a single punch (missing IN or OUT),3 days,rule
-100,20260201,2026-02,ABSENCE_3PLUS,3 or more unexcused absences in the month,3 absences,rule
-100,20260201,2026-02,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),6/16 days late,rule
-100,20260201,2026-02,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.00 < 3.00,rule
-102,20260201,2026-02,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.90 < 3.00,rule
-106,20260201,2026-02,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.70 < 3.00,rule
-109,20260201,2026-02,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.30 < 3.00,rule
-113,20260201,2026-02,SCORE_DROP_1,Weighted score dropped by 1.0 or more versus the previous month,4.80 -> 3.45,rule
-11,20260301,2026-03,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,1.90 < 3.00,rule
-13,20260301,2026-03,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.45 < 3.00,rule
-13,20260301,2026-03,SCORE_DROP_1,Weighted score dropped by 1.0 or more versus the previous month,3.45 -> 2.45,rule
-15,20260301,2026-03,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.80 < 3.00,rule
-16,20260301,2026-03,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.50 < 3.00,rule
-18,20260301,2026-03,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),8/20 days late,rule
-19,20260301,2026-03,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.90 < 3.00,rule
-26,20260301,2026-03,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.80 < 3.00,rule
-34,20260301,2026-03,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.90 < 3.00,rule
-37,20260301,2026-03,SCORE_DROP_1,Weighted score dropped by 1.0 or more versus the previous month,4.75 -> 3.55,rule
-44,20260301,2026-03,SCORE_DROP_1,Weighted score dropped by 1.0 or more versus the previous month,4.45 -> 3.10,rule
-51,20260301,2026-03,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.60 < 3.00,rule
-51,20260301,2026-03,SCORE_DROP_1,Weighted score dropped by 1.0 or more versus the previous month,3.85 -> 2.60,rule
-68,20260301,2026-03,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.40 < 3.00,rule
-71,20260301,2026-03,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.25 < 3.00,rule
-72,20260301,2026-03,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.95 < 3.00,rule
-100,20260301,2026-03,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.50 < 3.00,rule
-104,20260301,2026-03,SCORE_DROP_1,Weighted score dropped by 1.0 or more versus the previous month,4.80 -> 3.50,rule
-108,20260301,2026-03,SCORE_DROP_1,Weighted score dropped by 1.0 or more versus the previous month,4.80 -> 3.70,rule
-5,20260401,2026-04,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.80 < 3.00,rule
-11,20260401,2026-04,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),7/22 days late,rule
-11,20260401,2026-04,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.45 < 3.00,rule
-13,20260401,2026-04,ABSENCE_3PLUS,3 or more unexcused absences in the month,3 absences,rule
-13,20260401,2026-04,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.40 < 3.00,rule
-15,20260401,2026-04,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.30 < 3.00,rule
-16,20260401,2026-04,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),6/20 days late,rule
-16,20260401,2026-04,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,1.65 < 3.00,rule
-33,20260401,2026-04,ABSENCE_3PLUS,3 or more unexcused absences in the month,3 absences,rule
-34,20260401,2026-04,INCOMPLETE_3PLUS,3 or more days with a single punch (missing IN or OUT),3 days,rule
-35,20260401,2026-04,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.90 < 3.00,rule
-36,20260401,2026-04,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.85 < 3.00,rule
-55,20260401,2026-04,INCOMPLETE_3PLUS,3 or more days with a single punch (missing IN or OUT),3 days,rule
-67,20260401,2026-04,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),5/15 days late,rule
-68,20260401,2026-04,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.50 < 3.00,rule
-71,20260401,2026-04,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.25 < 3.00,rule
-81,20260401,2026-04,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.90 < 3.00,rule
-92,20260401,2026-04,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.45 < 3.00,rule
-100,20260401,2026-04,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.25 < 3.00,rule
-103,20260401,2026-04,SCORE_DROP_1,Weighted score dropped by 1.0 or more versus the previous month,4.20 -> 3.20,rule
-104,20260401,2026-04,ABSENCE_3PLUS,3 or more unexcused absences in the month,3 absences,rule
-118,20260401,2026-04,ABSENCE_3PLUS,3 or more unexcused absences in the month,3 absences,rule
-11,20260501,2026-05,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.60 < 3.00,rule
-13,20260501,2026-05,ABSENCE_3PLUS,3 or more unexcused absences in the month,3 absences,rule
-16,20260501,2026-05,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.70 < 3.00,rule
-19,20260501,2026-05,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.90 < 3.00,rule
-34,20260501,2026-05,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.90 < 3.00,rule
-35,20260501,2026-05,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.90 < 3.00,rule
-38,20260501,2026-05,ABSENCE_3PLUS,3 or more unexcused absences in the month,3 absences,rule
-46,20260501,2026-05,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.45 < 3.00,rule
-52,20260501,2026-05,SCORE_DROP_1,Weighted score dropped by 1.0 or more versus the previous month,4.45 -> 3.40,rule
-56,20260501,2026-05,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.90 < 3.00,rule
-61,20260501,2026-05,ABSENCE_3PLUS,3 or more unexcused absences in the month,3 absences,rule
-64,20260501,2026-05,SCORE_DROP_1,Weighted score dropped by 1.0 or more versus the previous month,4.45 -> 3.20,rule
-68,20260501,2026-05,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.70 < 3.00,rule
-71,20260501,2026-05,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.25 < 3.00,rule
-72,20260501,2026-05,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.25 < 3.00,rule
-79,20260501,2026-05,INCOMPLETE_3PLUS,3 or more days with a single punch (missing IN or OUT),3 days,rule
-85,20260501,2026-05,SCORE_DROP_1,Weighted score dropped by 1.0 or more versus the previous month,4.60 -> 3.50,rule
-88,20260501,2026-05,ABSENCE_3PLUS,3 or more unexcused absences in the month,3 absences,rule
-102,20260501,2026-05,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.65 < 3.00,rule
-102,20260501,2026-05,SCORE_DROP_1,Weighted score dropped by 1.0 or more versus the previous month,3.70 -> 2.65,rule
-105,20260501,2026-05,SCORE_DROP_1,Weighted score dropped by 1.0 or more versus the previous month,4.80 -> 3.70,rule
-107,20260501,2026-05,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.40 < 3.00,rule
-2,20260601,2026-06,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),6/20 days late,rule
-11,20260601,2026-06,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.45 < 3.00,rule
-12,20260601,2026-06,SCORE_DROP_1,Weighted score dropped by 1.0 or more versus the previous month,4.55 -> 3.20,rule
-13,20260601,2026-06,ABSENCE_3PLUS,3 or more unexcused absences in the month,3 absences,rule
-13,20260601,2026-06,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.65 < 3.00,rule
-15,20260601,2026-06,ABSENCE_3PLUS,3 or more unexcused absences in the month,5 absences,rule
-15,20260601,2026-06,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),8/17 days late,rule
-15,20260601,2026-06,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,1.95 < 3.00,rule
-23,20260601,2026-06,SCORE_DROP_1,Weighted score dropped by 1.0 or more versus the previous month,4.60 -> 3.55,rule
-26,20260601,2026-06,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.80 < 3.00,rule
-31,20260601,2026-06,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.90 < 3.00,rule
-32,20260601,2026-06,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.70 < 3.00,rule
-46,20260601,2026-06,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.75 < 3.00,rule
-66,20260601,2026-06,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),7/20 days late,rule
-66,20260601,2026-06,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.90 < 3.00,rule
-71,20260601,2026-06,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.35 < 3.00,rule
-81,20260601,2026-06,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),6/19 days late,rule
-92,20260601,2026-06,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.90 < 3.00,rule
-100,20260601,2026-06,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.70 < 3.00,rule
-103,20260601,2026-06,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),8/22 days late,rule
-107,20260601,2026-06,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),8/22 days late,rule
-112,20260601,2026-06,ABSENCE_3PLUS,3 or more unexcused absences in the month,3 absences,rule
-113,20260601,2026-06,SCORE_DROP_1,Weighted score dropped by 1.0 or more versus the previous month,4.60 -> 3.55,rule
-11,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.50 < 3.00,rule
-12,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.75 < 3.00,rule
-15,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.70 < 3.00,rule
-16,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.85 < 3.00,rule
-19,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.90 < 3.00,rule
-30,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.45 < 3.00,rule
-33,20260701,2026-07,ABSENCE_3PLUS,3 or more unexcused absences in the month,4 absences,rule
-46,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.70 < 3.00,rule
-51,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.90 < 3.00,rule
-66,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.65 < 3.00,rule
-71,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.65 < 3.00,rule
-90,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.80 < 3.00,rule
-92,20260701,2026-07,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),9/21 days late,rule
-92,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.55 < 3.00,rule
-100,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.85 < 3.00,rule
-107,20260701,2026-07,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),9/22 days late,rule
-107,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.45 < 3.00,rule
-112,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.55 < 3.00,rule
-118,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.25 < 3.00,rule
-11,20260801,2026-08,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.45 < 3.00,rule
-15,20260801,2026-08,ABSENCE_3PLUS,3 or more unexcused absences in the month,3 absences,rule
-15,20260801,2026-08,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,1.65 < 3.00,rule
-15,20260801,2026-08,SCORE_DROP_1,Weighted score dropped by 1.0 or more versus the previous month,2.70 -> 1.65,rule
-18,20260801,2026-08,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.65 < 3.00,rule
-34,20260801,2026-08,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),9/21 days late,rule
-35,20260801,2026-08,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),7/21 days late,rule
-35,20260801,2026-08,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.30 < 3.00,rule
-42,20260801,2026-08,INCOMPLETE_3PLUS,3 or more days with a single punch (missing IN or OUT),3 days,rule
-43,20260801,2026-08,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),7/22 days late,rule
-46,20260801,2026-08,LATE_RATE_30,Late on at least 30% of attended days (minimum 5 attended days),7/21 days late,rule
-46,20260801,2026-08,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.45 < 3.00,rule
-68,20260801,2026-08,INCOMPLETE_3PLUS,3 or more days with a single punch (missing IN or OUT),3 days,rule
-68,20260801,2026-08,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.65 < 3.00,rule
-71,20260801,2026-08,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.45 < 3.00,rule
-107,20260801,2026-08,INCOMPLETE_3PLUS,3 or more days with a single punch (missing IN or OUT),3 days,rule
-109,20260801,2026-08,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.80 < 3.00,rule
-118,20260801,2026-08,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,2.40 < 3.00,rule
+EmployeeKey,PeriodDateKey,Period,RuleCode,RuleDescription,Evidence,Method,RuleTitle,RuleTitleAr,EvidenceAr
+2,20250901,2025-09,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 7 of 21 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 7 من أصل 21 يوم حضور
+10,20250901,2025-09,ABSENCE_3PLUS,Three or more unexcused absences in the month,3 unexcused absences,rule,Frequent absences,غياب متكرر,غياب دون عذر: 3 أيام
+10,20250901,2025-09,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.15 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.15 (حد المراجعة 3.00)
+11,20250901,2025-09,ABSENCE_3PLUS,Three or more unexcused absences in the month,4 unexcused absences,rule,Frequent absences,غياب متكرر,غياب دون عذر: 4 أيام
+11,20250901,2025-09,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 8 of 17 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 8 من أصل 17 يوم حضور
+11,20250901,2025-09,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.10 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.10 (حد المراجعة 3.00)
+15,20250901,2025-09,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.50 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.50 (حد المراجعة 3.00)
+16,20250901,2025-09,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.70 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.70 (حد المراجعة 3.00)
+19,20250901,2025-09,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.90 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.90 (حد المراجعة 3.00)
+26,20250901,2025-09,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 7 of 21 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 7 من أصل 21 يوم حضور
+26,20250901,2025-09,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.00 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.00 (حد المراجعة 3.00)
+32,20250901,2025-09,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.70 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.70 (حد المراجعة 3.00)
+36,20250901,2025-09,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.80 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.80 (حد المراجعة 3.00)
+46,20250901,2025-09,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.90 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.90 (حد المراجعة 3.00)
+71,20250901,2025-09,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.85 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.85 (حد المراجعة 3.00)
+77,20250901,2025-09,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.70 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.70 (حد المراجعة 3.00)
+84,20250901,2025-09,INCOMPLETE_3PLUS,Three or more days with only one punch (no clock-in or no clock-out),3 days with a missing punch,rule,Repeated missing punches,بصمات ناقصة متكررة,بصمة ناقصة في 3 أيام
+85,20250901,2025-09,ABSENCE_3PLUS,Three or more unexcused absences in the month,3 unexcused absences,rule,Frequent absences,غياب متكرر,غياب دون عذر: 3 أيام
+100,20250901,2025-09,ABSENCE_3PLUS,Three or more unexcused absences in the month,5 unexcused absences,rule,Frequent absences,غياب متكرر,غياب دون عذر: 5 أيام
+100,20250901,2025-09,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 1.80 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 1.80 (حد المراجعة 3.00)
+13,20251001,2025-10,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.45 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.45 (حد المراجعة 3.00)
+16,20251001,2025-10,ABSENCE_3PLUS,Three or more unexcused absences in the month,3 unexcused absences,rule,Frequent absences,غياب متكرر,غياب دون عذر: 3 أيام
+16,20251001,2025-10,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.20 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.20 (حد المراجعة 3.00)
+22,20251001,2025-10,INCOMPLETE_3PLUS,Three or more days with only one punch (no clock-in or no clock-out),3 days with a missing punch,rule,Repeated missing punches,بصمات ناقصة متكررة,بصمة ناقصة في 3 أيام
+31,20251001,2025-10,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 7 of 21 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 7 من أصل 21 يوم حضور
+31,20251001,2025-10,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.80 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.80 (حد المراجعة 3.00)
+39,20251001,2025-10,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.85 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.85 (حد المراجعة 3.00)
+45,20251001,2025-10,ABSENCE_3PLUS,Three or more unexcused absences in the month,3 unexcused absences,rule,Frequent absences,غياب متكرر,غياب دون عذر: 3 أيام
+46,20251001,2025-10,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 7 of 20 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 7 من أصل 20 يوم حضور
+46,20251001,2025-10,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.05 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.05 (حد المراجعة 3.00)
+49,20251001,2025-10,SCORE_DROP_1,Weighted score fell by 1.0 or more compared with the previous month,Fell from 4.20 to 3.00,rule,Sharp drop in score,انخفاض حاد في الدرجة,انخفضت من 4.20 إلى 3.00
+51,20251001,2025-10,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.85 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.85 (حد المراجعة 3.00)
+68,20251001,2025-10,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.70 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.70 (حد المراجعة 3.00)
+71,20251001,2025-10,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.90 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.90 (حد المراجعة 3.00)
+72,20251001,2025-10,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.80 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.80 (حد المراجعة 3.00)
+73,20251001,2025-10,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.70 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.70 (حد المراجعة 3.00)
+77,20251001,2025-10,INCOMPLETE_3PLUS,Three or more days with only one punch (no clock-in or no clock-out),3 days with a missing punch,rule,Repeated missing punches,بصمات ناقصة متكررة,بصمة ناقصة في 3 أيام
+77,20251001,2025-10,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.70 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.70 (حد المراجعة 3.00)
+88,20251001,2025-10,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 9 of 21 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 9 من أصل 21 يوم حضور
+88,20251001,2025-10,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.95 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.95 (حد المراجعة 3.00)
+92,20251001,2025-10,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.65 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.65 (حد المراجعة 3.00)
+99,20251001,2025-10,ABSENCE_3PLUS,Three or more unexcused absences in the month,4 unexcused absences,rule,Frequent absences,غياب متكرر,غياب دون عذر: 4 أيام
+100,20251001,2025-10,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.80 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.80 (حد المراجعة 3.00)
+106,20251001,2025-10,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 6 of 20 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 6 من أصل 20 يوم حضور
+106,20251001,2025-10,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.45 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.45 (حد المراجعة 3.00)
+11,20251101,2025-11,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.70 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.70 (حد المراجعة 3.00)
+16,20251101,2025-11,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 9 of 20 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 9 من أصل 20 يوم حضور
+16,20251101,2025-11,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.20 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.20 (حد المراجعة 3.00)
+24,20251101,2025-11,SCORE_DROP_1,Weighted score fell by 1.0 or more compared with the previous month,Fell from 4.10 to 3.00,rule,Sharp drop in score,انخفاض حاد في الدرجة,انخفضت من 4.10 إلى 3.00
+31,20251101,2025-11,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.80 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.80 (حد المراجعة 3.00)
+46,20251101,2025-11,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.45 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.45 (حد المراجعة 3.00)
+72,20251101,2025-11,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.50 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.50 (حد المراجعة 3.00)
+95,20251101,2025-11,SCORE_DROP_1,Weighted score fell by 1.0 or more compared with the previous month,Fell from 4.25 to 3.05,rule,Sharp drop in score,انخفاض حاد في الدرجة,انخفضت من 4.25 إلى 3.05
+97,20251101,2025-11,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.90 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.90 (حد المراجعة 3.00)
+100,20251101,2025-11,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.80 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.80 (حد المراجعة 3.00)
+102,20251101,2025-11,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.40 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.40 (حد المراجعة 3.00)
+106,20251101,2025-11,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 7 of 21 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 7 من أصل 21 يوم حضور
+106,20251101,2025-11,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.65 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.65 (حد المراجعة 3.00)
+1,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.60 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.60 (حد المراجعة 3.00)
+1,20251201,2025-12,SCORE_DROP_1,Weighted score fell by 1.0 or more compared with the previous month,Fell from 3.65 to 2.60,rule,Sharp drop in score,انخفاض حاد في الدرجة,انخفضت من 3.65 إلى 2.60
+11,20251201,2025-12,ABSENCE_3PLUS,Three or more unexcused absences in the month,3 unexcused absences,rule,Frequent absences,غياب متكرر,غياب دون عذر: 3 أيام
+11,20251201,2025-12,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 7 of 20 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 7 من أصل 20 يوم حضور
+11,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.00 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.00 (حد المراجعة 3.00)
+13,20251201,2025-12,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 9 of 22 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 9 من أصل 22 يوم حضور
+14,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.45 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.45 (حد المراجعة 3.00)
+14,20251201,2025-12,SCORE_DROP_1,Weighted score fell by 1.0 or more compared with the previous month,Fell from 3.70 to 2.45,rule,Sharp drop in score,انخفاض حاد في الدرجة,انخفضت من 3.70 إلى 2.45
+15,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 1.90 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 1.90 (حد المراجعة 3.00)
+15,20251201,2025-12,SCORE_DROP_1,Weighted score fell by 1.0 or more compared with the previous month,Fell from 3.25 to 1.90,rule,Sharp drop in score,انخفاض حاد في الدرجة,انخفضت من 3.25 إلى 1.90
+16,20251201,2025-12,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 7 of 23 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 7 من أصل 23 يوم حضور
+26,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.85 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.85 (حد المراجعة 3.00)
+31,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.80 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.80 (حد المراجعة 3.00)
+39,20251201,2025-12,ABSENCE_3PLUS,Three or more unexcused absences in the month,3 unexcused absences,rule,Frequent absences,غياب متكرر,غياب دون عذر: 3 أيام
+42,20251201,2025-12,SCORE_DROP_1,Weighted score fell by 1.0 or more compared with the previous month,Fell from 5.00 to 3.80,rule,Sharp drop in score,انخفاض حاد في الدرجة,انخفضت من 5.00 إلى 3.80
+46,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.70 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.70 (حد المراجعة 3.00)
+47,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.65 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.65 (حد المراجعة 3.00)
+47,20251201,2025-12,SCORE_DROP_1,Weighted score fell by 1.0 or more compared with the previous month,Fell from 3.90 to 2.65,rule,Sharp drop in score,انخفاض حاد في الدرجة,انخفضت من 3.90 إلى 2.65
+51,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.70 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.70 (حد المراجعة 3.00)
+68,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.90 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.90 (حد المراجعة 3.00)
+70,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.95 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.95 (حد المراجعة 3.00)
+71,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.70 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.70 (حد المراجعة 3.00)
+72,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.85 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.85 (حد المراجعة 3.00)
+77,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.25 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.25 (حد المراجعة 3.00)
+77,20251201,2025-12,SCORE_DROP_1,Weighted score fell by 1.0 or more compared with the previous month,Fell from 3.25 to 2.25,rule,Sharp drop in score,انخفاض حاد في الدرجة,انخفضت من 3.25 إلى 2.25
+83,20251201,2025-12,SCORE_DROP_1,Weighted score fell by 1.0 or more compared with the previous month,Fell from 4.05 to 3.00,rule,Sharp drop in score,انخفاض حاد في الدرجة,انخفضت من 4.05 إلى 3.00
+87,20251201,2025-12,INCOMPLETE_3PLUS,Three or more days with only one punch (no clock-in or no clock-out),3 days with a missing punch,rule,Repeated missing punches,بصمات ناقصة متكررة,بصمة ناقصة في 3 أيام
+87,20251201,2025-12,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 7 of 23 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 7 من أصل 23 يوم حضور
+88,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.75 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.75 (حد المراجعة 3.00)
+89,20251201,2025-12,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 6 of 20 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 6 من أصل 20 يوم حضور
+95,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.75 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.75 (حد المراجعة 3.00)
+100,20251201,2025-12,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 7 of 23 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 7 من أصل 23 يوم حضور
+100,20251201,2025-12,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.70 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.70 (حد المراجعة 3.00)
+2,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.80 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.80 (حد المراجعة 3.00)
+3,20260101,2026-01,ABSENCE_3PLUS,Three or more unexcused absences in the month,3 unexcused absences,rule,Frequent absences,غياب متكرر,غياب دون عذر: 3 أيام
+11,20260101,2026-01,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 6 of 20 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 6 من أصل 20 يوم حضور
+11,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.40 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.40 (حد المراجعة 3.00)
+13,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.80 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.80 (حد المراجعة 3.00)
+14,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.90 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.90 (حد المراجعة 3.00)
+15,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 1.90 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 1.90 (حد المراجعة 3.00)
+16,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.45 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.45 (حد المراجعة 3.00)
+19,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.90 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.90 (حد المراجعة 3.00)
+31,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.75 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.75 (حد المراجعة 3.00)
+36,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.65 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.65 (حد المراجعة 3.00)
+46,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.75 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.75 (حد المراجعة 3.00)
+51,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.80 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.80 (حد المراجعة 3.00)
+52,20260101,2026-01,ABSENCE_3PLUS,Three or more unexcused absences in the month,3 unexcused absences,rule,Frequent absences,غياب متكرر,غياب دون عذر: 3 أيام
+56,20260101,2026-01,SCORE_DROP_1,Weighted score fell by 1.0 or more compared with the previous month,Fell from 4.25 to 3.00,rule,Sharp drop in score,انخفاض حاد في الدرجة,انخفضت من 4.25 إلى 3.00
+69,20260101,2026-01,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 6 of 20 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 6 من أصل 20 يوم حضور
+71,20260101,2026-01,ABSENCE_3PLUS,Three or more unexcused absences in the month,3 unexcused absences,rule,Frequent absences,غياب متكرر,غياب دون عذر: 3 أيام
+71,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.40 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.40 (حد المراجعة 3.00)
+77,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.70 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.70 (حد المراجعة 3.00)
+87,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.75 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.75 (حد المراجعة 3.00)
+97,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.85 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.85 (حد المراجعة 3.00)
+100,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.70 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.70 (حد المراجعة 3.00)
+103,20260101,2026-01,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 6 of 16 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 6 من أصل 16 يوم حضور
+103,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.50 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.50 (حد المراجعة 3.00)
+106,20260101,2026-01,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 8 of 21 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 8 من أصل 21 يوم حضور
+106,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.20 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.20 (حد المراجعة 3.00)
+109,20260101,2026-01,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.90 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.90 (حد المراجعة 3.00)
+1,20260201,2026-02,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 5 of 12 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 5 من أصل 12 يوم حضور
+2,20260201,2026-02,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 7 of 18 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 7 من أصل 18 يوم حضور
+11,20260201,2026-02,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.15 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.15 (حد المراجعة 3.00)
+15,20260201,2026-02,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.50 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.50 (حد المراجعة 3.00)
+34,20260201,2026-02,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.80 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.80 (حد المراجعة 3.00)
+37,20260201,2026-02,INCOMPLETE_3PLUS,Three or more days with only one punch (no clock-in or no clock-out),3 days with a missing punch,rule,Repeated missing punches,بصمات ناقصة متكررة,بصمة ناقصة في 3 أيام
+67,20260201,2026-02,ABSENCE_3PLUS,Three or more unexcused absences in the month,4 unexcused absences,rule,Frequent absences,غياب متكرر,غياب دون عذر: 4 أيام
+67,20260201,2026-02,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.75 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.75 (حد المراجعة 3.00)
+68,20260201,2026-02,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.45 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.45 (حد المراجعة 3.00)
+70,20260201,2026-02,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.90 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.90 (حد المراجعة 3.00)
+71,20260201,2026-02,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 6 of 18 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 6 من أصل 18 يوم حضور
+71,20260201,2026-02,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.25 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.25 (حد المراجعة 3.00)
+73,20260201,2026-02,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 2 of 6 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 2 من أصل 6 أيام حضور
+77,20260201,2026-02,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.50 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.50 (حد المراجعة 3.00)
+79,20260201,2026-02,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.70 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.70 (حد المراجعة 3.00)
+87,20260201,2026-02,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.55 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.55 (حد المراجعة 3.00)
+96,20260201,2026-02,INCOMPLETE_3PLUS,Three or more days with only one punch (no clock-in or no clock-out),3 days with a missing punch,rule,Repeated missing punches,بصمات ناقصة متكررة,بصمة ناقصة في 3 أيام
+100,20260201,2026-02,ABSENCE_3PLUS,Three or more unexcused absences in the month,3 unexcused absences,rule,Frequent absences,غياب متكرر,غياب دون عذر: 3 أيام
+100,20260201,2026-02,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 6 of 16 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 6 من أصل 16 يوم حضور
+100,20260201,2026-02,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.00 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.00 (حد المراجعة 3.00)
+102,20260201,2026-02,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.90 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.90 (حد المراجعة 3.00)
+106,20260201,2026-02,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.70 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.70 (حد المراجعة 3.00)
+109,20260201,2026-02,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.30 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.30 (حد المراجعة 3.00)
+113,20260201,2026-02,SCORE_DROP_1,Weighted score fell by 1.0 or more compared with the previous month,Fell from 4.80 to 3.45,rule,Sharp drop in score,انخفاض حاد في الدرجة,انخفضت من 4.80 إلى 3.45
+11,20260301,2026-03,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 1.90 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 1.90 (حد المراجعة 3.00)
+13,20260301,2026-03,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.45 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.45 (حد المراجعة 3.00)
+13,20260301,2026-03,SCORE_DROP_1,Weighted score fell by 1.0 or more compared with the previous month,Fell from 3.45 to 2.45,rule,Sharp drop in score,انخفاض حاد في الدرجة,انخفضت من 3.45 إلى 2.45
+15,20260301,2026-03,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.80 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.80 (حد المراجعة 3.00)
+16,20260301,2026-03,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.50 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.50 (حد المراجعة 3.00)
+18,20260301,2026-03,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 8 of 20 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 8 من أصل 20 يوم حضور
+19,20260301,2026-03,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.90 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.90 (حد المراجعة 3.00)
+26,20260301,2026-03,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.80 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.80 (حد المراجعة 3.00)
+34,20260301,2026-03,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.90 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.90 (حد المراجعة 3.00)
+37,20260301,2026-03,SCORE_DROP_1,Weighted score fell by 1.0 or more compared with the previous month,Fell from 4.75 to 3.55,rule,Sharp drop in score,انخفاض حاد في الدرجة,انخفضت من 4.75 إلى 3.55
+44,20260301,2026-03,SCORE_DROP_1,Weighted score fell by 1.0 or more compared with the previous month,Fell from 4.45 to 3.10,rule,Sharp drop in score,انخفاض حاد في الدرجة,انخفضت من 4.45 إلى 3.10
+51,20260301,2026-03,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.60 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.60 (حد المراجعة 3.00)
+51,20260301,2026-03,SCORE_DROP_1,Weighted score fell by 1.0 or more compared with the previous month,Fell from 3.85 to 2.60,rule,Sharp drop in score,انخفاض حاد في الدرجة,انخفضت من 3.85 إلى 2.60
+68,20260301,2026-03,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.40 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.40 (حد المراجعة 3.00)
+71,20260301,2026-03,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.25 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.25 (حد المراجعة 3.00)
+72,20260301,2026-03,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.95 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.95 (حد المراجعة 3.00)
+100,20260301,2026-03,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.50 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.50 (حد المراجعة 3.00)
+104,20260301,2026-03,SCORE_DROP_1,Weighted score fell by 1.0 or more compared with the previous month,Fell from 4.80 to 3.50,rule,Sharp drop in score,انخفاض حاد في الدرجة,انخفضت من 4.80 إلى 3.50
+108,20260301,2026-03,SCORE_DROP_1,Weighted score fell by 1.0 or more compared with the previous month,Fell from 4.80 to 3.70,rule,Sharp drop in score,انخفاض حاد في الدرجة,انخفضت من 4.80 إلى 3.70
+5,20260401,2026-04,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.80 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.80 (حد المراجعة 3.00)
+11,20260401,2026-04,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 7 of 22 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 7 من أصل 22 يوم حضور
+11,20260401,2026-04,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.45 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.45 (حد المراجعة 3.00)
+13,20260401,2026-04,ABSENCE_3PLUS,Three or more unexcused absences in the month,3 unexcused absences,rule,Frequent absences,غياب متكرر,غياب دون عذر: 3 أيام
+13,20260401,2026-04,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.40 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.40 (حد المراجعة 3.00)
+15,20260401,2026-04,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.30 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.30 (حد المراجعة 3.00)
+16,20260401,2026-04,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 6 of 20 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 6 من أصل 20 يوم حضور
+16,20260401,2026-04,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 1.65 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 1.65 (حد المراجعة 3.00)
+33,20260401,2026-04,ABSENCE_3PLUS,Three or more unexcused absences in the month,3 unexcused absences,rule,Frequent absences,غياب متكرر,غياب دون عذر: 3 أيام
+34,20260401,2026-04,INCOMPLETE_3PLUS,Three or more days with only one punch (no clock-in or no clock-out),3 days with a missing punch,rule,Repeated missing punches,بصمات ناقصة متكررة,بصمة ناقصة في 3 أيام
+35,20260401,2026-04,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.90 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.90 (حد المراجعة 3.00)
+36,20260401,2026-04,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.85 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.85 (حد المراجعة 3.00)
+55,20260401,2026-04,INCOMPLETE_3PLUS,Three or more days with only one punch (no clock-in or no clock-out),3 days with a missing punch,rule,Repeated missing punches,بصمات ناقصة متكررة,بصمة ناقصة في 3 أيام
+67,20260401,2026-04,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 5 of 15 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 5 من أصل 15 يوم حضور
+68,20260401,2026-04,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.50 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.50 (حد المراجعة 3.00)
+71,20260401,2026-04,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.25 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.25 (حد المراجعة 3.00)
+81,20260401,2026-04,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.90 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.90 (حد المراجعة 3.00)
+92,20260401,2026-04,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.45 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.45 (حد المراجعة 3.00)
+100,20260401,2026-04,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.25 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.25 (حد المراجعة 3.00)
+103,20260401,2026-04,SCORE_DROP_1,Weighted score fell by 1.0 or more compared with the previous month,Fell from 4.20 to 3.20,rule,Sharp drop in score,انخفاض حاد في الدرجة,انخفضت من 4.20 إلى 3.20
+104,20260401,2026-04,ABSENCE_3PLUS,Three or more unexcused absences in the month,3 unexcused absences,rule,Frequent absences,غياب متكرر,غياب دون عذر: 3 أيام
+118,20260401,2026-04,ABSENCE_3PLUS,Three or more unexcused absences in the month,3 unexcused absences,rule,Frequent absences,غياب متكرر,غياب دون عذر: 3 أيام
+11,20260501,2026-05,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.60 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.60 (حد المراجعة 3.00)
+13,20260501,2026-05,ABSENCE_3PLUS,Three or more unexcused absences in the month,3 unexcused absences,rule,Frequent absences,غياب متكرر,غياب دون عذر: 3 أيام
+16,20260501,2026-05,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.70 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.70 (حد المراجعة 3.00)
+19,20260501,2026-05,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.90 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.90 (حد المراجعة 3.00)
+34,20260501,2026-05,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.90 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.90 (حد المراجعة 3.00)
+35,20260501,2026-05,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.90 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.90 (حد المراجعة 3.00)
+38,20260501,2026-05,ABSENCE_3PLUS,Three or more unexcused absences in the month,3 unexcused absences,rule,Frequent absences,غياب متكرر,غياب دون عذر: 3 أيام
+46,20260501,2026-05,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.45 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.45 (حد المراجعة 3.00)
+52,20260501,2026-05,SCORE_DROP_1,Weighted score fell by 1.0 or more compared with the previous month,Fell from 4.45 to 3.40,rule,Sharp drop in score,انخفاض حاد في الدرجة,انخفضت من 4.45 إلى 3.40
+56,20260501,2026-05,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.90 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.90 (حد المراجعة 3.00)
+61,20260501,2026-05,ABSENCE_3PLUS,Three or more unexcused absences in the month,3 unexcused absences,rule,Frequent absences,غياب متكرر,غياب دون عذر: 3 أيام
+64,20260501,2026-05,SCORE_DROP_1,Weighted score fell by 1.0 or more compared with the previous month,Fell from 4.45 to 3.20,rule,Sharp drop in score,انخفاض حاد في الدرجة,انخفضت من 4.45 إلى 3.20
+68,20260501,2026-05,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.70 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.70 (حد المراجعة 3.00)
+71,20260501,2026-05,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.25 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.25 (حد المراجعة 3.00)
+72,20260501,2026-05,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.25 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.25 (حد المراجعة 3.00)
+79,20260501,2026-05,INCOMPLETE_3PLUS,Three or more days with only one punch (no clock-in or no clock-out),3 days with a missing punch,rule,Repeated missing punches,بصمات ناقصة متكررة,بصمة ناقصة في 3 أيام
+85,20260501,2026-05,SCORE_DROP_1,Weighted score fell by 1.0 or more compared with the previous month,Fell from 4.60 to 3.50,rule,Sharp drop in score,انخفاض حاد في الدرجة,انخفضت من 4.60 إلى 3.50
+88,20260501,2026-05,ABSENCE_3PLUS,Three or more unexcused absences in the month,3 unexcused absences,rule,Frequent absences,غياب متكرر,غياب دون عذر: 3 أيام
+102,20260501,2026-05,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.65 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.65 (حد المراجعة 3.00)
+102,20260501,2026-05,SCORE_DROP_1,Weighted score fell by 1.0 or more compared with the previous month,Fell from 3.70 to 2.65,rule,Sharp drop in score,انخفاض حاد في الدرجة,انخفضت من 3.70 إلى 2.65
+105,20260501,2026-05,SCORE_DROP_1,Weighted score fell by 1.0 or more compared with the previous month,Fell from 4.80 to 3.70,rule,Sharp drop in score,انخفاض حاد في الدرجة,انخفضت من 4.80 إلى 3.70
+107,20260501,2026-05,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.40 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.40 (حد المراجعة 3.00)
+2,20260601,2026-06,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 6 of 20 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 6 من أصل 20 يوم حضور
+11,20260601,2026-06,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.45 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.45 (حد المراجعة 3.00)
+12,20260601,2026-06,SCORE_DROP_1,Weighted score fell by 1.0 or more compared with the previous month,Fell from 4.55 to 3.20,rule,Sharp drop in score,انخفاض حاد في الدرجة,انخفضت من 4.55 إلى 3.20
+13,20260601,2026-06,ABSENCE_3PLUS,Three or more unexcused absences in the month,3 unexcused absences,rule,Frequent absences,غياب متكرر,غياب دون عذر: 3 أيام
+13,20260601,2026-06,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.65 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.65 (حد المراجعة 3.00)
+15,20260601,2026-06,ABSENCE_3PLUS,Three or more unexcused absences in the month,5 unexcused absences,rule,Frequent absences,غياب متكرر,غياب دون عذر: 5 أيام
+15,20260601,2026-06,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 8 of 17 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 8 من أصل 17 يوم حضور
+15,20260601,2026-06,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 1.95 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 1.95 (حد المراجعة 3.00)
+23,20260601,2026-06,SCORE_DROP_1,Weighted score fell by 1.0 or more compared with the previous month,Fell from 4.60 to 3.55,rule,Sharp drop in score,انخفاض حاد في الدرجة,انخفضت من 4.60 إلى 3.55
+26,20260601,2026-06,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.80 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.80 (حد المراجعة 3.00)
+31,20260601,2026-06,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.90 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.90 (حد المراجعة 3.00)
+32,20260601,2026-06,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.70 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.70 (حد المراجعة 3.00)
+46,20260601,2026-06,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.75 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.75 (حد المراجعة 3.00)
+66,20260601,2026-06,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 7 of 20 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 7 من أصل 20 يوم حضور
+66,20260601,2026-06,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.90 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.90 (حد المراجعة 3.00)
+71,20260601,2026-06,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.35 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.35 (حد المراجعة 3.00)
+81,20260601,2026-06,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 6 of 19 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 6 من أصل 19 يوم حضور
+92,20260601,2026-06,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.90 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.90 (حد المراجعة 3.00)
+100,20260601,2026-06,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.70 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.70 (حد المراجعة 3.00)
+103,20260601,2026-06,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 8 of 22 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 8 من أصل 22 يوم حضور
+107,20260601,2026-06,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 8 of 22 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 8 من أصل 22 يوم حضور
+112,20260601,2026-06,ABSENCE_3PLUS,Three or more unexcused absences in the month,3 unexcused absences,rule,Frequent absences,غياب متكرر,غياب دون عذر: 3 أيام
+113,20260601,2026-06,SCORE_DROP_1,Weighted score fell by 1.0 or more compared with the previous month,Fell from 4.60 to 3.55,rule,Sharp drop in score,انخفاض حاد في الدرجة,انخفضت من 4.60 إلى 3.55
+11,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.50 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.50 (حد المراجعة 3.00)
+12,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.75 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.75 (حد المراجعة 3.00)
+15,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.70 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.70 (حد المراجعة 3.00)
+16,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.85 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.85 (حد المراجعة 3.00)
+19,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.90 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.90 (حد المراجعة 3.00)
+30,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.45 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.45 (حد المراجعة 3.00)
+33,20260701,2026-07,ABSENCE_3PLUS,Three or more unexcused absences in the month,4 unexcused absences,rule,Frequent absences,غياب متكرر,غياب دون عذر: 4 أيام
+46,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.70 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.70 (حد المراجعة 3.00)
+51,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.90 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.90 (حد المراجعة 3.00)
+66,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.65 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.65 (حد المراجعة 3.00)
+71,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.65 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.65 (حد المراجعة 3.00)
+90,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.80 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.80 (حد المراجعة 3.00)
+92,20260701,2026-07,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 9 of 21 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 9 من أصل 21 يوم حضور
+92,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.55 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.55 (حد المراجعة 3.00)
+100,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.85 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.85 (حد المراجعة 3.00)
+107,20260701,2026-07,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 9 of 22 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 9 من أصل 22 يوم حضور
+107,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.45 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.45 (حد المراجعة 3.00)
+112,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.55 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.55 (حد المراجعة 3.00)
+118,20260701,2026-07,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.25 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.25 (حد المراجعة 3.00)
+11,20260801,2026-08,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.45 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.45 (حد المراجعة 3.00)
+15,20260801,2026-08,ABSENCE_3PLUS,Three or more unexcused absences in the month,3 unexcused absences,rule,Frequent absences,غياب متكرر,غياب دون عذر: 3 أيام
+15,20260801,2026-08,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 1.65 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 1.65 (حد المراجعة 3.00)
+15,20260801,2026-08,SCORE_DROP_1,Weighted score fell by 1.0 or more compared with the previous month,Fell from 2.70 to 1.65,rule,Sharp drop in score,انخفاض حاد في الدرجة,انخفضت من 2.70 إلى 1.65
+18,20260801,2026-08,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.65 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.65 (حد المراجعة 3.00)
+34,20260801,2026-08,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 9 of 21 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 9 من أصل 21 يوم حضور
+35,20260801,2026-08,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 7 of 21 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 7 من أصل 21 يوم حضور
+35,20260801,2026-08,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.30 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.30 (حد المراجعة 3.00)
+42,20260801,2026-08,INCOMPLETE_3PLUS,Three or more days with only one punch (no clock-in or no clock-out),3 days with a missing punch,rule,Repeated missing punches,بصمات ناقصة متكررة,بصمة ناقصة في 3 أيام
+43,20260801,2026-08,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 7 of 22 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 7 من أصل 22 يوم حضور
+46,20260801,2026-08,LATE_RATE_30,Late on at least 30% of the days attended (at least 5 days attended),Late on 7 of 21 days attended,rule,Often late,تأخر متكرر,أيام التأخر: 7 من أصل 21 يوم حضور
+46,20260801,2026-08,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.45 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.45 (حد المراجعة 3.00)
+68,20260801,2026-08,INCOMPLETE_3PLUS,Three or more days with only one punch (no clock-in or no clock-out),3 days with a missing punch,rule,Repeated missing punches,بصمات ناقصة متكررة,بصمة ناقصة في 3 أيام
+68,20260801,2026-08,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.65 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.65 (حد المراجعة 3.00)
+71,20260801,2026-08,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.45 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.45 (حد المراجعة 3.00)
+107,20260801,2026-08,INCOMPLETE_3PLUS,Three or more days with only one punch (no clock-in or no clock-out),3 days with a missing punch,rule,Repeated missing punches,بصمات ناقصة متكررة,بصمة ناقصة في 3 أيام
+109,20260801,2026-08,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.80 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.80 (حد المراجعة 3.00)
+118,20260801,2026-08,SCORE_BELOW_THRESHOLD,Weighted performance score below the review threshold,Score 2.40 (review below 3.00),rule,Low performance score,درجة أداء منخفضة,الدرجة 2.40 (حد المراجعة 3.00)
