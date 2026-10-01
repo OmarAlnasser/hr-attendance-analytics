@@ -30,7 +30,12 @@ GitHub repo ──push──▶ Render web service (gunicorn, Flask)  ──SQL�
    - Secret `SUPABASE_DB_PASSWORD` = the database password alone. The app URL-encodes it and inserts it,
      so special characters are safe. (A single secret `SUPABASE_DB_URL` with the full URI also works.)
    - Variable `DEMO_SITE_URL` = the Render URL (after step 3; optional, it wakes the site after each rebuild).
-2. **Actions → demo-reset → Run workflow** loads the demo data (about 2–4 minutes). After that it runs every night at 03:00 Riyadh.
+2. **Actions → demo-reset → Run workflow** loads the demo data (about 2 minutes). After that it runs every night at 03:00 Riyadh.
+
+   The job builds the demo on a throwaway PostgreSQL inside the GitHub runner, then copies it to Supabase with
+   `pg_dump | psql --single-transaction`. Building directly against Supabase from GitHub's US runners took over
+   20 minutes, because every insert crosses the Atlantic; the bulk copy takes seconds, and visitors never see a
+   half-loaded database.
 
 `demo-reset` generates 12 full months ending last month, so the demo never looks stale.
 

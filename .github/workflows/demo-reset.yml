@@ -2,6 +2,10 @@
 # (approvals, imports, new users...) is undone. It also keeps the free Supabase
 # project active: Supabase pauses free projects after a week without activity.
 #
+# How: the demo is built on a throwaway PostgreSQL inside this job (fast: no
+# network round trips), then copied to Supabase with pg_dump | psql in ONE
+# transaction, so the live site switches from old to new data at once.
+#
 # Needs:  repository variable SUPABASE_DB_URL       (Supabase > Connect > Session pooler URI, password part optional)
 #         repository secret   SUPABASE_DB_PASSWORD  (the database password on its own)
 #   (or a single secret SUPABASE_DB_URL containing the full URI with the password)
@@ -20,12 +24,19 @@ concurrency:
 jobs:
   reset:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
     env:
       TZ: Asia/Riyadh
-      HR_DATABASE_URL: ${{ secrets.SUPABASE_DB_URL || vars.SUPABASE_DB_URL }}
-      HR_DATABASE_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
       HR_SECRET_KEY: not-used-by-the-cli
+      BUILD_DB: postgresql://postgres:postgres@localhost:5432/postgres
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -33,13 +44,32 @@ jobs:
           python-version: "3.11"
           cache: pip
       - run: pip install -r requirements.txt
-      - name: Check the secret is set
-        run: test -n "$HR_DATABASE_URL" || (echo "Add the SUPABASE_DB_URL repository variable (or secret)" && exit 1)
-      - name: Rebuild the demo (12 full months ending last month)
+
+      - name: Build the demo locally (12 full months ending last month)
+        env:
+          HR_DATABASE_URL: ${{ env.BUILD_DB }}
         run: |
           export HR_SYNTHETIC_START=$(date -d "$(date +%Y-%m-01) -12 months" +%Y-%m-01)
           echo "Synthetic data from $HR_SYNTHETIC_START"
           python -m hr_analytics demo
+
+      - name: Publish to Supabase in one transaction
+        env:
+          TARGET_URL: ${{ secrets.SUPABASE_DB_URL || vars.SUPABASE_DB_URL }}
+          TARGET_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          test -n "$TARGET_URL" || { echo "::error::Add the SUPABASE_DB_URL repository variable (or secret)"; exit 1; }
+          FULL=$(python -c "import os; from hr_analytics.config import with_password as w; u, p = os.environ['TARGET_URL'], os.environ.get('TARGET_PASSWORD', ''); print(w(u, p) if p else u)")
+          echo "::add-mask::$FULL"
+          TABLES=$(python -c "from hr_analytics.db.connection import ALL_TABLES; print(' '.join('--table=public.' + t for t in ALL_TABLES))")
+          # same major version as the build database, so pg_dump always matches
+          docker run --rm --network host postgres:16 pg_dump "$BUILD_DB" --no-owner --no-privileges --clean --if-exists $TABLES > demo.sql
+          ls -lh demo.sql
+          docker run --rm -i postgres:16 psql "$FULL" --single-transaction -v ON_ERROR_STOP=1 -q -o /dev/null < demo.sql
+          echo "Rows now in Supabase:"
+          docker run --rm postgres:16 psql "$FULL" -tA -c "SELECT 'attendance_daily', count(*) FROM attendance_daily UNION ALL SELECT 'employees', count(*) FROM employees UNION ALL SELECT 'pending requests', (SELECT count(*) FROM leave_requests WHERE status = 'pending') + (SELECT count(*) FROM attendance_corrections WHERE status = 'pending')"
+
       - name: Wake the web service
         if: ${{ vars.DEMO_SITE_URL != '' }}
+        continue-on-error: true          # the data is published either way; a sleeping site is not a failure
         run: curl -fsS --retry 5 --retry-delay 20 --max-time 90 "${{ vars.DEMO_SITE_URL }}/healthz"
