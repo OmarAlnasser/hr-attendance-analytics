@@ -72,15 +72,58 @@ def attendance_kpis(df: pd.DataFrame) -> dict:
 
 
 def grouped_attendance_kpis(df: pd.DataFrame, by: str | list[str]) -> pd.DataFrame:
+    """attendance_kpis() per group, vectorised: one groupby over indicator columns
+    instead of one Python call per group (the review page groups by employee, and
+    on a small cloud CPU the per-group loop dominated page time). Same keys and the
+    same None-for-zero-denominator rules as attendance_kpis(); a test checks both agree."""
     if df.empty:
         return pd.DataFrame()
+    keys = [by] if isinstance(by, str) else list(by)
+    st = df["status"]
+    attended = st.isin(ATTENDED_STATUSES)
+    late = attended & (df["is_late"].fillna(0).astype(int) == 1)
+    span = df["span_minutes"].where(st == "present")
+    w = pd.DataFrame({k: df[k] for k in keys})
+    w["_expected"] = st.isin(EXPECTED_STATUSES).astype(int)
+    w["_attended"] = attended.astype(int)
+    w["_absent"] = (st == ABSENT).astype(int)
+    w["_incomplete"] = (st == INCOMPLETE).astype(int)
+    w["_late"] = late.astype(int)
+    w["_early"] = (attended & (df["early_leave_minutes"].fillna(0) > 0)).astype(int)
+    w["_leave"] = (st == LEAVE).astype(int)
+    w["_holiday"] = (st == HOLIDAY).astype(int)
+    w["_pending"] = (st == PENDING).astype(int)
+    w["_unscheduled"] = (st == UNSCHEDULED).astype(int)
+    w["_late_minutes"] = df["late_minutes"].fillna(0).where(late, 0).astype(float)
+    w["_span_sum"] = span.fillna(0).astype(float)
+    w["_span_n"] = span.notna().astype(int)
+    w["_emp"] = df["employee_id"] if "employee_id" in df else 0
+    g = w.groupby(keys, dropna=False, sort=True)
+    sums = g[[c for c in w.columns if c.startswith("_") and c != "_emp"]].sum()
+    emps = g["_emp"].nunique() if "employee_id" in df else None
     rows = []
-    for key, part in df.groupby(by, dropna=False, sort=True):
-        k = attendance_kpis(part)
-        if isinstance(by, str):
-            k[by] = key
-        else:
-            k.update(dict(zip(by, key if isinstance(key, tuple) else (key,))))
+    for key, r in sums.iterrows():
+        exp, att, late_n = int(r["_expected"]), int(r["_attended"]), int(r["_late"])
+        k = {
+            "employees": int(emps.loc[key]) if emps is not None else 0,
+            "expected_days": exp,
+            "attended_days": att,
+            "absent_days": int(r["_absent"]),
+            "incomplete_days": int(r["_incomplete"]),
+            "late_days": late_n,
+            "early_leave_days": int(r["_early"]),
+            "leave_days": int(r["_leave"]),
+            "holiday_days": int(r["_holiday"]),
+            "pending_days": int(r["_pending"]),
+            "unscheduled_days": int(r["_unscheduled"]),
+            "attendance_rate": safe_div(att, exp),
+            "absence_rate": safe_div(int(r["_absent"]), exp),
+            "late_rate": safe_div(late_n, att),
+            "incomplete_rate": safe_div(int(r["_incomplete"]), att),
+            "avg_late_minutes": safe_div(float(r["_late_minutes"]), late_n),
+            "avg_presence_span_hours": (float(r["_span_sum"]) / float(r["_span_n"]) / 60.0) if r["_span_n"] else None,
+        }
+        k.update(dict(zip(keys, key if isinstance(key, tuple) else (key,))))
         rows.append(k)
     return pd.DataFrame(rows)
 

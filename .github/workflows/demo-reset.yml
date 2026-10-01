@@ -72,4 +72,4 @@ jobs:
       - name: Wake the web service
         if: ${{ vars.DEMO_SITE_URL != '' }}
         continue-on-error: true          # the data is published either way; a sleeping site is not a failure
-        run: curl -fsS --retry 5 --retry-delay 20 --max-time 90 "${{ vars.DEMO_SITE_URL }}/healthz"
+        run: curl -fsS --retry 2 --retry-delay 15 --max-time 75 "${{ vars.DEMO_SITE_URL }}/healthz"

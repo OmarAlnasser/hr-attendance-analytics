@@ -118,3 +118,43 @@ class PerformanceKpiTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class GroupedKpiEquivalenceTests(unittest.TestCase):
+    """The vectorised grouped_attendance_kpis must agree with attendance_kpis() run per group."""
+
+    def test_matches_per_group_computation(self):
+        import numpy as np
+        import pandas as pd
+        from hr_analytics.domain.metrics import attendance_kpis, grouped_attendance_kpis
+        rng = np.random.default_rng(7)
+        n = 600
+        statuses = ["present", "incomplete", "absent", "leave", "holiday", "day_off", "pending", "unscheduled_work"]
+        df = pd.DataFrame({
+            "employee_id": rng.integers(1, 25, n),
+            "department_id": rng.integers(1, 4, n),
+            "status": rng.choice(statuses, n),
+            "is_late": rng.integers(0, 2, n),
+            "late_minutes": rng.integers(0, 90, n),
+            "early_leave_minutes": rng.choice([0, 0, 0, 12, 40], n),
+            "span_minutes": rng.choice([np.nan, 300, 480, 510], n),
+        })
+        df.loc[df.status.isin(["absent", "leave", "holiday", "day_off"]), ["is_late", "late_minutes"]] = 0
+        for by in ("employee_id", ["department_id"], ["department_id", "employee_id"]):
+            fast = grouped_attendance_kpis(df, by).to_dict("records")
+            keys = [by] if isinstance(by, str) else by
+            slow = []
+            for key, part in df.groupby(keys, sort=True):
+                k = attendance_kpis(part)
+                k.update(dict(zip(keys, key if isinstance(key, tuple) else (key,))))
+                slow.append(k)
+            self.assertEqual(len(fast), len(slow))
+            for a, b in zip(fast, slow):
+                self.assertEqual(set(a), set(b))
+                for col in a:
+                    na = a[col] is None or (isinstance(a[col], float) and a[col] != a[col])   # NaN in a DataFrame
+                    nb = b[col] is None
+                    if na or nb:
+                        self.assertEqual(na, nb, (by, col))
+                    else:
+                        self.assertAlmostEqual(float(a[col]), float(b[col]), places=9, msg=(by, col))
