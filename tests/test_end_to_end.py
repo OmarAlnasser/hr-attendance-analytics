@@ -60,7 +60,7 @@ class EndToEndTests(unittest.TestCase):
         cls._tmp.cleanup()
 
     def test_01_pipeline_outputs(self):
-        self.assertIn("26 employees", self.outputs["gen"])
+        self.assertIn("27 employees", self.outputs["gen"])   # 24 + 2 new hires + the General Manager
         self.assertIn("Processed", self.outputs["import"])
         self.assertIn("UNKNOWN_BADGE", self.outputs["import"], "planted bad rows are quarantined")
         n = self.conn.execute("SELECT COUNT(*) FROM attendance_daily").fetchone()[0]
@@ -100,11 +100,11 @@ class EndToEndTests(unittest.TestCase):
     def test_04_monthly_report_once_per_period(self):
         first = self.runner.invoke(cli, ["run-monthly", "--period", "2026-05", "--all-departments"])
         self.assertEqual(first.exit_code, 0, first.output)
-        self.assertEqual(first.output.count("[success]"), 7)       # organisation + 6 departments
+        self.assertEqual(first.output.count("[success]"), 8)       # organisation + 7 departments (incl. executive)
         second = self.runner.invoke(cli, ["run-monthly", "--period", "2026-05", "--all-departments"])
-        self.assertEqual(second.output.count("[skipped]"), 7)
+        self.assertEqual(second.output.count("[skipped]"), 8)
         runs = self.conn.execute("SELECT status, output_path FROM report_runs WHERE period='2026-05'").fetchall()
-        self.assertEqual(len(runs), 7)
+        self.assertEqual(len(runs), 8)
         for status, path in runs:
             self.assertEqual(status, "success")
             self.assertTrue(Path(path).read_bytes().startswith(b"%PDF"))

@@ -31,7 +31,13 @@ from typing import Iterator
 
 SCHEMA_PATH = Path(__file__).with_name("schema.sql")
 PG_SCHEMA_PATH = Path(__file__).with_name("schema_postgres.sql")
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
+
+# v3 columns: (table, column, SQL type). Added in place to older databases on both engines.
+V3_COLUMNS = [("departments", "name_ar", "TEXT"), ("shifts", "name_ar", "TEXT"), ("holidays", "name_ar", "TEXT"),
+              ("employees", "full_name_ar", "TEXT"), ("employees", "gender", "TEXT"),
+              ("employees", "job_title_ar", "TEXT")]
+ROLES = ("gm", "hr", "manager", "employee")
 
 # Tables whose integer primary key is generated; used to emulate lastrowid on PostgreSQL.
 PRIMARY_KEYS = {
@@ -323,14 +329,80 @@ def migrate(conn) -> list[str]:
             conn.execute("ALTER TABLE users ADD COLUMN must_change_password INTEGER NOT NULL DEFAULT 0 "
                          "CHECK (must_change_password IN (0, 1))")
             applied.append("users: must_change_password")
+        # ---- v3: Arabic names and gender
+        for table, column, sqltype in V3_COLUMNS:
+            if column not in _columns(conn, table):
+                conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {sqltype}")
+                applied.append(f"{table}: {column}")
         # attendance_corrections and stored_files are created by schema.sql (CREATE TABLE IF NOT EXISTS)
         conn.execute("CREATE INDEX IF NOT EXISTS ix_leave_status ON leave_requests(status, employee_id)")
-        conn.execute("INSERT INTO schema_meta(key, value) VALUES ('schema_version', ?) "
-                     "ON CONFLICT (key) DO UPDATE SET value = excluded.value", (str(SCHEMA_VERSION),))
         conn.commit()
     except BaseException:
         conn.rollback()
         raise
+    # v3: the General Manager role changes the users CHECK constraint (needs its own procedure)
+    users_sql = conn.execute("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'users'").fetchone()[0]
+    if "'gm'" not in users_sql:
+        _rebuild_users_for_gm(conn)
+        applied.append("users: 'gm' (General Manager) role")
+    conn.execute("INSERT INTO schema_meta(key, value) VALUES ('schema_version', ?) "
+                 "ON CONFLICT (key) DO UPDATE SET value = excluded.value", (str(SCHEMA_VERSION),))
+    conn.commit()
+    return applied
+
+
+def _rebuild_users_for_gm(conn) -> None:
+    """SQLite cannot change a CHECK constraint, so the users table is copied into a new one.
+    Many tables reference users, so foreign-key enforcement is paused for the swap (the
+    documented SQLite procedure, which only works outside a transaction) and every
+    reference is re-checked before the change is committed."""
+    keep = [r[1] for r in conn.execute("PRAGMA table_info(users)")]
+    conn.commit()
+    conn.execute("PRAGMA foreign_keys = OFF")
+    try:
+        conn.execute("BEGIN")
+        conn.execute("""CREATE TABLE users_v3 (
+            user_id INTEGER PRIMARY KEY,
+            username TEXT NOT NULL UNIQUE,
+            password_hash TEXT NOT NULL,
+            role TEXT NOT NULL CHECK (role IN ('gm', 'hr', 'manager', 'employee')),
+            employee_id INTEGER UNIQUE REFERENCES employees(employee_id),
+            is_active INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
+            last_login_at TEXT,
+            created_at TEXT NOT NULL DEFAULT (datetime('now')),
+            must_change_password INTEGER NOT NULL DEFAULT 0 CHECK (must_change_password IN (0, 1)))""")
+        conn.execute(f"INSERT INTO users_v3({', '.join(keep)}) SELECT {', '.join(keep)} FROM users")
+        conn.execute("DROP TABLE users")
+        conn.execute("ALTER TABLE users_v3 RENAME TO users")
+        problems = conn.execute("PRAGMA foreign_key_check").fetchall()
+        if problems:
+            raise RuntimeError(f"foreign key check failed after rebuilding users: {[tuple(p) for p in problems[:5]]}")
+        conn.commit()
+    except BaseException:
+        conn.rollback()
+        raise
+    finally:
+        conn.execute("PRAGMA foreign_keys = ON")
+
+
+def _pg_upgrade(conn) -> list[str]:
+    """Bring an existing PostgreSQL database to v3 (idempotent; cheap when already current)."""
+    applied = []
+    for table, column, sqltype in V3_COLUMNS:
+        exists = conn.execute("SELECT 1 FROM information_schema.columns WHERE table_schema = current_schema() "
+                              "AND table_name = ? AND column_name = ?", (table, column)).fetchone()
+        if not exists:
+            conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {sqltype}")
+            applied.append(f"{table}: {column}")
+    check = conn.execute("SELECT pg_get_constraintdef(c.oid) FROM pg_constraint c JOIN pg_class t ON t.oid = c.conrelid "
+                         "WHERE t.relname = 'users' AND t.relnamespace = current_schema()::regnamespace "
+                         "AND c.contype = 'c' AND pg_get_constraintdef(c.oid) LIKE '%role%'").fetchone()
+    if check and "'gm'" not in check[0]:
+        conn.execute("ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check")
+        conn.execute("ALTER TABLE users ADD CONSTRAINT users_role_check CHECK (role IN ('gm', 'hr', 'manager', 'employee'))")
+        applied.append("users: 'gm' (General Manager) role")
+    conn.execute("UPDATE schema_meta SET value = ? WHERE key = 'schema_version'", (str(SCHEMA_VERSION),))
+    conn.commit()
     return applied
 
 
@@ -345,7 +417,7 @@ def ensure_schema(target: str) -> list[str]:
                 init_schema(conn)
                 return ["postgresql: schema created"]
             conn.executescript(PG_SCHEMA_PATH.read_text(encoding="utf-8"))   # new tables / indexes only
-            return []
+            return _pg_upgrade(conn)
         finally:
             conn.close()
     if not Path(target).exists():

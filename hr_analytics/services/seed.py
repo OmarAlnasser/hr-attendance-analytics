@@ -30,6 +30,9 @@ def load_master_data(conn, data_dir: str | Path, *, settings, demo_password: str
     shifts = pd.read_csv(data_dir / "shifts.csv", dtype=str)
     depts = pd.read_csv(data_dir / "departments.csv", dtype=str)
     emps = pd.read_csv(data_dir / "employees.csv", dtype=str, keep_default_na=False)
+    for col in ("full_name_ar", "gender", "job_title_ar"):         # older generated files lack these
+        if col not in emps:
+            emps[col] = ""
     assigns = pd.read_csv(data_dir / "shift_assignments.csv", dtype=str, keep_default_na=False)
     hols = pd.read_csv(data_dir / "holidays.csv", dtype=str)
     leaves = pd.read_csv(data_dir / "leave_requests.csv", dtype=str)
@@ -42,14 +45,17 @@ def load_master_data(conn, data_dir: str | Path, *, settings, demo_password: str
     with transaction(conn):
         shift_ids = {}
         for r in shifts.to_dict("records"):
-            shift_ids[r["code"]] = repos.save_shift(conn, {**r, "is_active": 1})
-        dept_ids = {r["code"]: repos.save_department(conn, {"code": r["code"], "name": r["name"]})
+            shift_ids[r["code"]] = repos.save_shift(conn, {**r, "name_ar": _none(r.get("name_ar")), "is_active": 1})
+        dept_ids = {r["code"]: repos.save_department(conn, {"code": r["code"], "name": r["name"],
+                                                            "name_ar": _none(r.get("name_ar"))})
                     for r in depts.to_dict("records")}
         emp_ids = {}
         for r in emps.to_dict("records"):
             emp_ids[r["employee_code"]] = repos.save_employee(conn, {
                 "employee_code": r["employee_code"], "badge_id": r["badge_id"], "full_name": r["full_name"],
-                "email": r["email"], "job_title": r["job_title"], "department_id": dept_ids[r["department_code"]],
+                "full_name_ar": _none(r["full_name_ar"]), "gender": _none(r["gender"]),
+                "email": r["email"], "job_title": r["job_title"], "job_title_ar": _none(r["job_title_ar"]),
+                "department_id": dept_ids[r["department_code"]],
                 "manager_employee_id": None, "hire_date": r["hire_date"],
                 "termination_date": _none(r["termination_date"]), "is_synthetic": 1})
         for r in emps.to_dict("records"):
@@ -63,8 +69,9 @@ def load_master_data(conn, data_dir: str | Path, *, settings, demo_password: str
                          "VALUES (?,?,?,?)",
                          [(emp_ids[a["employee_code"]], shift_ids[a["shift_code"]], a["effective_from"],
                            _none(a["effective_to"])) for a in assigns.to_dict("records")])
-        conn.executemany("INSERT INTO holidays(holiday_date, name, is_illustrative) VALUES (?,?,?)",
-                         [(h["holiday_date"], h["name"], int(h["is_illustrative"])) for h in hols.to_dict("records")])
+        conn.executemany("INSERT INTO holidays(holiday_date, name, name_ar, is_illustrative) VALUES (?,?,?,?)",
+                         [(h["holiday_date"], h["name"], _none(h.get("name_ar")), int(h["is_illustrative"]))
+                          for h in hols.to_dict("records")])
         conn.executemany("INSERT INTO leave_requests(employee_id, leave_type, start_date, end_date, status) "
                          "VALUES (?,?,?,?,?)",
                          [(emp_ids[lv["employee_code"]], lv["leave_type"], lv["start_date"], lv["end_date"], lv["status"])
@@ -80,11 +87,13 @@ def load_master_data(conn, data_dir: str | Path, *, settings, demo_password: str
     if not demo_password:
         cred_file = Path(settings.INSTANCE_DIR) / "demo_credentials.txt"
         cred_file.parent.mkdir(parents=True, exist_ok=True)
+        gm_users = users[users.role == "gm"].username.tolist()
         hr_users = users[users.role == "hr"].username.tolist()
         mgr_users = users[users.role == "manager"].username.tolist()
         cred_file.write_text(
             "SYNTHETIC DEMO ACCOUNTS — local testing only, not real credentials.\n"
             f"Shared demo password: {password}\n"
+            f"General Manager: {', '.join(gm_users)}\n"
             f"HR accounts: {', '.join(hr_users)}\n"
             f"Manager accounts: {', '.join(mgr_users)}\n"
             "Employee accounts: every other employee code in lower case (e.g. e0010)\n",

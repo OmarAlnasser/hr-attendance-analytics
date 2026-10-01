@@ -1,4 +1,4 @@
--- HR Attendance & Performance Analytics System — schema v2 (see CHANGELOG.md)
+-- HR Attendance & Performance Analytics System — schema v3 (see CHANGELOG.md)
 -- Written in portable SQL. SQLite-specific notes:
 --   * INTEGER PRIMARY KEY  -> use GENERATED ALWAYS AS IDENTITY on PostgreSQL / IDENTITY on SQL Server
 --   * dates/times are stored as ISO-8601 TEXT in the organisation's local timezone
@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS departments (
     department_id        INTEGER PRIMARY KEY,
     code                 TEXT NOT NULL UNIQUE,
     name                 TEXT NOT NULL,
+    name_ar              TEXT,                     -- v3: Arabic name (optional; English is used when empty)
     manager_employee_id  INTEGER REFERENCES employees(employee_id),
     is_active            INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
     created_at           TEXT NOT NULL DEFAULT (datetime('now'))
@@ -22,6 +23,7 @@ CREATE TABLE IF NOT EXISTS shifts (
     shift_id                   INTEGER PRIMARY KEY,
     code                       TEXT NOT NULL UNIQUE,
     name                       TEXT NOT NULL,
+    name_ar                    TEXT,                   -- v3
     start_time                 TEXT NOT NULL,          -- 'HH:MM'
     end_time                   TEXT NOT NULL,          -- 'HH:MM'; end <= start means the shift crosses midnight
     grace_minutes              INTEGER NOT NULL DEFAULT 15 CHECK (grace_minutes BETWEEN 0 AND 120),
@@ -35,8 +37,11 @@ CREATE TABLE IF NOT EXISTS employees (
     employee_code        TEXT NOT NULL UNIQUE,
     badge_id             TEXT NOT NULL UNIQUE,     -- identifier used by the time-clock device
     full_name            TEXT NOT NULL,
+    full_name_ar         TEXT,                     -- v3: Arabic spelling of the name
+    gender               TEXT CHECK (gender IS NULL OR gender IN ('M', 'F')),  -- v3: for correct Arabic grammar
     email                TEXT UNIQUE,              -- also the Power BI UPN for RLS
     job_title            TEXT,
+    job_title_ar         TEXT,                     -- v3
     department_id        INTEGER NOT NULL REFERENCES departments(department_id),
     manager_employee_id  INTEGER REFERENCES employees(employee_id),
     hire_date            TEXT NOT NULL,
@@ -59,6 +64,7 @@ CREATE TABLE IF NOT EXISTS employee_shift_assignments (
 CREATE TABLE IF NOT EXISTS holidays (
     holiday_date     TEXT PRIMARY KEY,
     name             TEXT NOT NULL,
+    name_ar          TEXT,                         -- v3
     is_illustrative  INTEGER NOT NULL DEFAULT 0    -- 1 = approximate date, verify against the official calendar
 );
 
@@ -86,7 +92,7 @@ CREATE TABLE IF NOT EXISTS users (
     user_id        INTEGER PRIMARY KEY,
     username       TEXT NOT NULL UNIQUE,
     password_hash  TEXT NOT NULL,
-    role           TEXT NOT NULL CHECK (role IN ('hr', 'manager', 'employee')),
+    role           TEXT NOT NULL CHECK (role IN ('gm', 'hr', 'manager', 'employee')),  -- gm = General Manager (v3)
     employee_id    INTEGER UNIQUE REFERENCES employees(employee_id),
     is_active      INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
     last_login_at  TEXT,
@@ -295,4 +301,4 @@ CREATE TABLE IF NOT EXISTS schema_meta (
 );
 -- Fresh databases start at the current version; older ones are upgraded by
 -- db/connection.py:migrate() (called by init-db and on web start-up).
-INSERT OR IGNORE INTO schema_meta(key, value) VALUES ('schema_version', '2');
+INSERT OR IGNORE INTO schema_meta(key, value) VALUES ('schema_version', '3');

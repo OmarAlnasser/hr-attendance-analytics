@@ -18,7 +18,7 @@ from .connection import in_clause, now_str, read_sql, rows_to_dicts
 # =========================================================== organisation ==
 
 def list_departments(conn, department_ids: set[int] | None = None) -> list[dict]:
-    sql = """SELECT d.*, m.full_name AS manager_name,
+    sql = """SELECT d.*, m.full_name AS manager_name, m.full_name_ar AS manager_name_ar,
                     (SELECT COUNT(*) FROM employees e WHERE e.department_id = d.department_id
                        AND e.termination_date IS NULL) AS active_headcount
              FROM departments d LEFT JOIN employees m ON m.employee_id = d.manager_employee_id"""
@@ -36,11 +36,13 @@ def get_department(conn, department_id: int) -> dict | None:
 
 def save_department(conn, data: dict, department_id: int | None = None) -> int:
     if department_id:
-        conn.execute("UPDATE departments SET code=?, name=?, manager_employee_id=?, is_active=? WHERE department_id=?",
-                     (data["code"], data["name"], data.get("manager_employee_id"), data.get("is_active", 1), department_id))
+        conn.execute("UPDATE departments SET code=?, name=?, name_ar=?, manager_employee_id=?, is_active=? WHERE department_id=?",
+                     (data["code"], data["name"], data.get("name_ar"), data.get("manager_employee_id"),
+                      data.get("is_active", 1), department_id))
         return department_id
-    cur = conn.execute("INSERT INTO departments(code, name, manager_employee_id, is_active) VALUES (?,?,?,?)",
-                       (data["code"], data["name"], data.get("manager_employee_id"), data.get("is_active", 1)))
+    cur = conn.execute("INSERT INTO departments(code, name, name_ar, manager_employee_id, is_active) VALUES (?,?,?,?,?)",
+                       (data["code"], data["name"], data.get("name_ar"), data.get("manager_employee_id"),
+                        data.get("is_active", 1)))
     return cur.lastrowid
 
 
@@ -54,8 +56,9 @@ def get_shift(conn, shift_id: int) -> dict | None:
 
 
 def save_shift(conn, data: dict, shift_id: int | None = None) -> int:
-    cols = ("code", "name", "start_time", "end_time", "grace_minutes", "early_leave_grace_minutes", "workdays", "is_active")
-    vals = [data[c] for c in cols]
+    cols = ("code", "name", "name_ar", "start_time", "end_time", "grace_minutes", "early_leave_grace_minutes",
+            "workdays", "is_active")
+    vals = [data.get(c) for c in cols]
     if shift_id:
         conn.execute(f"UPDATE shifts SET {', '.join(c + '=?' for c in cols)} WHERE shift_id=?", (*vals, shift_id))
         return shift_id
@@ -66,7 +69,7 @@ def save_shift(conn, data: dict, shift_id: int | None = None) -> int:
 def list_employees(conn, user: UserContext, department_id: int | None = None, q: str | None = None,
                    include_terminated: bool = True, limit: int = 500) -> list[dict]:
     clause, params = scope_clause(user, "e")
-    sql = f"""SELECT e.*, d.name AS department_name, d.code AS department_code,
+    sql = f"""SELECT e.*, d.name AS department_name, d.name_ar AS department_name_ar, d.code AS department_code,
                      (SELECT s.code FROM employee_shift_assignments a JOIN shifts s ON s.shift_id = a.shift_id
                        WHERE a.employee_id = e.employee_id ORDER BY a.effective_from DESC LIMIT 1) AS shift_code
               FROM employees e JOIN departments d ON d.department_id = e.department_id
@@ -75,8 +78,8 @@ def list_employees(conn, user: UserContext, department_id: int | None = None, q:
         sql += " AND e.department_id = ?"
         params.append(department_id)
     if q:
-        sql += " AND (e.full_name LIKE ? OR e.employee_code LIKE ? OR e.badge_id LIKE ?)"
-        params += [f"%{q}%"] * 3
+        sql += " AND (e.full_name LIKE ? OR e.full_name_ar LIKE ? OR e.employee_code LIKE ? OR e.badge_id LIKE ?)"
+        params += [f"%{q}%"] * 4
     if not include_terminated:
         sql += " AND e.termination_date IS NULL"
     sql += " ORDER BY e.employee_code LIMIT ?"
@@ -85,15 +88,17 @@ def list_employees(conn, user: UserContext, department_id: int | None = None, q:
 
 
 def get_employee(conn, employee_id: int) -> dict | None:
-    r = conn.execute("""SELECT e.*, d.name AS department_name FROM employees e
+    r = conn.execute("""SELECT e.*, d.name AS department_name, d.name_ar AS department_name_ar,
+                               (SELECT u.role FROM users u WHERE u.employee_id = e.employee_id) AS app_role
+                        FROM employees e
                         JOIN departments d ON d.department_id = e.department_id WHERE e.employee_id = ?""",
                      (employee_id,)).fetchone()
     return dict(r) if r else None
 
 
 def save_employee(conn, data: dict, employee_id: int | None = None) -> int:
-    cols = ("employee_code", "badge_id", "full_name", "email", "job_title", "department_id",
-            "manager_employee_id", "hire_date", "termination_date")
+    cols = ("employee_code", "badge_id", "full_name", "full_name_ar", "gender", "email", "job_title", "job_title_ar",
+            "department_id", "manager_employee_id", "hire_date", "termination_date")
     vals = [data.get(c) for c in cols]
     if employee_id:
         conn.execute(f"UPDATE employees SET {', '.join(c + '=?' for c in cols)} WHERE employee_id=?", (*vals, employee_id))
@@ -291,12 +296,13 @@ def replace_exceptions(conn, start_dt: str, end_dt: str, employee_ids: list[int]
 def attendance_frame(conn, user: UserContext, start: str, end: str, department_id: int | None = None,
                      employee_id: int | None = None, status: str | None = None) -> pd.DataFrame:
     clause, params = scope_clause(user, "e")
-    sql = f"""SELECT a.*, e.employee_code, e.full_name, e.department_id, d.name AS department_name,
-                     s.code AS shift_code
+    sql = f"""SELECT a.*, e.employee_code, e.full_name, e.full_name_ar, e.department_id, d.name AS department_name,
+                     d.name_ar AS department_name_ar, s.code AS shift_code, h.name_ar AS holiday_name_ar
               FROM attendance_daily a
               JOIN employees e ON e.employee_id = a.employee_id
               JOIN departments d ON d.department_id = e.department_id
               LEFT JOIN shifts s ON s.shift_id = a.shift_id
+              LEFT JOIN holidays h ON h.holiday_date = a.shift_date AND a.holiday_name IS NOT NULL
               WHERE a.shift_date BETWEEN ? AND ? AND {clause}"""
     params = [start, end, *params]
     if department_id:
@@ -393,7 +399,8 @@ def evaluation_history(conn, evaluation_id: int) -> list[dict]:
 def evaluations_frame(conn, user: UserContext, period_from: str, period_to: str, department_id: int | None = None,
                       employee_id: int | None = None) -> pd.DataFrame:
     clause, params = scope_clause(user, "e")
-    sql = f"""SELECT p.*, e.employee_code, e.full_name, e.department_id, d.name AS department_name,
+    sql = f"""SELECT p.*, e.employee_code, e.full_name, e.full_name_ar, e.department_id, d.name AS department_name,
+                     d.name_ar AS department_name_ar,
                      u.username AS evaluator
               FROM performance_evaluations p
               JOIN employees e ON e.employee_id = p.employee_id
@@ -412,8 +419,9 @@ def evaluations_frame(conn, user: UserContext, period_from: str, period_to: str,
 
 def employees_frame(conn, user: UserContext, department_id: int | None = None) -> pd.DataFrame:
     clause, params = scope_clause(user, "e")
-    sql = f"""SELECT e.employee_id, e.employee_code, e.full_name, e.email, e.department_id, e.hire_date,
-                     e.termination_date, d.name AS department_name
+    sql = f"""SELECT e.employee_id, e.employee_code, e.full_name, e.full_name_ar, e.email, e.department_id,
+                     e.hire_date, e.termination_date, d.name AS department_name, d.name_ar AS department_name_ar,
+                     (SELECT u.role FROM users u WHERE u.employee_id = e.employee_id) AS app_role
               FROM employees e JOIN departments d ON d.department_id = e.department_id WHERE {clause}"""
     if department_id:
         sql += " AND e.department_id = ?"
@@ -461,7 +469,8 @@ def replace_risk_scores(conn, target_period: str, model_version: str, rows: list
 def risk_frame(conn, user: UserContext, target_period: str) -> pd.DataFrame:
     clause, params = scope_clause(user, "e")
     return read_sql(
-        f"""SELECT r.*, e.employee_code, e.full_name, d.name AS department_name
+        f"""SELECT r.*, e.employee_code, e.full_name, e.full_name_ar, d.name AS department_name,
+                   d.name_ar AS department_name_ar
             FROM risk_scores r JOIN employees e ON e.employee_id = r.employee_id
             JOIN departments d ON d.department_id = e.department_id
             WHERE r.target_period = ? AND {clause} ORDER BY r.probability DESC""",
@@ -514,10 +523,11 @@ def monthly_score_summary(conn, user: UserContext, period_from: str, period_to: 
     return rows_to_dicts(conn.execute(sql + " GROUP BY p.period ORDER BY p.period", params))
 
 
-def save_holiday(conn, holiday_date: str, name: str) -> None:
-    conn.execute("""INSERT INTO holidays(holiday_date, name, is_illustrative) VALUES (?,?,0)
-                    ON CONFLICT (holiday_date) DO UPDATE SET name = excluded.name, is_illustrative = 0""",
-                 (holiday_date, name))
+def save_holiday(conn, holiday_date: str, name: str, name_ar: str | None = None) -> None:
+    conn.execute("""INSERT INTO holidays(holiday_date, name, name_ar, is_illustrative) VALUES (?,?,?,0)
+                    ON CONFLICT (holiday_date) DO UPDATE SET name = excluded.name, name_ar = excluded.name_ar,
+                    is_illustrative = 0""",
+                 (holiday_date, name, name_ar))
 
 
 def delete_holiday(conn, holiday_date: str) -> None:
@@ -526,7 +536,7 @@ def delete_holiday(conn, holiday_date: str) -> None:
 
 def list_leaves(conn, user: UserContext, limit: int = 200, employee_id: int | None = None) -> list[dict]:
     clause, params = scope_clause(user, "e")
-    sql = f"""SELECT l.*, e.employee_code, e.full_name, u.username AS approved_by
+    sql = f"""SELECT l.*, e.employee_code, e.full_name, e.full_name_ar, u.username AS approved_by
               FROM leave_requests l JOIN employees e ON e.employee_id = l.employee_id
               LEFT JOIN users u ON u.user_id = l.approved_by_user_id WHERE {clause}"""
     if employee_id:
@@ -562,7 +572,7 @@ def get_user(conn, user_id: int) -> dict | None:
 
 
 def evaluation_by_id(conn, evaluation_id: int) -> dict | None:
-    r = conn.execute("""SELECT p.*, e.employee_code, e.full_name, e.department_id, u.username AS evaluator
+    r = conn.execute("""SELECT p.*, e.employee_code, e.full_name, e.full_name_ar, e.department_id, u.username AS evaluator
                         FROM performance_evaluations p JOIN employees e ON e.employee_id = p.employee_id
                         JOIN users u ON u.user_id = p.evaluator_user_id WHERE p.evaluation_id = ?""",
                      (evaluation_id,)).fetchone()
@@ -603,7 +613,7 @@ def insert_leave_request(conn, employee_id: int, leave_type: str, start_date: st
 
 
 def get_leave(conn, leave_id: int) -> dict | None:
-    r = conn.execute("""SELECT l.*, e.employee_code, e.full_name, e.department_id FROM leave_requests l
+    r = conn.execute("""SELECT l.*, e.employee_code, e.full_name, e.full_name_ar, e.department_id FROM leave_requests l
                         JOIN employees e ON e.employee_id = l.employee_id WHERE l.leave_id = ?""", (leave_id,)).fetchone()
     return dict(r) if r else None
 
@@ -631,7 +641,7 @@ def insert_correction(conn, c: dict) -> int:
 
 
 def get_correction(conn, correction_id: int) -> dict | None:
-    r = conn.execute("""SELECT c.*, e.employee_code, e.full_name, e.badge_id, e.department_id
+    r = conn.execute("""SELECT c.*, e.employee_code, e.full_name, e.full_name_ar, e.badge_id, e.department_id
                         FROM attendance_corrections c JOIN employees e ON e.employee_id = c.employee_id
                         WHERE c.correction_id = ?""", (correction_id,)).fetchone()
     return dict(r) if r else None
@@ -680,7 +690,8 @@ def _approver_clause(user: UserContext, emp_alias: str = "e") -> tuple[str, list
 def list_leave_requests(conn, user: UserContext, *, statuses: tuple[str, ...] | None = None,
                         employee_id: int | None = None, for_approval: bool = False, limit: int = 200) -> list[dict]:
     clause, params = _approver_clause(user) if for_approval else scope_clause(user, "e")
-    sql = f"""SELECT l.*, e.employee_code, e.full_name, d.name AS department_name,
+    sql = f"""SELECT l.*, e.employee_code, e.full_name, e.full_name_ar, d.name AS department_name,
+                     d.name_ar AS department_name_ar,
                      u.username AS decided_by, r.username AS requested_by
               FROM leave_requests l JOIN employees e ON e.employee_id = l.employee_id
               JOIN departments d ON d.department_id = e.department_id
@@ -705,7 +716,8 @@ def list_corrections(conn, user: UserContext, *, statuses: tuple[str, ...] | Non
                      employee_id: int | None = None, for_approval: bool = False, limit: int = 200,
                      start: str | None = None, end: str | None = None) -> list[dict]:
     clause, params = _approver_clause(user) if for_approval else scope_clause(user, "e")
-    sql = f"""SELECT c.*, e.employee_code, e.full_name, d.name AS department_name, u.username AS decided_by,
+    sql = f"""SELECT c.*, e.employee_code, e.full_name, e.full_name_ar, d.name AS department_name,
+                     d.name_ar AS department_name_ar, u.username AS decided_by,
                      a.status AS day_status, a.first_punch, a.last_punch, a.punch_count
               FROM attendance_corrections c JOIN employees e ON e.employee_id = c.employee_id
               JOIN departments d ON d.department_id = e.department_id
@@ -748,13 +760,14 @@ def pending_counts(conn, user: UserContext) -> dict:
 
 def list_users(conn, q: str | None = None, role: str | None = None, limit: int = 500) -> list[dict]:
     sql = """SELECT u.user_id, u.username, u.role, u.employee_id, u.is_active, u.last_login_at, u.created_at,
-                    u.must_change_password, e.employee_code, e.full_name, e.termination_date, d.name AS department_name
+                    u.must_change_password, e.employee_code, e.full_name, e.full_name_ar, e.gender, e.termination_date,
+                    d.name AS department_name, d.name_ar AS department_name_ar
              FROM users u LEFT JOIN employees e ON e.employee_id = u.employee_id
              LEFT JOIN departments d ON d.department_id = e.department_id WHERE 1=1"""
     params: list = []
     if q:
-        sql += " AND (u.username LIKE ? OR e.full_name LIKE ? OR e.employee_code LIKE ?)"
-        params += [f"%{q}%"] * 3
+        sql += " AND (u.username LIKE ? OR e.full_name LIKE ? OR e.full_name_ar LIKE ? OR e.employee_code LIKE ?)"
+        params += [f"%{q}%"] * 4
     if role:
         sql += " AND u.role = ?"
         params.append(role)
@@ -776,7 +789,7 @@ def set_user_role(conn, user_id: int, role: str) -> None:
 
 def employees_without_account(conn, limit: int = 2000) -> list[dict]:
     return rows_to_dicts(conn.execute(
-        """SELECT e.employee_id, e.employee_code, e.full_name FROM employees e
+        """SELECT e.employee_id, e.employee_code, e.full_name, e.full_name_ar FROM employees e
            LEFT JOIN users u ON u.employee_id = e.employee_id
            WHERE u.user_id IS NULL AND e.termination_date IS NULL ORDER BY e.employee_code LIMIT ?""", (limit,)))
 
@@ -822,3 +835,19 @@ def load_file(conn, path: str) -> bytes | None:
 
 def stored_paths(conn, prefix: str) -> set[str]:
     return {r[0] for r in conn.execute("SELECT path FROM stored_files WHERE path LIKE ?", (prefix + "%",))}
+
+
+
+def user_profile(conn, user_id: int) -> dict | None:
+    """What the sidebar card shows: name (both languages), gender, job title, department."""
+    r = conn.execute("""SELECT u.username, u.role, e.employee_id, e.full_name, e.full_name_ar, e.gender, e.job_title,
+                               e.job_title_ar, d.name AS department_name, d.name_ar AS department_name_ar
+                        FROM users u LEFT JOIN employees e ON e.employee_id = u.employee_id
+                        LEFT JOIN departments d ON d.department_id = e.department_id
+                        WHERE u.user_id = ?""", (user_id,)).fetchone()
+    return dict(r) if r else None
+
+
+def user_role_of_employee(conn, employee_id: int) -> str | None:
+    r = conn.execute("SELECT role FROM users WHERE employee_id = ?", (employee_id,)).fetchone()
+    return r[0] if r else None

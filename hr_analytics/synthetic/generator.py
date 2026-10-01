@@ -35,6 +35,7 @@ SHIFTS = [
     ("EVE", "Evening shift", "14:00", "22:00", 10, 5, "SUN,MON,TUE,WED,THU"),
     ("NIGHT", "Night shift", "22:00", "06:00", 15, 5, "SUN,MON,TUE,WED,THU"),
 ]
+SHIFT_NAMES_AR = {"DAY": "الوردية الصباحية", "EVE": "الوردية المسائية", "NIGHT": "الوردية الليلية"}
 DEPARTMENTS = [
     # code, name, share of headcount, shift mix, device, job titles
     ("OPS", "Operations", 0.27, {"DAY": 0.5, "NIGHT": 0.5}, "D02-GATE", ["Operations Technician", "Shift Supervisor", "Logistics Coordinator"]),
@@ -44,20 +45,76 @@ DEPARTMENTS = [
     ("FIN", "Finance", 0.13, {"DAY": 1.0}, "D01-MAIN", ["Accountant", "Financial Analyst"]),
     ("HR", "Human Resources", 0.09, {"DAY": 1.0}, "D01-MAIN", ["HR Specialist", "Recruiter", "Payroll Officer"]),
 ]
-FIRST_NAMES = ["Abdullah", "Mohammed", "Fahad", "Khalid", "Sultan", "Faisal", "Turki", "Nasser", "Yousef", "Omar",
-               "Saad", "Majed", "Rakan", "Hamad", "Ziyad", "Nora", "Sara", "Reem", "Lama", "Haya", "Maha", "Dana",
-               "Abeer", "Hind", "Lina", "Rana", "Shahad", "Joud", "Ghada", "Asma"]
-FAMILY_NAMES = ["Al-Otaibi", "Al-Qahtani", "Al-Harbi", "Al-Shammari", "Al-Dosari", "Al-Mutairi", "Al-Zahrani",
-                "Al-Ghamdi", "Al-Anazi", "Al-Subaie", "Al-Shehri", "Al-Omari", "Al-Malki", "Al-Rashidi", "Al-Juhani",
-                "Al-Tamimi", "Al-Khaldi", "Al-Balawi", "Al-Hajri", "Al-Yami"]
+# The original name lists. The main random stream still draws from them (and throws
+# the result away) so that every other draw - attendance, leave, scores - stays exactly
+# as before. Display names come from the bilingual lists below, on their own stream.
+_LEGACY_FIRST = ["Abdullah", "Mohammed", "Fahad", "Khalid", "Sultan", "Faisal", "Turki", "Nasser", "Yousef", "Omar",
+                 "Saad", "Majed", "Rakan", "Hamad", "Ziyad", "Nora", "Sara", "Reem", "Lama", "Haya", "Maha", "Dana",
+                 "Abeer", "Hind", "Lina", "Rana", "Shahad", "Joud", "Ghada", "Asma"]
+_LEGACY_FAMILY = ["Al-Otaibi", "Al-Qahtani", "Al-Harbi", "Al-Shammari", "Al-Dosari", "Al-Mutairi", "Al-Zahrani",
+                  "Al-Ghamdi", "Al-Anazi", "Al-Subaie", "Al-Shehri", "Al-Omari", "Al-Malki", "Al-Rashidi", "Al-Juhani",
+                  "Al-Tamimi", "Al-Khaldi", "Al-Balawi", "Al-Hajri", "Al-Yami"]
+MALE_SHARE = 0.75
+MALE_NAMES = [("Abdullah", "عبدالله"), ("Mohammed", "محمد"), ("Fahad", "فهد"), ("Khalid", "خالد"),
+              ("Sultan", "سلطان"), ("Faisal", "فيصل"), ("Turki", "تركي"), ("Nasser", "ناصر"), ("Yousef", "يوسف"),
+              ("Saad", "سعد"), ("Majed", "ماجد"), ("Rakan", "راكان"), ("Hamad", "حمد"), ("Ziyad", "زياد"),
+              ("Abdulrahman", "عبدالرحمن"), ("Ibrahim", "إبراهيم"), ("Saleh", "صالح"), ("Bandar", "بندر"),
+              ("Nawaf", "نواف"), ("Mishal", "مشعل"), ("Ahmed", "أحمد"), ("Ali", "علي"), ("Mansour", "منصور"),
+              ("Waleed", "وليد"), ("Yazeed", "يزيد"), ("Badr", "بدر"), ("Talal", "طلال"), ("Osama", "أسامة"),
+              ("Hamza", "حمزة"), ("Meshari", "مشاري")]
+FEMALE_NAMES = [("Nora", "نورة"), ("Sara", "سارة"), ("Reem", "ريم"), ("Lama", "لمى"), ("Haya", "هيا"),
+                ("Maha", "مها"), ("Dana", "دانة"), ("Abeer", "عبير"), ("Hind", "هند"), ("Lina", "لينا"),
+                ("Shahad", "شهد"), ("Joud", "جود"), ("Ghada", "غادة"), ("Asma", "أسماء"), ("Amal", "أمل")]
+FAMILY_NAMES = [("Al-Otaibi", "العتيبي"), ("Al-Qahtani", "القحطاني"), ("Al-Harbi", "الحربي"),
+                ("Al-Shammari", "الشمري"), ("Al-Dosari", "الدوسري"), ("Al-Mutairi", "المطيري"),
+                ("Al-Zahrani", "الزهراني"), ("Al-Ghamdi", "الغامدي"), ("Al-Anazi", "العنزي"),
+                ("Al-Subaie", "السبيعي"), ("Al-Shehri", "الشهري"), ("Al-Omari", "العمري"), ("Al-Malki", "المالكي"),
+                ("Al-Rashidi", "الرشيدي"), ("Al-Juhani", "الجهني"), ("Al-Tamimi", "التميمي"),
+                ("Al-Khaldi", "الخالدي"), ("Al-Balawi", "البلوي"), ("Al-Hajri", "الهاجري"), ("Al-Yami", "اليامي"),
+                ("Al-Dhafiri", "الظفيري"), ("Al-Sahli", "السهلي")]
+DEPARTMENT_NAMES_AR = {"OPS": "العمليات", "CS": "خدمة العملاء", "SAL": "المبيعات", "IT": "تقنية المعلومات",
+                       "FIN": "المالية", "HR": "الموارد البشرية", "EXEC": "الإدارة التنفيذية"}
+# job title -> (Arabic for a man, Arabic for a woman)
+JOB_TITLES_AR = {
+    "Operations Technician": ("فني عمليات", "فنية عمليات"),
+    "Shift Supervisor": ("مشرف وردية", "مشرفة وردية"),
+    "Logistics Coordinator": ("منسق خدمات لوجستية", "منسقة خدمات لوجستية"),
+    "Customer Service Agent": ("موظف خدمة عملاء", "موظفة خدمة عملاء"),
+    "Service Team Lead": ("قائد فريق الخدمة", "قائدة فريق الخدمة"),
+    "Account Executive": ("مسؤول حسابات العملاء", "مسؤولة حسابات العملاء"),
+    "Sales Coordinator": ("منسق مبيعات", "منسقة مبيعات"),
+    "Systems Analyst": ("محلل نظم", "محللة نظم"),
+    "Support Engineer": ("مهندس دعم فني", "مهندسة دعم فني"),
+    "Data Analyst": ("محلل بيانات", "محللة بيانات"),
+    "Accountant": ("محاسب", "محاسبة"),
+    "Financial Analyst": ("محلل مالي", "محللة مالية"),
+    "HR Specialist": ("أخصائي موارد بشرية", "أخصائية موارد بشرية"),
+    "Recruiter": ("أخصائي توظيف", "أخصائية توظيف"),
+    "Payroll Officer": ("مسؤول رواتب", "مسؤولة رواتب"),
+    "Operations Manager": ("مدير العمليات", "مديرة العمليات"),
+    "Customer Service Manager": ("مدير خدمة العملاء", "مديرة خدمة العملاء"),
+    "Sales Manager": ("مدير المبيعات", "مديرة المبيعات"),
+    "Information Technology Manager": ("مدير تقنية المعلومات", "مديرة تقنية المعلومات"),
+    "Finance Manager": ("المدير المالي", "المديرة المالية"),
+    "Human Resources Manager": ("مدير الموارد البشرية", "مديرة الموارد البشرية"),
+    "General Manager": ("المدير العام", "المديرة العامة"),
+}
+# Fixed people of the demo organisation
+HR_HEAD_NAME = ("Omar Alnasser", "عمر الناصر", "M")
+GM_NAME = ("Abdulaziz Al-Mutlaq", "عبدالعزيز المطلق", "M")
+GM_CODE = "E0000"
+_FITR, _ADHA = ("Eid al-Fitr (approximate date)", "عيد الفطر (تاريخ تقريبي)"), ("Eid al-Adha (approximate date)", "عيد الأضحى (تاريخ تقريبي)")
 HOLIDAYS = [
-    # date, name, illustrative flag (1 = approximate Hijri-based date, verify officially)
-    ("2025-09-23", "National Day", 0),
-    ("2026-02-22", "Founding Day", 0),
-    ("2026-03-19", "Eid al-Fitr (illustrative)", 1), ("2026-03-20", "Eid al-Fitr (illustrative)", 1),
-    ("2026-03-21", "Eid al-Fitr (illustrative)", 1), ("2026-03-22", "Eid al-Fitr (illustrative)", 1),
-    ("2026-05-26", "Eid al-Adha (illustrative)", 1), ("2026-05-27", "Eid al-Adha (illustrative)", 1),
-    ("2026-05-28", "Eid al-Adha (illustrative)", 1), ("2026-05-29", "Eid al-Adha (illustrative)", 1),
+    # date, (English, Arabic), approximate flag (1 = Hijri-based date, confirm with the official announcement)
+    ("2025-09-23", ("National Day", "اليوم الوطني"), 0),
+    ("2026-02-22", ("Founding Day", "يوم التأسيس"), 0),
+    ("2026-03-19", _FITR, 1), ("2026-03-20", _FITR, 1), ("2026-03-21", _FITR, 1), ("2026-03-22", _FITR, 1),
+    ("2026-05-26", _ADHA, 1), ("2026-05-27", _ADHA, 1), ("2026-05-28", _ADHA, 1), ("2026-05-29", _ADHA, 1),
+    ("2026-09-23", ("National Day", "اليوم الوطني"), 0),
+    ("2027-02-22", ("Founding Day", "يوم التأسيس"), 0),
+    ("2027-03-09", _FITR, 1), ("2027-03-10", _FITR, 1), ("2027-03-11", _FITR, 1), ("2027-03-12", _FITR, 1),
+    ("2027-05-16", _ADHA, 1), ("2027-05-17", _ADHA, 1), ("2027-05-18", _ADHA, 1), ("2027-05-19", _ADHA, 1),
+    ("2027-09-23", ("National Day", "اليوم الوطني"), 0),
 ]
 WEEKDAY_CODES = ("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN")
 EVALUABLE_MIN_DAYS = 10
@@ -92,6 +149,20 @@ def _shift_times(code: str):
 def generate(out_dir: str | Path, *, seed: int = 42, start: str = "2025-09-01", months: int = 12,
              n_employees: int = 110, n_new_hires: int = 10) -> GeneratedSummary:
     rng = np.random.default_rng(seed)
+    name_rng = np.random.default_rng(seed + 7919)     # names only: never touches the main stream
+    used_names: set[str] = set()
+
+    def person() -> dict:
+        rng.choice(_LEGACY_FIRST), rng.choice(_LEGACY_FAMILY)   # keep the main stream's draws unchanged
+        while True:
+            gender = "M" if name_rng.random() < MALE_SHARE else "F"
+            first = (MALE_NAMES if gender == "M" else FEMALE_NAMES)[int(name_rng.integers(0, len(MALE_NAMES if gender == "M" else FEMALE_NAMES)))]
+            family = FAMILY_NAMES[int(name_rng.integers(0, len(FAMILY_NAMES)))]
+            full = f"{first[0]} {family[0]}"
+            if full not in used_names:
+                used_names.add(full)
+                return {"full_name": full, "full_name_ar": f"{first[1]} {family[1]}", "gender": gender}
+
     out = Path(out_dir)
     (out / "master").mkdir(parents=True, exist_ok=True)
     (out / "punches").mkdir(parents=True, exist_ok=True)
@@ -99,7 +170,7 @@ def generate(out_dir: str | Path, *, seed: int = 42, start: str = "2025-09-01", 
     period_start = date.fromisoformat(start)
     month_ranges = _months(period_start, months)
     period_end = month_ranges[-1][1]
-    holidays = {d: n for d, n, _ in HOLIDAYS if period_start.isoformat() <= d <= period_end.isoformat()}
+    holidays = {d: n[0] for d, n, _ in HOLIDAYS if period_start.isoformat() <= d <= period_end.isoformat()}
 
     # ------------------------------------------------------------ employees
     sizes = [max(2, int(round(d[2] * n_employees))) for d in DEPARTMENTS]
@@ -113,8 +184,7 @@ def generate(out_dir: str | Path, *, seed: int = 42, start: str = "2025-09-01", 
             shift = "DAY" if is_manager else rng.choice(list(mix), p=list(mix.values()))
             hire = date(2014, 1, 1) + timedelta(days=int(rng.integers(0, (period_start - date(2014, 1, 1)).days - 30)))
             employees.append({
-                "employee_code": f"E{code_no:04d}", "badge_id": f"B{10000 + code_no}",
-                "full_name": f"{rng.choice(FIRST_NAMES)} {rng.choice(FAMILY_NAMES)}",
+                "employee_code": f"E{code_no:04d}", "badge_id": f"B{10000 + code_no}", **person(),
                 "email": f"e{code_no:04d}@example.com",
                 "job_title": f"{dname} Manager" if is_manager else str(rng.choice(titles)),
                 "department_code": dcode, "is_manager": is_manager, "hire_date": hire.isoformat(),
@@ -128,8 +198,7 @@ def generate(out_dir: str | Path, *, seed: int = 42, start: str = "2025-09-01", 
         hire = month_ranges[min(len(month_ranges) - 1, int(rng.integers(1, max(2, months - 2))))][0] + \
             timedelta(days=int(rng.integers(0, 20)))
         employees.append({
-            "employee_code": f"E{code_no:04d}", "badge_id": f"B{10000 + code_no}",
-            "full_name": f"{rng.choice(FIRST_NAMES)} {rng.choice(FAMILY_NAMES)}",
+            "employee_code": f"E{code_no:04d}", "badge_id": f"B{10000 + code_no}", **person(),
             "email": f"e{code_no:04d}@example.com", "job_title": str(rng.choice(dept[5])),
             "department_code": dept[0], "is_manager": False, "hire_date": hire.isoformat(),
             "termination_date": None, "shift": str(shift), "device": dept[4],
@@ -142,9 +211,11 @@ def generate(out_dir: str | Path, *, seed: int = 42, start: str = "2025-09-01", 
             timedelta(days=int(rng.integers(0, 25)))
         employees[int(i)]["termination_date"] = min(term, period_end).isoformat()
 
+    hr_head_e = next(e for e in employees if e["department_code"] == "HR" and e["is_manager"])
+    hr_head_e.update(full_name=HR_HEAD_NAME[0], full_name_ar=HR_HEAD_NAME[1], gender=HR_HEAD_NAME[2])
     managers = {e["department_code"]: e["employee_code"] for e in employees if e["is_manager"]}
     for e in employees:
-        e["manager_code"] = None if e["is_manager"] else managers[e["department_code"]]
+        e["manager_code"] = GM_CODE if e["is_manager"] else managers[e["department_code"]]
         assignments.append({"employee_code": e["employee_code"], "shift_code": e["shift"],
                             "effective_from": e["hire_date"], "effective_to": None})
     # shift changes mid-period for a few operations staff
@@ -311,25 +382,8 @@ def generate(out_dir: str | Path, *, seed: int = 42, start: str = "2025-09-01", 
             {"badge_id": employees[3]["badge_id"], "punch_time": "2099-01-01 08:00:00", "device_id": "D01-MAIN", "punch_type": "IN"},
         ]
 
-    files, total_rows = [], 0
-    for mi, (m_first, _m_last) in enumerate(month_ranges):
-        df = pd.DataFrame(rows_by_month[mi])
-        df = df.sample(frac=1.0, random_state=seed + mi).reset_index(drop=True)  # devices do not export in order
-        total_rows += len(df)
-        if mi == months - 1:
-            # the last month arrives as Excel with different header spellings
-            df = df.rename(columns={"badge_id": "Badge No", "punch_time": "Date Time",
-                                    "device_id": "Terminal", "punch_type": "State"})
-            p = out / "punches" / f"device_export_{m_first:%Y-%m}.xlsx"
-            df.to_excel(p, index=False)
-        else:
-            p = out / "punches" / f"device_export_{m_first:%Y-%m}.csv"
-            df.to_csv(p, index=False)
-        files.append(str(p))
-
     # ---------------------------------------------------------- evaluations
     evals = []
-    hr_head = next(e for e in employees if e["department_code"] == "HR" and e["is_manager"])["employee_code"]
     hr_second = hr_staff[1]["employee_code"]
     for mi, (m_first, _m_last) in enumerate(month_ranges):
         for e in employees:
@@ -346,10 +400,8 @@ def generate(out_dir: str | Path, *, seed: int = 42, start: str = "2025-09-01", 
 
             p = score(5.0 - 6 * late_rate - 10 * abs_rate, 0.45)
             c, t, w = score(3.4 + 0.55 * q), score(3.4 + 0.65 * q), score(3.5 + 0.45 * q)
-            if code == hr_head:
-                evaluator = hr_second
-            elif e["is_manager"] or e["department_code"] == "HR" and code == hr_second:
-                evaluator = hr_head
+            if e["is_manager"] or code == hr_second:
+                evaluator = GM_CODE          # HR accounts and department managers report to the General Manager
             else:
                 evaluator = e["manager_code"]
             avg = (p + c + t + w) / 4
@@ -358,19 +410,67 @@ def generate(out_dir: str | Path, *, seed: int = 42, start: str = "2025-09-01", 
                        "Below expectations this month; follow-up conversation recommended.")
             evals.append({"employee_code": code, "period": f"{m_first:%Y-%m}", "evaluator_username": evaluator.lower(),
                           "punctuality": p, "communication": c, "task_completion": t, "teamwork": w,
-                          "comments": f"[SYNTHETIC] {comment}"})
+                          "comments": comment})
+
+    # ------------------------------------------------------ general manager
+    # Added last, on a separate random stream, so nobody else's data changes.
+    gm_rng = np.random.default_rng(seed + 104729)
+    gm = {"employee_code": GM_CODE, "badge_id": "B10000", "full_name": GM_NAME[0], "full_name_ar": GM_NAME[1],
+          "gender": GM_NAME[2], "email": "e0000@example.com", "job_title": "General Manager",
+          "department_code": "EXEC", "is_manager": True, "manager_code": None, "hire_date": "2015-01-04",
+          "termination_date": None, "shift": "DAY", "device": "D01-MAIN"}
+    assignments.append({"employee_code": GM_CODE, "shift_code": "DAY", "effective_from": gm["hire_date"],
+                        "effective_to": None})
+    users.append({"username": GM_CODE.lower(), "role": "gm", "employee_code": GM_CODE})
+    st, en, _g, workdays = _shift_times("DAY")
+    for mi, (m_first, m_last) in enumerate(month_ranges):
+        d = m_first
+        while d <= m_last:
+            if d.weekday() in workdays and d.isoformat() not in holidays and gm_rng.random() > 0.015:
+                arrive = datetime.combine(d, st) + timedelta(minutes=float(np.clip(gm_rng.normal(-12, 6), -40, 14)),
+                                                             seconds=int(gm_rng.integers(0, 60)))
+                leave_at = datetime.combine(d, en) + timedelta(minutes=float(np.clip(gm_rng.normal(40, 20), 0, 120)))
+                for ts, kind in ((arrive, "IN"), (leave_at, "OUT")):
+                    rows_by_month[mi].append({"badge_id": gm["badge_id"], "punch_time": ts.strftime("%Y-%m-%d %H:%M:%S"),
+                                              "device_id": "D01-MAIN", "punch_type": kind})
+            d += timedelta(days=1)
+    employees.append(gm)
+    for e in employees:
+        title = JOB_TITLES_AR.get(e["job_title"])
+        e["job_title_ar"] = (title[0] if e["gender"] == "M" else title[1]) if title else None
 
     # ---------------------------------------------------------------- write
-    pd.DataFrame([{k: v for k, v in zip(("code", "name", "start_time", "end_time", "grace_minutes",
-                                          "early_leave_grace_minutes", "workdays"), s)} for s in SHIFTS]
+    files, total_rows = [], 0
+    for mi, (m_first, _m_last) in enumerate(month_ranges):
+        df = pd.DataFrame(rows_by_month[mi])
+        df = df.sample(frac=1.0, random_state=seed + mi).reset_index(drop=True)  # devices do not export in order
+        total_rows += len(df)
+        if mi == months - 1:
+            # the last month arrives as Excel with different header spellings
+            df = df.rename(columns={"badge_id": "Badge No", "punch_time": "Date Time",
+                                    "device_id": "Terminal", "punch_type": "State"})
+            p = out / "punches" / f"device_export_{m_first:%Y-%m}.xlsx"
+            df.to_excel(p, index=False)
+        else:
+            p = out / "punches" / f"device_export_{m_first:%Y-%m}.csv"
+            df.to_csv(p, index=False)
+        files.append(str(p))
+
+    pd.DataFrame([{**{k: v for k, v in zip(("code", "name", "start_time", "end_time", "grace_minutes",
+                                            "early_leave_grace_minutes", "workdays"), s)},
+                   "name_ar": SHIFT_NAMES_AR[s[0]]} for s in SHIFTS]
                  ).to_csv(out / "master" / "shifts.csv", index=False)
-    pd.DataFrame([{"code": d[0], "name": d[1], "manager_employee_code": managers[d[0]]} for d in DEPARTMENTS]
+    pd.DataFrame([{"code": d[0], "name": d[1], "name_ar": DEPARTMENT_NAMES_AR[d[0]],
+                   "manager_employee_code": managers[d[0]]} for d in DEPARTMENTS]
+                 + [{"code": "EXEC", "name": "Executive Management", "name_ar": DEPARTMENT_NAMES_AR["EXEC"],
+                     "manager_employee_code": GM_CODE}]
                  ).to_csv(out / "master" / "departments.csv", index=False)
-    pd.DataFrame([{k: e[k] for k in ("employee_code", "badge_id", "full_name", "email", "job_title",
-                                     "department_code", "manager_code", "hire_date", "termination_date")}
+    pd.DataFrame([{k: e[k] for k in ("employee_code", "badge_id", "full_name", "full_name_ar", "gender", "email",
+                                     "job_title", "job_title_ar", "department_code", "manager_code", "hire_date",
+                                     "termination_date")}
                   for e in employees]).to_csv(out / "master" / "employees.csv", index=False)
     pd.DataFrame(assignments).to_csv(out / "master" / "shift_assignments.csv", index=False)
-    pd.DataFrame([{"holiday_date": d, "name": n, "is_illustrative": f} for d, n, f in HOLIDAYS
+    pd.DataFrame([{"holiday_date": d, "name": n[0], "name_ar": n[1], "is_illustrative": f} for d, n, f in HOLIDAYS
                   if d in holidays]).to_csv(out / "master" / "holidays.csv", index=False)
     pd.DataFrame(leaves).to_csv(out / "master" / "leave_requests.csv", index=False)
     pd.DataFrame(users).to_csv(out / "master" / "users.csv", index=False)
